@@ -1,0 +1,14 @@
+first : 
+- server model 	: recup donnŽes IN + TI -> DB + reconnection = IN uid
+- client mobile : build UI + workflow
+- server algo   : find people around my trips
+
+then : 
+- client mobile : messageBox
+- server model  : messageBox
+
+finally : 
+- server : update existing trips with TI pulls
+- mobile : manual creation + import to TI ?
+
+  
