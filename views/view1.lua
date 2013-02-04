@@ -7,6 +7,7 @@
 
 local storyboard = require( "storyboard" )
 local scene = storyboard.newScene()
+local tripit = require("libs.social.Tripit")
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -37,10 +38,36 @@ function scene:createScene( event )
 	summary.x = display.contentWidth * 0.5 + 10
 	summary.y = title.y + 215
 	
-	-- all objects must be added to group (e.g. self.view)
+	
+	-- 
+	---- Add demo button to screen
+	tripit.init();
+	local authorise = function() return tripit.authorise(tripitAuthenticated) end;
+	button1 = ui.newButton{default="images/buttons/buttonArrow.png", over="images/buttons/buttonArrowOver.png", onRelease=authorise, x = 160, y = 360}
+	-- 
+	---- Add label for button
+--	b1text = display.newText( "Click To Load", 0, 0, nil, 15 )
+--	b1text:setTextColor( 45, 45, 45, 255 ); b1text.x = 160; b1text.y = 360
+	-- 
+	---- Displays App title
+--	title = display.newText( "Simple Image Download", 0, 30, native.systemFontBold, 20 )
+--	title.x = display.contentWidth/2                -- center title
+--	title:setTextColor( 255,255,0 )
+
+	--- all objects must be added to group (e.g. self.view)
 	group:insert( bg )
-	group:insert( title )
 	group:insert( summary )
+	group:insert( button1 )
+end
+
+
+function tripitAuthenticated()
+	print ( "tripitAuthenticated" )
+	
+	for i in pairs(tripit.data.trips) do
+		print("trip : " .. tripit.data.trips[i].display_name.value)
+	end
+	
 end
 
 -- Called immediately after scene has moved onscreen:

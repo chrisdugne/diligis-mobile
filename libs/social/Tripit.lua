@@ -1,11 +1,11 @@
 -----------------------------------------------------------------------------------------
--- Project: LinkedIn for Corona
+-- Project: Tripit for Corona
 --
--- Date: January 28, 2013
+-- Date: February 02, 2013
 --
 -- Version: 1.0
 --
--- File name: LinkedIn.lua
+-- File name: Tripit.lua
 --
 -- Author: Chris Dugne of Uralys - www.uralys.com
 --
@@ -19,6 +19,7 @@ data = {}
 
 ----------------------------------------------------------------------------------------------------
 
+local xml = require( "libs.Xml" )
 local json = require( "json" )
 local utils = require("libs.Utils")
 local oAuth = require( "libs.oauth.oAuth" )
@@ -35,8 +36,8 @@ local callBackAuthorisationDone;
 -- @param consumerSecret The consumer secret of your app.
 function init()
 
-	data.consumerKey = "nkdrs359t7ta";
-	data.consumerSecret = "cixqyissLNH8fQ44"
+	data.consumerKey = "02230a62bdc05aa23da53c683b78427a644b7459";
+	data.consumerSecret = "03e8b2b77d80fdaca283d33c15805d97bcc82efd"
 
 	data.requestToken = nil
 	data.requestTokenSecret = nil
@@ -61,13 +62,8 @@ end
 
 function getRequestToken()
 
-	local requestTokenUrl = "https://api.linkedin.com/uas/oauth/requestToken"
-
-	local customParams = 
-	{
-		oauth_callback = "backtodiligis",
-		scope = "r_fullprofile r_emailaddress r_network rw_nus"
-	}
+	local requestTokenUrl = "https://api.tripit.com/oauth/request_token"
+	local customParams = {}
 
 	oAuth.networkRequest(requestTokenUrl, customParams, data.consumerKey, nil, data.consumerSecret, nil, "POST", requestTokenListener)
 
@@ -75,15 +71,14 @@ end
 
 --- requestToken reception
 function requestTokenListener( event )
-
-	print("linkedin requestTokenListener")
+	print("tripit requestTokenListener")
 	if ( not event.isError ) then
 
 		data.requestToken = event.response:match('oauth_token=([^&]+)')
 		data.requestTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
 		-- need to add a dummy callBack to go to authListener (else go to the linkedIn OOB page)
-		local authenticateUrl = "https://www.linkedin.com/uas/oauth/authenticate?oauth_token=" .. data.requestToken
+		local authenticateUrl = "https://m.tripit.com/oauth/authorize?oauth_token=" .. data.requestToken .."&oauth_callback=backtodiligis"
 
 		-- webView = native.newWebView( display.screenOriginX, display.screenOriginY, fullX, fullY )
 		webView = native.newWebView( 0, 0, 320, 480 )
@@ -101,12 +96,10 @@ end
 function webviewListener( event )
 
 	if event.url then
-		if string.find(string.lower(event.url), "backtodiligis") then
+		if string.find(string.lower(event.url), "https://m.tripit.com/oauth/backtodiligis") then
 
-			local params = utils.getUrlParams(event.url);
-			
-			getAccessToken(params["oauth_verifier"])
-			
+			getAccessToken()
+		
 			webView:removeSelf()
 			webView = nil;
 		end
@@ -121,14 +114,11 @@ end
 -----------------------------------------------------
 
 --- 3 - Request the accessToken
-function getAccessToken(oauthVerifier)
+function getAccessToken()
 
-	local accessTokenUrl = "https://api.linkedin.com/uas/oauth/accessToken"
-
-	local customParams = 
-	{
-        oauth_verifier = oauthVerifier
-	}
+	print("tripit getAccessToken")
+	local accessTokenUrl = "https://api.tripit.com/oauth/access_token"
+	local customParams = {} 
 
 	oAuth.networkRequest(accessTokenUrl, customParams, data.consumerKey, data.requestToken, data.consumerSecret, data.requestTokenSecret, "POST", accessTokenListener)
         
@@ -138,12 +128,14 @@ end
 --- accessToken reception
 function accessTokenListener( event )
 
+	print("tripit accessTokenListener")
+	
 	if ( not event.isError ) then
 
 		data.accessToken = event.response:match('oauth_token=([^&]+)')
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
-		getProfile();
+		getTrips();
 		
 	end
 	
@@ -155,43 +147,25 @@ end
 -----------------------------------------------------------------------------------------
 
 --- profile request
-function getProfile()
+function getTrips()
 
-	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url)";
-  
-	local customParams = 
-	{
-        format = "json"
-	}
+	local profileUrl = "https://api.tripit.com/v1/list/trip";
+	local customParams = {} 
 
-	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", profileListener)
+	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", tripsListener)
         
 end
 
 --- profile reception
-function profileListener( event )
+function tripsListener( event )
 
 	if ( not event.isError ) then
-		data.profile = json.decode(event.response);
-		print ( "pictureUrl : " .. data.profile.pictureUrl )
+	
+		local response = xml.parseXML(event.response).Response
+		data.trips = response.Trip
+		
 	end
 	
 	callBackAuthorisationDone();
 	
 end
-
------------------------------------------------------------------------------------------
---- Deauthorises the user.
------------------------------------------------------------------------------------------
-
-function deauthorise()
-
-	data.accessToken = nil
-	data.accessTokenSecret = nil
-	data.profile = nil
-
-	-- os.remove( system.pathForFile( "data.dat", system.DocumentsDirectory ) )
-
-end
-
---
