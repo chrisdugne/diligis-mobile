@@ -19,8 +19,6 @@ data = {}
 
 ----------------------------------------------------------------------------------------------------
 
-local json = require( "json" )
-local utils = require("libs.Utils")
 local oAuth = require( "libs.oauth.oAuth" )
 
 ----------------------------------------------------------------------------------------------------
@@ -76,7 +74,6 @@ end
 --- requestToken reception
 function requestTokenListener( event )
 
-	print("linkedin requestTokenListener")
 	if ( not event.isError ) then
 
 		data.requestToken = event.response:match('oauth_token=([^&]+)')
@@ -157,7 +154,7 @@ end
 --- profile request
 function getProfile()
 
-	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url)";
+	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,headline,industry,email-address)";
   
 	local customParams = 
 	{
