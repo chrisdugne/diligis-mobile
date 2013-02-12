@@ -1,11 +1,10 @@
 -----------------------------------------------------------------------------------------
 --
--- view1.lua
+-- tophome.lua
 --
 
 -----------------------------------------------------------------------------------------
 
-local storyboard = require( "storyboard" )
 local scene = storyboard.newScene()
 local tripit = require("libs.social.Tripit")
 
@@ -21,54 +20,53 @@ local tripit = require("libs.social.Tripit")
 function scene:createScene( event )
 	local group = self.view
 	
-	-- create a white background to fill screen
+	--- bg
 	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
-	bg:setFillColor( 0 )
+	bg:setFillColor( 255 )
 	
-	-- create some text
-	local title = display.newRetinaText( "Diligis", 0, 0, native.systemFont, 32 )
-	title:setTextColor( 255 )	
-	title:setReferencePoint( display.CenterReferencePoint )
-	title.x = display.contentWidth * 0.5
-	title.y = 125
+	--- logo
+	local logo = display.newImage( "images/logos/d_logo.png" )
+	logo.x = display.contentWidth/2
+	logo.y = display.contentHeight/4
 	
-	local summary = display.newRetinaText( "Loaded by the first tab 'onPress' listener\n— specified in the 'tabButtons' table.", 0, 0, 292, 292, native.systemFont, 14 )
-	summary:setTextColor( 255 ) 
-	summary:setReferencePoint( display.CenterReferencePoint )
-	summary.x = display.contentWidth * 0.5 + 10
-	summary.y = title.y + 215
+	--- sign in text
+	local signin = display.newRetinaText( "sign in", 0, 0, native.systemFont, 21 )
+	signin:setTextColor( 0 )	
+	signin:setReferencePoint( display.CenterReferencePoint )
+	signin.x = display.contentWidth * 0.5
+	signin.y = 3*display.contentHeight/4 - 45
+		
+	--- in button
+	local signinAction = function() return linkedInConnect() end;
+	local openHomeAction = function() return router.openHome() end;
+	local signinButton = ui.newButton{
+		default="images/buttons/linkedin.medium.png", 
+		over="images/buttons/linkedin.medium.png", 
+	--	onRelease=signinAction, 
+		onRelease=openHomeAction, 
+		x = display.contentWidth/2, y = 3*display.contentHeight/4+20,
+	}
 	
-	
-	-- 
-	---- Add demo button to screen
-	tripit.init();
-	local authorise = function() return tripit.authorise(tripitAuthenticated) end;
-	button1 = ui.newButton{default="images/buttons/buttonArrow.png", over="images/buttons/buttonArrowOver.png", onRelease=authorise, x = 160, y = 360}
-	-- 
-	---- Add label for button
---	b1text = display.newText( "Click To Load", 0, 0, nil, 15 )
---	b1text:setTextColor( 45, 45, 45, 255 ); b1text.x = 160; b1text.y = 360
-	-- 
-	---- Displays App title
---	title = display.newText( "Simple Image Download", 0, 30, native.systemFontBold, 20 )
---	title.x = display.contentWidth/2                -- center title
---	title:setTextColor( 255,255,0 )
-
 	--- all objects must be added to group (e.g. self.view)
 	group:insert( bg )
-	group:insert( summary )
-	group:insert( button1 )
+	group:insert( logo )
+	group:insert( signin )
+	group:insert( signinButton )
 end
 
+------------------------------------------
 
-function tripitAuthenticated()
-	print ( "tripitAuthenticated" )
-	
-	for i in pairs(tripit.data.trips) do
-		print("trip : " .. tripit.data.trips[i].display_name.value)
-	end
-	
+local function linkedInConnect()
+	linkedIn.init();
+	linkedIn.authorise(linkedInConnected);
 end
+
+function linkedInConnected()
+	imageLoader.loadImage(linkedIn.data.profile.pictureUrl, "profile.png", 30, 30);
+	accountManager.getAccount(linkedIn);
+end
+
+------------------------------------------
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )

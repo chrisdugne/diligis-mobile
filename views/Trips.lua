@@ -1,11 +1,12 @@
 -----------------------------------------------------------------------------------------
 --
--- view2.lua
+-- trips.lua
 --
+
 -----------------------------------------------------------------------------------------
 
-local storyboard = require( "storyboard" )
 local scene = storyboard.newScene()
+local tripit = require("libs.social.Tripit")
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -19,35 +20,33 @@ local scene = storyboard.newScene()
 function scene:createScene( event )
 	local group = self.view
 	
-	-- create a white background to fill screen
-	local bg = display.newRect( 0, 0, display.contentWidth, display.contentHeight )
-	bg:setFillColor( 255 )	-- white
+	--- reset + header
+	viewTools.drawHeader(group);
 	
-	-- create some text
-	local title = display.newRetinaText( "Diligis", 0, 0, native.systemFont, 32 )
-	title:setTextColor( 0 )	-- black
-	title:setReferencePoint( display.CenterReferencePoint )
-	title.x = display.contentWidth * 0.5
-	title.y = 125
+	---- Add demo button to screen
+	tripit.init();
+	local importFromTripit = function() return tripit.authorise(tripitAuthenticated) end;
+	tripitButton = ui.newButton{default="images/buttons/tripit.png", over="images/buttons/tripit.png", onRelease=importFromTripit, x = 160, y = 360}
+
+	--- all objects must be added to group (e.g. self.view)
+	group:insert( tripitButton )
+end
+
+
+function tripitAuthenticated()
+	print ( "tripitAuthenticated" )
 	
-	local summary = display.newRetinaText( "Loaded by the first tab 'onPress' listener\n— specified in the 'tabButtons' table.", 0, 0, 292, 292, native.systemFont, 14 )
-	summary:setTextColor( 0 ) -- black
-	summary:setReferencePoint( display.CenterReferencePoint )
-	summary.x = display.contentWidth * 0.5 + 10
-	summary.y = title.y + 215
+	for i in pairs(tripit.data.trips) do
+		print("trip : " .. tripit.data.trips[i].display_name.value)
+	end
 	
-	-- all objects must be added to group (e.g. self.view)
-	group:insert( bg )
-	group:insert( title )
-	group:insert( summary )
 end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	local group = self.view
 	
-	-- do nothing
-	
+	-- Do nothing
 end
 
 -- Called when scene is about to move offscreen:
