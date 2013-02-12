@@ -31,9 +31,29 @@ function scene:createScene( event )
 		onRelease=openTripsAction, 
 		x = display.contentWidth * (27/100), y = display.contentHeight * (24/100),
 	}
+
+	--- find button
+	local openFinderAction = function() return router.openFinder() end;
+	local findButton = ui.newButton{
+		default="images/buttons/find.medium.png", 
+		over="images/buttons/find.medium.png", 
+		onRelease=openFinderAction, 
+		x = display.contentWidth * (73/100), y = display.contentHeight * (24/100),
+	}
+
+	--- messages button
+	local openMessagesAction = function() return router.openMessages() end;
+	local messagesButton = ui.newButton{
+		default="images/buttons/messages.medium.png", 
+		over="images/buttons/messages.medium.png", 
+		onRelease=openMessagesAction, 
+		x = display.contentWidth * (27/100), y = display.contentHeight * (48/100),
+	}
 	
 	--- all objects must be added to group (e.g. self.view)
 	group:insert( tripsButton )
+	group:insert( findButton )
+	group:insert( messagesButton )
 end
 
 -----------------------------------------------------------------------------------------

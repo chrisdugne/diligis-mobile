@@ -9,17 +9,17 @@ module(..., package.seeall)
 -----------------------------------------------------------------------------------------
 
 function openTopHome()
-	storyboard.gotoScene( "views.tophome" )
+	storyboard.gotoScene( "views.TopHome" )
 end
 
 ---------------------------------------------
 
 function openHome()
-	storyboard.gotoScene( "views.home" )
+	storyboard.gotoScene( "views.Home" )
 end
 
 ---------------------------------------------
 
 function openTrips()
-	storyboard.gotoScene( "views.trips" )
+	storyboard.gotoScene( "views.Trips" )
 end
