@@ -3,6 +3,10 @@
 module(..., package.seeall)
 
 -----------------------------------------------------------------------------------------
+
+user = {}
+
+-----------------------------------------------------------------------------------------
 --
 --
 function getAccount()
@@ -11,13 +15,7 @@ function getAccount()
 
 	local postData = 
 	{
-		user = {
-			linkedinId = linkedIn.data.profile.id,
-			email = linkedIn.data.profile.emailAddress,
-			name = linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
-			headline = linkedIn.data.profile.headline,
-			industry = linkedIn.data.profile.industry
-		}
+		user = accountManager.user;
 	}
 
 	local headers = {}
@@ -31,9 +29,34 @@ function getAccount()
 end
 
 function getAccountListener( event )
-	print(event.response);
+	accountManager.user = json.decode(event.response);
+	router.openHome();
 end
 
+-----------------------------------------------------------------------------------------
+--
+--
+function refreshTrips()
+	
+	local serverUrl = SERVER_URL .. "/refreshTrips"
 
+	local postData = 
+	{
+		user = accountManager.user;
+	}
+
+	local headers = {}
+	headers["Content-Type"] = "application/json"
+
+	local params = {}
+	params.headers = headers
+	params.body = json.encode(postData)
+
+	network.request(serverUrl, "POST", refreshTripsListener, params)
+end
+
+function refreshTripsListener( event )
+	router.openTrips()
+end
 
 

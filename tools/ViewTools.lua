@@ -11,7 +11,7 @@ function drawHeader(group)
 	bg:setFillColor( 255 )
 	
 	--- header background
-	local bgheader = display.newRect( 0, 0, display.contentWidth, 50 )
+	local bgheader = display.newRect( 0, 0, display.contentWidth, (display.contentHeight)*(15/100) )
 	bgheader:setFillColor( 23,55,94 )
 
 	---- pour les dimensions de lecran....adapter a chaque device.... : http://developer.coronalabs.com/reference/index/systemgetinfo
@@ -21,13 +21,13 @@ function drawHeader(group)
 		default="images/buttons/home.png", 
 		over="images/buttons/home.png", 
 		onRelease=backToAction, 
-		x = 20, y = 27
+		x = (display.contentWidth)*(15/100), y = (display.contentHeight)*(10/100)
 	}
 	
 	--- top logo
 	local logo = display.newImage( "images/logos/top.logo.png" )
 	logo.x = display.contentWidth/2
-	logo.y = 30
+	logo.y = (display.contentHeight)*(10/100)
 	
 	--- insert all
 	group:insert( bg )

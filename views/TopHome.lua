@@ -38,7 +38,8 @@ function scene:createScene( event )
 		
 	--- in button
 	local signinAction = function() return linkedInConnect() end;
-	local openHomeAction = function() return router.openHome() end;
+--	local openHomeAction = function() return router.openHome() end;
+	local openHomeAction = function() return dummyLinkedIn() end;
 	local signinButton = ui.newButton{
 		default="images/buttons/linkedin.medium.png", 
 		over="images/buttons/linkedin.medium.png", 
@@ -61,9 +62,29 @@ local function linkedInConnect()
 	linkedIn.authorise(linkedInConnected);
 end
 
+function dummyLinkedIn()
+	accountManager.user =	{
+		linkedinId = "polo1234567",
+		email = "polo@diligis.com",
+		name = "Polo Kluk",
+		headline = "Master",
+		industry = "Web"
+	}
+	
+	accountManager.getAccount();
+end
+
 function linkedInConnected()
-	imageLoader.loadImage(linkedIn.data.profile.pictureUrl, "profile.png", 30, 30);
-	accountManager.getAccount(linkedIn);
+	accountManager.user =	{
+		linkedinId = linkedIn.data.profile.id,
+		email = linkedIn.data.profile.emailAddress,
+		name = linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
+		headline = linkedIn.data.profile.headline,
+		industry = linkedIn.data.profile.industry
+	}
+		
+	imageLoader.loadImage(linkedIn.data.profile.pictureUrl, "profile.png", (display.contentWidth)*(80/100), (display.contentHeight)*(10/100));
+	accountManager.getAccount();
 end
 
 ------------------------------------------
