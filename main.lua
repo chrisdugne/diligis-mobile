@@ -6,27 +6,29 @@
 
 SERVER_URL = "http://192.168.0.4:9000" 
 
+IMAGE_CENTER = "IMAGE_CENTER";
+IMAGE_TOP_LEFT = "IMAGE_TOP_LEFT";
+
 -----------------------------------------------------------------------------------------
---- Global libs
+--- Corona's libraries
+ui 				= require "ui"
+json 			= require "json"
+widget 			= require "widget"
+storyboard 		= require "storyboard"
 
-json = require "json"
-xml = require "libs.Xml"
-utils = require "libs.Utils"
-router = require "tools.Router"
-linkedIn = require "libs.social.LinkedIn"
+---- Additional libs
+xml 			= require "libs.Xml"
+utils 			= require "libs.Utils"
+linkedIn 		= require "libs.social.LinkedIn"
 
-----
+---- Server access Managers
+accountManager 	= require "managers.AccountManager"
 
-imageLoader = require "libs.ImageLoader"
-viewTools = require "tools.ViewTools"
+---- App Tools
+router 			= require "tools.Router"
+viewTools		= require "tools.ViewTools"
+imagesManager 	= require "tools.ImagesManager"
 
-----
-
-accountManager = require "managers.AccountManager"
-
---- Corona's "widget" library
-widget = require "widget"
-storyboard = require "storyboard"
 
 -----------------------------------------------------------------------------------------
 
@@ -34,8 +36,6 @@ print("Here is Diligis !");
 
 -----------------------------------------------------------------------------------------
 
--- show default status bar (iOS)
---display.setStatusBar( display.DefaultStatusBar )
 display.setStatusBar( display.HiddenStatusBar ) 
 
 ------------------------------------------

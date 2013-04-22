@@ -46,6 +46,20 @@ end
 
 -----------------------------------------------------------------------------------------
 
+function imageName( url )
+	
+	local index = string.find(url,"/")
+	
+	if(index == nil) then 
+		return url;
+	else
+		local subURL = url:sub(index+1, string.len(url))
+		return imageName(subURL)
+	end
+end
+
+-----------------------------------------------------------------------------------------
+
 --a tester  https://gist.github.com/874792
 
 function tprint (tbl, indent)

@@ -10,7 +10,6 @@ user = {}
 --
 --
 function getAccount()
-	print("getAccount");
 
 	local serverUrl = SERVER_URL .. "/getAccount"
 
@@ -30,9 +29,7 @@ function getAccount()
 end
 
 function getAccountListener( event )
-	print("account received");
 	accountManager.user = json.decode(event.response);
-	print(user);
 	router.openHome();
 end
 

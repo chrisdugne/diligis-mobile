@@ -29,3 +29,9 @@ end
 function openFinder()
 	storyboard.gotoScene( "views.Finder" )
 end
+
+---------------------------------------------
+
+function openMessages()
+	storyboard.gotoScene( "views.Messages" )
+end

@@ -22,8 +22,6 @@ function scene:createScene( event )
 	--- reset + header
 	viewTools.drawHeader(group);
 
-	viewTools.drawList(group);
-
 end
 
 -- Called immediately after scene has moved onscreen:

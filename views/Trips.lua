@@ -7,7 +7,17 @@
 
 local scene = storyboard.newScene()
 local tripit = require("libs.social.Tripit")
---local tableView = require("tools.tableView")
+
+local user
+local currentTrip
+
+-- Forward reference for our back button & tableview
+local list, backButton, syncwith, tripitButton, itemSelected
+
+local syncwithX = display.contentWidth * 0.27
+local syncwithY = display.contentHeight * 0.93
+local tripitButtonX = display.contentWidth * 0.6
+local tripitButtonY = display.contentHeight * 0.93
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -19,93 +29,20 @@ local tripit = require("libs.social.Tripit")
 
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
-	local group = self.view
-
-	--- reset + header
-	viewTools.drawHeader(group);
-
-	--- 'sync with' text
-	local syncwith = display.newRetinaText( "sync with", 0, 0, native.systemFont, 21 )
-	syncwith:setTextColor( 0 )	
-	syncwith:setReferencePoint( display.CenterReferencePoint )
-	syncwith.x = display.contentWidth * 0.17
-	syncwith.y = display.contentHeight/4
-
-	---- Add demo button to screen
+	local view = self.view
 	tripit.init();
-	local importFromTripit = function() return tripit.authorise(tripitAuthenticated) end;
-	tripitButton = ui.newButton{default="images/buttons/tripit.png", over="images/buttons/tripit.png", onRelease=importFromTripit, x = display.contentWidth * 0.5, y = display.contentHeight/4 + 20  }
-
+ 	user = accountManager.user;
+ 	
+	--- reset + header
+	viewTools.drawHeader(view);
 
 	----------------------
-
-	local tripList = {}
-	local user = accountManager.user;
-
-	for i in pairs(user.trips) do
-		local tripName = display.newRetinaText( user.trips[i].displayName, 0, 0, native.systemFont, 13 )
-		tripName:setTextColor( 0 )	
-		tripName:setReferencePoint( display.CenterReferencePoint )
-		tripName.x = display.contentWidth * 0.17
-		tripName.y = 200 + i*25
-		
-		group:insert(tripName);
-	end
 	
+	drawTripList(view);
 	
---	
---	for i in pairs(user.trips) do
---		local data = {}
---		data.title = user.trips[i].displayName
---		data.subtitle = user.trips[i].country
---		data.image = user.trips[i].imageUrl
---		table.insert(tripList, data)
---	end
---
---	local topBoundary = display.screenOriginY + 140
---	local bottomBoundary = display.screenOriginY + 0
---
---	-- create the list of items
---	myList = tableView.newList{
---		data=tripList, 
---		default="listItemBg.png",
---		--default="listItemBg_white.png",
---		over="listItemBg_over.png",
-----		onRelease=listButtonRelease,
---		top=topBoundary,
---		bottom=bottomBoundary,
---		--backgroundColor={ 255, 255, 255 },  --commented this out because we're going to add it down below
---		callback = function( row )
---			local g = display.newGroup()
---
---			local img = display.newImage(row.image)
---			g:insert(img)
---			img.x = math.floor(img.width*0.5 + 6)
---			img.y = math.floor(img.height*0.5) 
---
---			local title =  display.newText( row.title, 0, 0, native.systemFontBold, 14 )
---			title:setTextColor(0, 0, 0)
---			--title:setTextColor(255, 255, 255)
---			g:insert(title)
---			title.x = title.width*0.5 + img.width + 6
---			title.y = 30
---
---			local subtitle =  display.newText( row.subtitle, 0, 0, native.systemFont, 12 )
---			subtitle:setTextColor(80,80,80)
---			--subtitle:setTextColor(180,180,180)
---			g:insert(subtitle)
---			subtitle.x = subtitle.width*0.5 + img.width + 6
---			subtitle.y = title.y + title.height + 6
---
---			return g   
---		end 
---	}
-
-	--- all objects must be added to group (e.g. self.view)
-	group:insert( syncwith )
-	group:insert( tripitButton )
 end
 
+-----------------------------------------------------------------------------------------
 
 function tripitAuthenticated()
 	print ( "tripitAuthenticated" )
@@ -133,24 +70,169 @@ function tripitAuthenticated()
 	accountManager.refreshTrips()
 end
 
+-----------------------------------------------------------------------------------------
+
+function drawTripList(view)
+	
+	--- 'sync with' text
+	syncwith = display.newText( "sync with", 0, 0, native.systemFont, 21 )
+	syncwith:setTextColor( 0 )	
+	syncwith:setReferencePoint( display.CenterReferencePoint )
+	syncwith.x = syncwithX
+	syncwith.y = syncwithY
+	view:insert( syncwith )
+
+	---- Add demo button to screen
+	local importFromTripit = function() return tripit.authorise(tripitAuthenticated) end;
+	tripitButton = ui.newButton{
+		default="images/buttons/tripit.png", 
+		over="images/buttons/tripit.png", 
+		onRelease=importFromTripit, 
+		x = tripitButtonX,
+		y = tripitButtonY 
+	}
+	view:insert( tripitButton )
+
+	----------------------
+	
+	--Text to show which item we selected
+	itemSelected = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
+	itemSelected:setTextColor( 0 )
+	itemSelected.x = display.contentWidth + itemSelected.contentWidth * 0.5
+	itemSelected.y = display.contentCenterY
+	view:insert( itemSelected )
+	
+	----------------------
+	-- Create a tableView
+
+	local onRowTouch = function(event) return onRowTouch(event, view) end
+
+	list = widget.newTableView
+	{
+		top = 38,
+		width = 320, 
+		height = 348,
+		hideBackground = true,
+		maskFile = "images/masks/mask-320x348.png",
+		onRowRender = onRowRender,
+		onRowTouch = onRowTouch,
+	}
+
+	--Insert widgets/images into a view
+	view:insert( list )
+	
+	----------------------
+	--Create the back button
+	backButton = widget.newButton
+	{
+		width = 298,
+		height = 56,
+		label = "Back", 
+		labelYOffset = - 1,
+		onRelease = onBackRelease
+	}
+	backButton.alpha = 0
+	backButton.x = display.contentCenterX
+	backButton.y = display.contentHeight - backButton.contentHeight
+	view:insert( backButton )
+
+	----------------------
+	-- insert rows into list (tableView widget)
+	for i in pairs(user.trips) do
+		imagesManager.fetchImage(user.trips[i].imageUrl, createRow) 
+	end
+
+end
+
+function createRow()
+	list:insertRow
+	{
+		height = 72,
+		rowColor = 
+		{ 
+			default = { 255, 255, 255, 0 },
+		}
+	}
+end
+
+----------------------
+-- Handle row rendering
+function onRowRender( event )
+	local phase = event.phase
+	local row = event.row
+	local tripRendered = user.trips[row.index];
+
+	local rowTitle = display.newText( row, tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
+	rowTitle:setTextColor( 0 )
+	rowTitle.x = row.x - ( row.contentWidth * 0.5 ) + ( rowTitle.contentWidth * 0.5 ) + 50
+	rowTitle.y = row.contentHeight * 0.5
+
+	local rowArrow = display.newImage( row, "images/buttons/rowArrow.png", false )
+	rowArrow.x = row.x + ( row.contentWidth * 0.5 ) - rowArrow.contentWidth
+	rowArrow.y = row.contentHeight * 0.5
+
+	print(IMAGE_TOP_LEFT)
+	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
+end
+
+----------------------
+-- Handle row touch events
+function onRowTouch( event, view )
+	local phase = event.phase
+	local row = event.target
+	currentTrip = user.trips[row.index];
+	currentTrip.ui = {}
+
+	if "release" == phase then
+		-- Update the item selected text
+		itemSelected.text = currentTrip.displayName
+
+		currentTrip.ui.image = imagesManager.drawImage(view, currentTrip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+
+		--Transition out the list, transition in the item selected text and the back button
+		transition.to( list, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( syncwith, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( tripitButton, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( itemSelected, { x = display.contentCenterX, time = 400, transition = easing.outExpo } )
+		transition.to( backButton, { alpha = 1, time = 400, transition = easing.outQuad } )
+	end
+end
+
+
+----------------------
+--Handle the back button release event
+function onBackRelease()
+	--Transition in the list, transition out the item selected text and the back button
+	transition.to( list, { x = 0, time = 400, transition = easing.outExpo } )
+	transition.to( syncwith, { x = syncwithX, time = 400, transition = easing.outExpo } )
+	transition.to( tripitButton, { x = tripitButtonX, time = 400, transition = easing.outExpo } )
+	transition.to( itemSelected, { x = display.contentWidth + itemSelected.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
+	transition.to( backButton, { alpha = 0, time = 400, transition = easing.outQuad } )
+	
+	if(currentTrip ~= nil) then
+		imagesManager.hideImage(currentTrip.ui.image)
+	end
+end
+-----------------------------------------------------------------------------------------
+
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	local group = self.view
+	local view = self.view
+	onBackRelease();	
 
 	-- Do nothing
 end
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )
-	local group = self.view
-
+	local view = self.view
 	-- INSERT code here (e.g. stop timers, remove listenets, unload sounds, etc.)
 
 end
 
 -- If scene's view is removed, scene:destroyScene() will be called just prior to:
 function scene:destroyScene( event )
-	local group = self.view
+	local view = self.view
 
 	-- INSERT code here (e.g. remove listeners, remove widgets, save state variables, etc.)
 
