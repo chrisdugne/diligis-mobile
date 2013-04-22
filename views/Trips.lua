@@ -171,7 +171,6 @@ function onRowRender( event )
 	rowArrow.x = row.x + ( row.contentWidth * 0.5 ) - rowArrow.contentWidth
 	rowArrow.y = row.contentHeight * 0.5
 
-	print(IMAGE_TOP_LEFT)
 	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
 end
 
