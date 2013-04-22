@@ -12,6 +12,8 @@ local tripit = require("libs.social.Tripit")
 --
 
 local linkedInImage
+local signInButton
+local loadingSpinner
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -34,7 +36,7 @@ function scene:createScene( event )
 	logo.y = display.contentHeight/4
 	
 	--- sign in text
-	local signin = display.newText( "sign in", 0, 0, native.systemFont, 21 )
+	signin = display.newText( "sign in", 0, 0, native.systemFont, 21 )
 	signin:setTextColor( 0 )	
 	signin:setReferencePoint( display.CenterReferencePoint )
 	signin.x = display.contentWidth * 0.5
@@ -42,25 +44,41 @@ function scene:createScene( event )
 		
 	--- in button
 	local signinAction = function() return linkedInConnect() end
---	local openHomeAction = function() return router.openHome() end
-	local openHomeAction = function() return dummyLinkedIn() end
-	local signinButton = ui.newButton{
+	local openHomeAction = function() return router.openHome() end
+	local openHomeForDummyAction = function() return dummyLinkedIn() end
+	signInButton = ui.newButton{
 		default="images/buttons/linkedin.medium.png", 
 		over="images/buttons/linkedin.medium.png", 
-	--	onRelease=signinAction, 
-		onRelease=openHomeAction, 
+		onRelease=signinAction, 
+--		onRelease=openHomeForDummyAction, 
 		x = display.contentWidth/2, y = 3*display.contentHeight/4+20,
 	}
+	
+	-- Create a spinner widget
+	loadingSpinner = widget.newSpinner
+	{
+		left = display.contentCenterX - 25,
+		top = 3*display.contentHeight/4,
+		width = 50,
+		height = 50,
+	}
+	loadingSpinner.alpha = 0
+	group:insert( loadingSpinner )
 	
 	--- all objects must be added to group (e.g. self.view)
 	group:insert( logo )
 	group:insert( signin )
-	group:insert( signinButton )
+	group:insert( signInButton )
 end
 
 ------------------------------------------
 
-local function linkedInConnect()
+function linkedInConnect()
+	signInButton.alpha = 0
+
+	loadingSpinner:start()
+	transition.to( loadingSpinner, { alpha = 1.0 } )
+	
 	linkedIn.init();
 	linkedIn.authorise(linkedInConnected);
 end
@@ -86,12 +104,11 @@ function linkedInConnected()
 		email = linkedIn.data.profile.emailAddress,
 		name = linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
 		headline = linkedIn.data.profile.headline,
-		industry = linkedIn.data.profile.industry,
-		pictureUrl = linkedIn.data.profile.pictureUrl,
+		industry = linkedIn.data.profile.industry
 	}
-	
-	imagesManager.fetchImage(accountManager.user.pictureUrl);
-	accountManager.getAccount();
+
+	local next = function() return accountManager.getAccount() end	
+	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next, "profilePicture.png");
 end
 
 ------------------------------------------

@@ -10,7 +10,6 @@ user = {}
 --
 --
 function getAccount()
-
 	local serverUrl = SERVER_URL .. "/getAccount"
 
 	local postData = 

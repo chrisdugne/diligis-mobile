@@ -51,10 +51,6 @@ function drawHeader(group)
 	logo.x = 160
 	logo.y = titleBar.y
 	
-	-- linkedin picture
-	if(accountManager.user.pictureUrl ~= nil) then
-		imagesManager.drawImage(group, accountManager.user.pictureUrl, display.contentWidth - 20, 10, 0.6)
-	end
 
 	--- insert all
 	group:insert( bg )
@@ -64,6 +60,8 @@ function drawHeader(group)
 	--	group:insert( logo )
 	group:insert( homeButton )
 
+	-- linkedin picture
+	local profileImage = imagesManager.drawImage(group, "profilePicture.png", display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
 end
 
 function drawLoadingSpinner(group)

@@ -19,9 +19,6 @@ data = {}
 
 ----------------------------------------------------------------------------------------------------
 
-local xml = require( "libs.Xml" )
-local json = require( "json" )
-local utils = require("libs.Utils")
 local oAuth = require( "libs.oauth.oAuth" )
 
 ----------------------------------------------------------------------------------------------------
@@ -71,7 +68,6 @@ end
 
 --- requestToken reception
 function requestTokenListener( event )
-	print("tripit requestTokenListener")
 	if ( not event.isError ) then
 
 		data.requestToken = event.response:match('oauth_token=([^&]+)')
@@ -80,8 +76,8 @@ function requestTokenListener( event )
 		-- need to add a dummy callBack to go to authListener (else go to the linkedIn OOB page)
 		local authenticateUrl = "https://m.tripit.com/oauth/authorize?oauth_token=" .. data.requestToken .."&oauth_callback=backtodiligis"
 
-		-- webView = native.newWebView( display.screenOriginX, display.screenOriginY, fullX, fullY )
-		webView = native.newWebView( 0, 0, 320, 480 )
+		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
+--		webView = native.newWebView( 0, 0, 320, 480 )
 		webView:request( authenticateUrl )
 
 		webView:addEventListener( "urlRequest", webviewListener )
@@ -116,7 +112,6 @@ end
 --- 3 - Request the accessToken
 function getAccessToken()
 
-	print("tripit getAccessToken")
 	local accessTokenUrl = "https://api.tripit.com/oauth/access_token"
 	local customParams = {} 
 
@@ -128,8 +123,6 @@ end
 --- accessToken reception
 function accessTokenListener( event )
 
-	print("tripit accessTokenListener")
-	
 	if ( not event.isError ) then
 
 		data.accessToken = event.response:match('oauth_token=([^&]+)')

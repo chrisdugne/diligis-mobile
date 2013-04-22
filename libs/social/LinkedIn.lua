@@ -82,8 +82,8 @@ function requestTokenListener( event )
 		-- need to add a dummy callBack to go to authListener (else go to the linkedIn OOB page)
 		local authenticateUrl = "https://www.linkedin.com/uas/oauth/authenticate?oauth_token=" .. data.requestToken
 
-		-- webView = native.newWebView( display.screenOriginX, display.screenOriginY, fullX, fullY )
-		webView = native.newWebView( 0, 0, 320, 480 )
+--		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
+		webView = native.newWebView(  -30, -120 , 400, 780 )
 		webView:request( authenticateUrl )
 
 		webView:addEventListener( "urlRequest", webviewListener )
@@ -101,9 +101,9 @@ function webviewListener( event )
 		if string.find(string.lower(event.url), "backtodiligis") then
 
 			local params = utils.getUrlParams(event.url);
-			
+
 			getAccessToken(params["oauth_verifier"])
-			
+
 			webView:removeSelf()
 			webView = nil;
 		end
@@ -124,11 +124,11 @@ function getAccessToken(oauthVerifier)
 
 	local customParams = 
 	{
-        oauth_verifier = oauthVerifier
+		oauth_verifier = oauthVerifier
 	}
 
 	oAuth.networkRequest(accessTokenUrl, customParams, data.consumerKey, data.requestToken, data.consumerSecret, data.requestTokenSecret, "POST", accessTokenListener)
-        
+
 end
 
 
@@ -141,9 +141,9 @@ function accessTokenListener( event )
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
 		getProfile();
-		
+
 	end
-	
+
 end
 
 -----------------------------------------------------------------------------------------
@@ -155,14 +155,14 @@ end
 function getProfile()
 
 	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,headline,industry,email-address)";
-  
+
 	local customParams = 
 	{
-        format = "json"
+		format = "json"
 	}
 
 	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", profileListener)
-        
+
 end
 
 --- profile reception
@@ -172,9 +172,9 @@ function profileListener( event )
 		data.profile = json.decode(event.response);
 		print ( "pictureUrl : " .. data.profile.pictureUrl )
 	end
-	
+
 	callBackAuthorisationDone();
-	
+
 end
 
 -----------------------------------------------------------------------------------------

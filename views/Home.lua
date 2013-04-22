@@ -19,7 +19,7 @@ local tripit = require("libs.social.Tripit")
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
 	local group = self.view
-
+	
 	--- reset + header
 	viewTools.drawHeader(group);
 	
