@@ -4,7 +4,7 @@
 --
 -----------------------------------------------------------------------------------------
 
-SERVER_URL = "http://192.168.0.18:9000" 
+SERVER_URL = "http://192.168.0.4:9000" 
 
 -----------------------------------------------------------------------------------------
 --- Global libs
@@ -35,7 +35,8 @@ print("Here is Diligis !");
 -----------------------------------------------------------------------------------------
 
 -- show default status bar (iOS)
-display.setStatusBar( display.DefaultStatusBar )
+--display.setStatusBar( display.DefaultStatusBar )
+display.setStatusBar( display.HiddenStatusBar ) 
 
 ------------------------------------------
 

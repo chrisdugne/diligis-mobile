@@ -12,8 +12,8 @@ settings = {
 		plist = {
 			--CFBundleExecutable = "Diligis",
 
-			UIStatusBarHidden = false,
-			UIPrerenderedIcon = true, -- set to false for "shine" overlay
+			--UIStatusBarHidden = false,
+			--UIPrerenderedIcon = true, -- set to false for "shine" overlay
 			--UIApplicationExitsOnSuspend = true, -- uncomment to quit app on suspend
 
 			CFBundleIconFile = "Icon.png",

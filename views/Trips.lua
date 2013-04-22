@@ -7,7 +7,7 @@
 
 local scene = storyboard.newScene()
 local tripit = require("libs.social.Tripit")
-local tableView = require("tools.tableView")
+--local tableView = require("tools.tableView")
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -51,6 +51,8 @@ function scene:createScene( event )
 		
 		group:insert(tripName);
 	end
+	
+	
 --	
 --	for i in pairs(user.trips) do
 --		local data = {}

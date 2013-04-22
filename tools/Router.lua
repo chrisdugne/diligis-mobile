@@ -23,3 +23,9 @@ end
 function openTrips()
 	storyboard.gotoScene( "views.Trips" )
 end
+
+---------------------------------------------
+
+function openFinder()
+	storyboard.gotoScene( "views.Finder" )
+end
