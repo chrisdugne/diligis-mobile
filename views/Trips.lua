@@ -7,16 +7,7 @@
 local scene = storyboard.newScene()
 
 --- The elements
-local list, syncwith, tripitButton, noTripText, detailsGroup
---local detailsElements = {
---	tripSelectedText	= "tripSelectedText",
---	tripSelectedImage 	= "tripSelectedImage",
---	backButton 			= "backButton",
---	country 			= "country",
---	city 				= "city", 
---	startDate 			= "startDate",
---	endDate 			= "endDate"
---}
+local list, syncwith, tripitButton, noTripText, details
 
 --- Many settings
 local syncwithX = display.contentWidth * 0.38
@@ -43,7 +34,7 @@ function scene:createScene( event )
  	
  	----------------------
 
-	detailsGroup = display.newGroup()
+	details = display.newGroup()
 	
 	----------------------
 	
@@ -155,12 +146,12 @@ end
 function scene:buildDetails()
 
 	local view = self.view
-	utils.emptyGroup(detailsGroup)
+	utils.emptyGroup(details)
 	
 	----------------------
-	--Create the back button
+
 	local backButton = widget.newButton	{
-		width = 298,
+		width = display.contentWidth/3,
 		height = 56,
 		label = "Back", 
 		labelYOffset = - 1,
@@ -171,22 +162,56 @@ function scene:buildDetails()
 	backButton.x = display.contentCenterX
 	backButton.y = display.contentHeight - backButton.contentHeight
 	
-	detailsGroup:insert( backButton )
-	detailsGroup.backButton = backButton 
+	details:insert( backButton )
+	details.backButton = backButton 
 
 	----------------------
 	
-	--Text to show which item we selected
-	local tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
+	local tripSelectedText = display.newText( "", 0, 0, native.systemFontBold, 28 )
 	tripSelectedText:setTextColor( 0 )
-	tripSelectedText.x = display.contentWidth + tripSelectedText.contentWidth * 0.5
-	tripSelectedText.y = display.contentCenterY
+	tripSelectedText.x = display.contentWidth * 0.5
+	tripSelectedText.y = 200
 
-	detailsGroup:insert( tripSelectedText )
-	detailsGroup.tripSelectedText = tripSelectedText 
+	details:insert( tripSelectedText )
+	details.tripSelectedText = tripSelectedText 
+
+	----------------------
+
+	local address = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	address:setTextColor( 0 )
+	address.x = display.contentWidth * 0.5
+	address.y = 240
+
+	details:insert( address )
+	details.address = address 
+
+	----------------------
+
+	local startDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	startDate:setTextColor( 0 )
+	startDate.x = display.contentWidth * 0.5
+	startDate.y = 320
+
+	details:insert( startDate )
+	details.startDate = startDate
+	 
+	----------------------
+
+	local endDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	endDate:setTextColor( 0 )
+	endDate.x = display.contentWidth * 0.5
+	endDate.y = 360
+
+	details:insert( endDate )
+	details.endDate = endDate 
 
 	----------------------
 	
+	details.x = display.contentWidth + display.contentWidth * 0.5
+	details.y = 0
+	
+--	startDate 			= "startDate",
+--	endDate 			= "endDate"
 	--Text to show which item we selected
 --	local tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
 --	tripSelectedText:setTextColor( 0 )
@@ -194,12 +219,12 @@ function scene:buildDetails()
 --	tripSelectedText.y = display.contentCenterY
 --	view:insert( tripSelectedText )
 --	
---	detailsGroup:insert( backButton )
---	detailsGroup.backButton = backButton
+--	details:insert( backButton )
+--	details.backButton = backButton
 	 
 	----------------------
 	
-	view:insert(detailsGroup)
+	view:insert(details)
 end
 
 -----------------------------------------------------------------------------------------
@@ -241,15 +266,18 @@ function onRowTouch( event )
 
 	if "release" == phase then
 		-- Update the item selected text
-		detailsGroup.tripSelectedText.text = trip.displayName
-		detailsGroup.tripSelectedImage = imagesManager.drawImage(detailsGroup, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+		details.tripSelectedText.text 	= trip.displayName
+		details.address.text 			= trip.address
+		details.startDate.text 			= "From " .. trip.startDate
+		details.endDate.text 			= "To "   .. trip.endDate
+		details.tripSelectedImage 		= imagesManager.drawImage(details, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
 
 		--Transition out the list, transition in the item selected text and the back button
-		transition.to( list, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( syncwith, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( tripitButton, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( detailsGroup.tripSelectedText, { x = display.contentCenterX, time = 400, transition = easing.outExpo } )
-		transition.to( detailsGroup.backButton, { alpha = 1, time = 400, transition = easing.outQuad } )
+		transition.to( list, 					{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( syncwith, 				{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( tripitButton, 			{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( details, 				{ x = 0, time = 400, transition = easing.outExpo } )
+		transition.to( details.backButton, 		{ alpha = 1, time = 400, transition = easing.outQuad } )
 	end
 end
 
@@ -258,13 +286,13 @@ end
 --Handle the back button release event
 function onBackRelease()
 	--Transition in the list, transition out the item selected text and the back button
-	transition.to( list, { x = 0, time = 400, transition = easing.outExpo } )
-	transition.to( syncwith, { x = syncwithX, time = 400, transition = easing.outExpo } )
-	transition.to( tripitButton, { x = tripitButtonX, time = 400, transition = easing.outExpo } )
-	transition.to( detailsGroup.tripSelectedText, { x = display.contentWidth + detailsGroup.tripSelectedText.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
-	transition.to( detailsGroup.backButton, { alpha = 0, time = 400, transition = easing.outQuad } )
+	transition.to( list, 						{ x = 0, time = 400, transition = easing.outExpo } )
+	transition.to( syncwith, 					{ x = syncwithX, time = 400, transition = easing.outExpo } )
+	transition.to( tripitButton,				{ x = tripitButtonX, time = 400, transition = easing.outExpo } )
+	transition.to( details, 					{ x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
+	transition.to( details.backButton, 			{ alpha = 0, time = 400, transition = easing.outQuad } )
 	
-	imagesManager.hideImage(detailsGroup.tripSelectedImage)
+	imagesManager.hideImage(details.tripSelectedImage)
 end
 -----------------------------------------------------------------------------------------
 
