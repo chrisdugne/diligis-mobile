@@ -29,7 +29,7 @@ function scene:createScene( event )
 		default="images/buttons/trips.medium.png", 
 		over="images/buttons/trips.medium.png", 
 		onRelease=openTripsAction, 
-		x = display.contentWidth * (27/100), y = display.contentHeight * (33/100),
+		x = display.contentWidth * (25/100), y = display.contentHeight - 40,
 	}
 
 	--- find button
@@ -38,7 +38,7 @@ function scene:createScene( event )
 		default="images/buttons/find.medium.png", 
 		over="images/buttons/find.medium.png", 
 		onRelease=openFinderAction, 
-		x = display.contentWidth * (73/100), y = display.contentHeight * (33/100),
+		x = display.contentWidth * (50/100), y = display.contentHeight - 40,
 	}
 
 	--- messages button
@@ -47,7 +47,7 @@ function scene:createScene( event )
 		default="images/buttons/messages.medium.png", 
 		over="images/buttons/messages.medium.png", 
 		onRelease=openMessagesAction, 
-		x = display.contentWidth * (27/100), y = display.contentHeight * (57/100),
+		x = display.contentWidth * (75/100), y = display.contentHeight - 40,
 	}
 	
 	--- all objects must be added to group (e.g. self.view)

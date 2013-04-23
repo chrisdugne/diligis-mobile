@@ -14,22 +14,22 @@ function drawHeader(group)
 	--- header background
 	-- The gradient used by the title bar
 	local titleGradient = graphics.newGradient( 
-	{ 189, 203, 220, 255 }, 
-	{ 89, 116, 152, 255 }, "down" )
+	{ 23, 55, 94, 110 }, 
+	{ 23, 55, 94, 255 }, "down" )
 
 	-- Create toolbar to go at the top of the screen
 	local titleBar = display.newRect( 0, 0, display.contentWidth, 32 )
-	titleBar.y = display.statusBarHeight + ( titleBar.contentHeight * 0.5 )
 	titleBar:setFillColor( titleGradient )
 	titleBar.y = display.screenOriginY + titleBar.contentHeight * 0.5
 	group:insert( titleBar )
 
 	-- create embossed text to go on toolbar
-	--	local titleText = display.newEmbossedText( "Diligis", 0, 0, native.systemFontBold, 20 )
-	--	titleText:setReferencePoint( display.CenterReferencePoint )
-	--	titleText:setTextColor( 255 )
-	--	titleText.x = 160
-	--	titleText.y = titleBar.y
+	local titleText = display.newText( "Diligis", 0, 0, native.systemFont, 20 )
+	titleText:setReferencePoint( display.CenterReferencePoint )
+	titleText:setTextColor( 255 )
+	titleText.x = 160
+	titleText.y = titleBar.y
+	group:insert( titleBar )
 
 	--	local bgheader = display.newRect( 0, 0, display.contentWidth, (display.contentHeight)*(15/100) )
 	--	bgheader:setFillColor( 23,55,94 )
@@ -73,9 +73,9 @@ function drawHeader(group)
 	
 	--
 	--	--- top logo
-	local logo = display.newImage(group, "images/logos/top.logo.png" )
-	logo.x = display.contentWidth/2
-	logo.y = titleBar.y
+--	local logo = display.newImage(group, "images/logos/top.logo.png" )
+--	logo.x = display.contentWidth/2
+--	logo.y = titleBar.y
 
 	-- linkedin picture
 	local profileImage = imagesManager.drawImage(group, "profilePicture.png", display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
