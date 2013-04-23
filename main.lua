@@ -6,8 +6,12 @@
 
 SERVER_URL = "http://192.168.0.4:9000" 
 
-IMAGE_CENTER = "IMAGE_CENTER";
-IMAGE_TOP_LEFT = "IMAGE_TOP_LEFT";
+IMAGE_CENTER	= "IMAGE_CENTER";
+IMAGE_TOP_LEFT 	= "IMAGE_TOP_LEFT";
+
+
+LINKEDIN_CONSUMER_KEY 		= "nkdrs359t7ta";
+LINKEDIN_CONSUMER_SECRET 	= "cixqyissLNH8fQ44";
 
 -----------------------------------------------------------------------------------------
 --- Corona's libraries
@@ -32,7 +36,7 @@ imagesManager 	= require "tools.ImagesManager"
 
 -----------------------------------------------------------------------------------------
 
-print("Here is Diligis !");
+print("-----------------------------------------------------");
 
 -----------------------------------------------------------------------------------------
 

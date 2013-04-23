@@ -3,11 +3,12 @@
 --
 -- Date: January 28, 2013
 --
--- Version: 1.0
+-- Version: 1.2
 --
--- File name: LinkedIn.lua
---
--- Author: Chris Dugne of Uralys - www.uralys.com
+-- File name	: LinkedIn.lua
+-- Require 		: Utils.lua
+-- 
+-- Author: Chris Dugne @ Uralys - www.uralys.com
 --
 ----------------------------------------------------------------------------------------------------
 
@@ -25,16 +26,17 @@ local oAuth = require( "libs.oauth.oAuth" )
 
 local webView;
 local callBackAuthorisationDone;
+local callBackCancel;
 
 ----------------------------------------------------------------------------------------------------
 
 --- Initiates a new data object.
 -- @param consumerKey The consumer key of your app.
 -- @param consumerSecret The consumer secret of your app.
-function init()
+function init(consumerKey, consumerSecret)
 
-	data.consumerKey = "nkdrs359t7ta";
-	data.consumerSecret = "cixqyissLNH8fQ44"
+	data.consumerKey = consumerKey
+	data.consumerSecret = consumerSecret
 
 	data.requestToken = nil
 	data.requestTokenSecret = nil
@@ -52,8 +54,9 @@ end
 --
 
 --- 1 - Request a requestToken
-function authorise(callBack)
+function authorise(callBack, cancel)
 	callBackAuthorisationDone = callBack;
+	callBackCancel = cancel;
 	getRequestToken();
 end
 
@@ -63,7 +66,7 @@ function getRequestToken()
 
 	local customParams = 
 	{
-		oauth_callback = "backtodiligis",
+		oauth_callback = "appcallback_"..data.consumerKey,
 		scope = "r_fullprofile r_emailaddress r_network rw_nus"
 	}
 
@@ -82,8 +85,7 @@ function requestTokenListener( event )
 		-- need to add a dummy callBack to go to authListener (else go to the linkedIn OOB page)
 		local authenticateUrl = "https://www.linkedin.com/uas/oauth/authenticate?oauth_token=" .. data.requestToken
 
---		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
-		webView = native.newWebView(  -30, -120 , 400, 780 )
+		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
 		webView:request( authenticateUrl )
 
 		webView:addEventListener( "urlRequest", webviewListener )
@@ -98,11 +100,15 @@ end
 function webviewListener( event )
 
 	if event.url then
-		if string.find(string.lower(event.url), "backtodiligis") then
-
+		if string.find(string.lower(event.url), "appcallback_"..data.consumerKey) then
+			
 			local params = utils.getUrlParams(event.url);
-
-			getAccessToken(params["oauth_verifier"])
+			
+			if(params["oauth_problem"] == "user_refused") then
+				callBackCancel();
+			else
+				getAccessToken(params["oauth_verifier"])
+			end
 
 			webView:removeSelf()
 			webView = nil;
@@ -170,7 +176,6 @@ function profileListener( event )
 
 	if ( not event.isError ) then
 		data.profile = json.decode(event.response);
-		print ( "pictureUrl : " .. data.profile.pictureUrl )
 	end
 
 	callBackAuthorisationDone();
@@ -182,13 +187,18 @@ end
 -----------------------------------------------------------------------------------------
 
 function deauthorise()
+	local logoutURL = "https://api.linkedin.com/uas/oauth/invalidateToken";
+	local customParams = {}
+	 
+	oAuth.networkRequest(logoutURL, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", logoutListener)
+end
 
+--- logout ok
+function logoutListener( event )
 	data.accessToken = nil
 	data.accessTokenSecret = nil
 	data.profile = nil
-
-	-- os.remove( system.pathForFile( "data.dat", system.DocumentsDirectory ) )
-
+	callBackCancel()
 end
 
 --

@@ -27,8 +27,10 @@ local loadingSpinner
 function scene:createScene( event )
 	local group = self.view
 	
-	--- bg
-	display.setDefault( "background", 255, 255, 255 )
+	--- reset
+	local bg = display.newRect( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
+	bg:setFillColor( 255 )
+	group:insert( bg )
 	
 	--- logo
 	local logo = display.newImage( "images/logos/d_logo.png" )
@@ -79,23 +81,12 @@ function linkedInConnect()
 	loadingSpinner:start()
 	transition.to( loadingSpinner, { alpha = 1.0 } )
 	
-	linkedIn.init();
-	linkedIn.authorise(linkedInConnected);
+	linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET);
+	linkedIn.authorise(linkedInConnected, linkedInCancel);
 end
 
-function dummyLinkedIn()
-
-	print("--> dummyLinkedIn");
-	
-	accountManager.user =	{
-		linkedinId = "polo1234567",
-		email = "polo@diligis.com",
-		name = "Polo Kluk",
-		headline = "Master",
-		industry = "Web"
-	}
-	
-	accountManager.getAccount();
+function linkedInCancel()
+	router.openTopHome()
 end
 
 function linkedInConnected()
@@ -116,8 +107,8 @@ end
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	local group = self.view
-	
-	-- Do nothing
+	loadingSpinner.alpha = 0
+	transition.to( signInButton, { alpha = 1.0 } )
 end
 
 -- Called when scene is about to move offscreen:

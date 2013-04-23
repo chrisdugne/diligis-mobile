@@ -19,9 +19,7 @@ end
 
 function storeImage( name, image, next)
 	image.alpha = 0;
-	print(image.width)
 	images[name] = image
-	print("stored " .. name)
 	next();
 end
 
@@ -29,10 +27,7 @@ end
 
 function drawImage( group, url, x, y, positionFrom, scale )
 
-	print("drawImage " .. url)
     local name = utils.imageName(url)
-	print("name " .. name)
-
 	local image = display.newImage( group, name, system.TemporaryDirectory)
 	image.xScale = scale
 	image.yScale = scale

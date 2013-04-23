@@ -1,5 +1,5 @@
 first : 
-- server model 	: recup donnŽes IN + TI -> DB + reconnection = IN uid
+- server model 	: recup donnÃ©es IN + TI -> DB + reconnection = IN uid
 - client mobile : build UI + workflow
 - server algo   : find people around my trips
 

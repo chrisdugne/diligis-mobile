@@ -9,6 +9,7 @@ function drawHeader(group)
 	--- reset
 	local bg = display.newRect( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
 	bg:setFillColor( 255 )
+	group:insert( bg )
 
 	--- header background
 	-- The gradient used by the title bar
@@ -21,6 +22,7 @@ function drawHeader(group)
 	titleBar.y = display.statusBarHeight + ( titleBar.contentHeight * 0.5 )
 	titleBar:setFillColor( titleGradient )
 	titleBar.y = display.screenOriginY + titleBar.contentHeight * 0.5
+	group:insert( titleBar )
 
 	-- create embossed text to go on toolbar
 	--	local titleText = display.newEmbossedText( "Diligis", 0, 0, native.systemFontBold, 20 )
@@ -43,22 +45,23 @@ function drawHeader(group)
 		x = 25,
 		y = titleBar.y
 	}
+	group:insert( homeButton )
+	
+	local logoutAction = function() return linkedIn.deauthorise() end;
+	local logoutButton = ui.newButton{
+		default="images/buttons/home.png", 
+		over="images/buttons/home.png", 
+		onRelease=logoutAction, 
+		x = 250,
+		y = titleBar.y
+	}
+	group:insert( logoutButton )
+	
 	--
 	--	--- top logo
-	local logo = display.newImage( "images/logos/top.logo.png" )
-	--	logo.x = display.contentWidth/2
-	--	logo.y = (display.contentHeight)*(10/100)
-	logo.x = 160
+	local logo = display.newImage(group, "images/logos/top.logo.png" )
+	logo.x = display.contentWidth/2
 	logo.y = titleBar.y
-	
-
-	--- insert all
-	group:insert( bg )
-	--	group:insert( bgheader )
-	group:insert( titleBar )
-	--	group:insert( titleText )
-	--	group:insert( logo )
-	group:insert( homeButton )
 
 	-- linkedin picture
 	local profileImage = imagesManager.drawImage(group, "profilePicture.png", display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
