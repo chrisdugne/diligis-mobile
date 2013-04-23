@@ -46,6 +46,17 @@ end
 
 -----------------------------------------------------------------------------------------
 
+function emptyGroup( group )
+	if(group ~= nil) then
+		for i=group.numChildren,1,-1 do
+        	local child = group[i]
+        	child.parent:remove( child )
+		end
+	end
+end
+
+-----------------------------------------------------------------------------------------
+
 function imageName( url )
 	
 	local index = string.find(url,"/")

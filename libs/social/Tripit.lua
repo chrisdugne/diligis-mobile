@@ -53,6 +53,7 @@ end
 
 --- 1 - Request a requestToken
 function authorise(callBack)
+	native.setActivityIndicator( true )
 	callBackAuthorisationDone = callBack;
 	getRequestToken();
 end
@@ -158,7 +159,7 @@ function tripsListener( event )
 	end
 	
 	callBackAuthorisationDone();
-	
+	native.setActivityIndicator( false )
 end
 
 function logout()

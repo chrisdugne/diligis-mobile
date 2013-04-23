@@ -2,28 +2,35 @@
 --
 -- trips.lua
 --
-
 -----------------------------------------------------------------------------------------
 
 local scene = storyboard.newScene()
 
--- Forward reference for our back button & tableview
-local list, backButton, syncwith, tripitButton, tripSelectedText, noTripText, tripSelectedTextImage
+--- The elements
+local list, syncwith, tripitButton, noTripText, detailsGroup
+--local detailsElements = {
+--	tripSelectedText	= "tripSelectedText",
+--	tripSelectedImage 	= "tripSelectedImage",
+--	backButton 			= "backButton",
+--	country 			= "country",
+--	city 				= "city", 
+--	startDate 			= "startDate",
+--	endDate 			= "endDate"
+--}
 
+--- Many settings
 local syncwithX = display.contentWidth * 0.38
 local syncwithY = display.contentHeight * 0.93
 local tripitButtonX = display.contentWidth * 0.67
 local tripitButtonY = display.contentHeight * 0.93
 
 -----------------------------------------------------------------------------------------
--- BEGINNING OF YOUR IMPLEMENTATION
--- 
 -- NOTE: Code outside of listener functions (below) will only be executed once,
 --		 unless storyboard.removeScene() is called.
 -- 
 -----------------------------------------------------------------------------------------
 
--- Called when the scene's view does not exist:
+--- Called when the scene's view does not exist:
 function scene:createScene( event )
 	local view = self.view
 	
@@ -34,16 +41,27 @@ function scene:createScene( event )
 	--- reset + header
 	viewTools.drawHeader(view);
  	
+ 	----------------------
+
+	detailsGroup = display.newGroup()
+	
 	----------------------
-	self:refreshScene(view)
+	
+	self:refreshScene()
+	
 end
 
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene(view)
-	
+function scene:refreshScene()
+
+	local view = self.view
+
 	----------------------
-	-- Reset all elements
+
+	hideNoTrips();
+
+	----------------------
 	
 	if(list ~= nil) then list:removeSelf() end
 	list = nil
@@ -56,12 +74,6 @@ function scene:refreshScene(view)
 
 	if(tripitButton ~= nil) then tripitButton:removeSelf() end
 	tripitButton = nil
-	
-	if(tripSelectedText ~= nil) then tripSelectedText:removeSelf() end
-	tripSelectedText = nil
-
-	if(backButton ~= nil) then backButton:removeSelf() end
-	backButton = nil
 
 	----------------------
 	
@@ -83,7 +95,8 @@ function scene:refreshScene(view)
 	view:insert( syncwith )
 
 	---- Add demo button to screen
-	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) end;
+	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) 
+	end
 	tripitButton = ui.newButton{
 		default="images/buttons/tripit.png", 
 		over="images/buttons/tripit.png", 
@@ -94,18 +107,7 @@ function scene:refreshScene(view)
 	view:insert( tripitButton )
 
 	----------------------
-	
-	--Text to show which item we selected
-	tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
-	tripSelectedText:setTextColor( 0 )
-	tripSelectedText.x = display.contentWidth + tripSelectedText.contentWidth * 0.5
-	tripSelectedText.y = display.contentCenterY
-	view:insert( tripSelectedText )
-	
-	----------------------
 	-- Create a tableView
-
-	local onRowTouch = function(event) return onRowTouch(event, view) end
 
 	list = widget.newTableView
 	{
@@ -120,22 +122,10 @@ function scene:refreshScene(view)
 
 	--Insert widgets/images into a view
 	view:insert( list )
-	
 	----------------------
-	--Create the back button
-	backButton = widget.newButton
-	{
-		width = 298,
-		height = 56,
-		label = "Back", 
-		labelYOffset = - 1,
-		onRelease = onBackRelease
-	}
-	backButton.alpha = 0
-	backButton.x = display.contentCenterX
-	backButton.y = display.contentHeight - backButton.contentHeight
-	view:insert( backButton )
 
+	self:buildDetails();
+	
 	----------------------
 	-- insert rows into list (tableView widget)
 	-- 
@@ -148,7 +138,6 @@ function scene:refreshScene(view)
  	end		
  	
 end
------------------------------------------------------------------------------------------
 
 function createRow()
 	list:insertRow
@@ -161,13 +150,66 @@ function createRow()
 	}
 end
 
+-----------------------------------------------------------------------------------------
+
+function scene:buildDetails()
+
+	local view = self.view
+	utils.emptyGroup(detailsGroup)
+	
+	----------------------
+	--Create the back button
+	local backButton = widget.newButton	{
+		width = 298,
+		height = 56,
+		label = "Back", 
+		labelYOffset = - 1,
+		onRelease = onBackRelease
+	}
+	
+	backButton.alpha = 0
+	backButton.x = display.contentCenterX
+	backButton.y = display.contentHeight - backButton.contentHeight
+	
+	detailsGroup:insert( backButton )
+	detailsGroup.backButton = backButton 
+
+	----------------------
+	
+	--Text to show which item we selected
+	local tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
+	tripSelectedText:setTextColor( 0 )
+	tripSelectedText.x = display.contentWidth + tripSelectedText.contentWidth * 0.5
+	tripSelectedText.y = display.contentCenterY
+
+	detailsGroup:insert( tripSelectedText )
+	detailsGroup.tripSelectedText = tripSelectedText 
+
+	----------------------
+	
+	--Text to show which item we selected
+--	local tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
+--	tripSelectedText:setTextColor( 0 )
+--	tripSelectedText.x = display.contentWidth + tripSelectedText.contentWidth * 0.5
+--	tripSelectedText.y = display.contentCenterY
+--	view:insert( tripSelectedText )
+--	
+--	detailsGroup:insert( backButton )
+--	detailsGroup.backButton = backButton
+	 
+	----------------------
+	
+	view:insert(detailsGroup)
+end
+
+-----------------------------------------------------------------------------------------
+
+
 function showNoTrips()
-	print("showNoTrips")
 	transition.to( noTripText, { alpha = 1.0 } )
 end
 
 function hideNoTrips()
-	print("hideNoTrips")
 	transition.to( noTripText, { alpha = 0 } )
 end
 
@@ -192,22 +234,22 @@ end
 
 ----------------------
 -- Handle row touch events
-function onRowTouch( event, view )
+function onRowTouch( event )
 	local phase = event.phase
 	local row = event.target
 	local trip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
 		-- Update the item selected text
-		tripSelectedText.text = trip.displayName
-		tripSelectedImage = imagesManager.drawImage(view, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+		detailsGroup.tripSelectedText.text = trip.displayName
+		detailsGroup.tripSelectedImage = imagesManager.drawImage(detailsGroup, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
 
 		--Transition out the list, transition in the item selected text and the back button
 		transition.to( list, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
 		transition.to( syncwith, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
 		transition.to( tripitButton, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( tripSelectedText, { x = display.contentCenterX, time = 400, transition = easing.outExpo } )
-		transition.to( backButton, { alpha = 1, time = 400, transition = easing.outQuad } )
+		transition.to( detailsGroup.tripSelectedText, { x = display.contentCenterX, time = 400, transition = easing.outExpo } )
+		transition.to( detailsGroup.backButton, { alpha = 1, time = 400, transition = easing.outQuad } )
 	end
 end
 
@@ -219,29 +261,26 @@ function onBackRelease()
 	transition.to( list, { x = 0, time = 400, transition = easing.outExpo } )
 	transition.to( syncwith, { x = syncwithX, time = 400, transition = easing.outExpo } )
 	transition.to( tripitButton, { x = tripitButtonX, time = 400, transition = easing.outExpo } )
-	transition.to( tripSelectedText, { x = display.contentWidth + tripSelectedText.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
-	transition.to( backButton, { alpha = 0, time = 400, transition = easing.outQuad } )
+	transition.to( detailsGroup.tripSelectedText, { x = display.contentWidth + detailsGroup.tripSelectedText.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
+	transition.to( detailsGroup.backButton, { alpha = 0, time = 400, transition = easing.outQuad } )
 	
-	imagesManager.hideImage(tripSelectedImage)
+	imagesManager.hideImage(detailsGroup.tripSelectedImage)
 end
 -----------------------------------------------------------------------------------------
 
--- Called immediately after scene has moved onscreen:
+--- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	local view = self.view
-	hideNoTrips();
-	self:refreshScene(view);
-	onBackRelease();	
+	self:refreshScene();
 end
 
--- Called when scene is about to move offscreen:
+--- Called when scene is about to move offscreen:
 function scene:exitScene( event )
 	local view = self.view
 	-- INSERT code here (e.g. stop timers, remove listenets, unload sounds, etc.)
 
 end
 
--- If scene's view is removed, scene:destroyScene() will be called just prior to:
+--- If scene's view is removed, scene:destroyScene() will be called just prior to:
 function scene:destroyScene( event )
 	local view = self.view
 
@@ -250,21 +289,19 @@ function scene:destroyScene( event )
 end
 
 -----------------------------------------------------------------------------------------
--- END OF YOUR IMPLEMENTATION
------------------------------------------------------------------------------------------
 
--- "createScene" event is dispatched if scene's view does not exist
+--- "createScene" event is dispatched if scene's view does not exist
 scene:addEventListener( "createScene", scene )
 
--- "enterScene" event is dispatched whenever scene transition has finished
+--- "enterScene" event is dispatched whenever scene transition has finished
 scene:addEventListener( "enterScene", scene )
 
--- "exitScene" event is dispatched whenever before next scene's transition begins
+--- "exitScene" event is dispatched whenever before next scene's transition begins
 scene:addEventListener( "exitScene", scene )
 
--- "destroyScene" event is dispatched before view is unloaded, which can be
--- automatically unloaded in low memory situations, or explicitly via a call to
--- storyboard.purgeScene() or storyboard.removeScene().
+--- "destroyScene" event is dispatched before view is unloaded, which can be
+--- automatically unloaded in low memory situations, or explicitly via a call to
+--- storyboard.purgeScene() or storyboard.removeScene().
 scene:addEventListener( "destroyScene", scene )
 
 -----------------------------------------------------------------------------------------
