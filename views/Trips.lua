@@ -6,17 +6,13 @@
 -----------------------------------------------------------------------------------------
 
 local scene = storyboard.newScene()
-local tripit = require("libs.social.Tripit")
-
-local user
-local currentTrip
 
 -- Forward reference for our back button & tableview
-local list, backButton, syncwith, tripitButton, itemSelected
+local list, backButton, syncwith, tripitButton, tripSelectedText, noTripText, tripSelectedTextImage
 
-local syncwithX = display.contentWidth * 0.27
+local syncwithX = display.contentWidth * 0.38
 local syncwithY = display.contentHeight * 0.93
-local tripitButtonX = display.contentWidth * 0.6
+local tripitButtonX = display.contentWidth * 0.67
 local tripitButtonY = display.contentHeight * 0.93
 
 -----------------------------------------------------------------------------------------
@@ -30,49 +26,53 @@ local tripitButtonY = display.contentHeight * 0.93
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
 	local view = self.view
+	
+	----------------------
 	tripit.init();
- 	user = accountManager.user;
- 	
+
+	----------------------
 	--- reset + header
 	viewTools.drawHeader(view);
+ 	
+	----------------------
+	self:refreshScene(view)
+end
+
+-----------------------------------------------------------------------------------------
+
+function scene:refreshScene(view)
+	
+	----------------------
+	-- Reset all elements
+	
+	if(list ~= nil) then list:removeSelf() end
+	list = nil
+
+	if(noTripText ~= nil) then noTripText:removeSelf() end
+	noTripText = nil
+
+	if(syncwith ~= nil) then syncwith:removeSelf() end
+	syncwith = nil
+
+	if(tripitButton ~= nil) then tripitButton:removeSelf() end
+	tripitButton = nil
+	
+	if(tripSelectedText ~= nil) then tripSelectedText:removeSelf() end
+	tripSelectedText = nil
+
+	if(backButton ~= nil) then backButton:removeSelf() end
+	backButton = nil
 
 	----------------------
 	
-	drawTripList(view);
-	
-end
+	noTripText = display.newText( "No Trip", 0, 0, native.systemFontBold, 28 )
+	noTripText:setTextColor( 0 )
+	noTripText.x = display.contentWidth/2
+	noTripText.y = display.contentCenterY
+	noTripText.alpha = 0;
+	view:insert( noTripText )
 
------------------------------------------------------------------------------------------
-
-function tripitAuthenticated()
-	print ( "tripitAuthenticated" )
-
-	local trips = {}
-
-	for i in pairs(tripit.data.trips) do
-		local trip = {
-			displayName = tripit.data.trips[i].display_name.value,
-			id = tripit.data.trips[i].id.value,
-			startDate = tripit.data.trips[i].start_date.value,
-			endDate = tripit.data.trips[i].end_date.value,
-			country = tripit.data.trips[i].PrimaryLocationAddress.country.value,
-			city = tripit.data.trips[i].PrimaryLocationAddress.city.value,
-			latitude = tripit.data.trips[i].PrimaryLocationAddress.latitude.value,
-			longitude = tripit.data.trips[i].PrimaryLocationAddress.longitude.value,
-			imageUrl = tripit.data.trips[i].image_url.value,
-			lastModified = tripit.data.trips[i].last_modified.value
-		}
-
-		table.insert(trips, trip)
-	end
-
-	accountManager.user.trips = trips
-	accountManager.refreshTrips()
-end
-
------------------------------------------------------------------------------------------
-
-function drawTripList(view)
+	----------------------
 	
 	--- 'sync with' text
 	syncwith = display.newText( "sync with", 0, 0, native.systemFont, 21 )
@@ -83,7 +83,7 @@ function drawTripList(view)
 	view:insert( syncwith )
 
 	---- Add demo button to screen
-	local importFromTripit = function() return tripit.authorise(tripitAuthenticated) end;
+	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) end;
 	tripitButton = ui.newButton{
 		default="images/buttons/tripit.png", 
 		over="images/buttons/tripit.png", 
@@ -96,11 +96,11 @@ function drawTripList(view)
 	----------------------
 	
 	--Text to show which item we selected
-	itemSelected = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
-	itemSelected:setTextColor( 0 )
-	itemSelected.x = display.contentWidth + itemSelected.contentWidth * 0.5
-	itemSelected.y = display.contentCenterY
-	view:insert( itemSelected )
+	tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
+	tripSelectedText:setTextColor( 0 )
+	tripSelectedText.x = display.contentWidth + tripSelectedText.contentWidth * 0.5
+	tripSelectedText.y = display.contentCenterY
+	view:insert( tripSelectedText )
 	
 	----------------------
 	-- Create a tableView
@@ -138,11 +138,17 @@ function drawTripList(view)
 
 	----------------------
 	-- insert rows into list (tableView widget)
-	for i in pairs(user.trips) do
-		imagesManager.fetchImage(user.trips[i].imageUrl, createRow) 
-	end
-
+	-- 
+ 	if(accountManager.user.trips == nil or table.getn(accountManager.user.trips) == 0) then
+ 		showNoTrips();
+ 	else
+		for i in pairs(accountManager.user.trips) do
+			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, createRow) 
+		end
+ 	end		
+ 	
 end
+-----------------------------------------------------------------------------------------
 
 function createRow()
 	list:insertRow
@@ -155,12 +161,22 @@ function createRow()
 	}
 end
 
-----------------------
+function showNoTrips()
+	print("showNoTrips")
+	transition.to( noTripText, { alpha = 1.0 } )
+end
+
+function hideNoTrips()
+	print("hideNoTrips")
+	transition.to( noTripText, { alpha = 0 } )
+end
+
+-----------------------------------------------------------------------------------------
 -- Handle row rendering
 function onRowRender( event )
 	local phase = event.phase
 	local row = event.row
-	local tripRendered = user.trips[row.index];
+	local tripRendered = accountManager.user.trips[row.index];
 
 	local rowTitle = display.newText( row, tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
 	rowTitle:setTextColor( 0 )
@@ -179,20 +195,18 @@ end
 function onRowTouch( event, view )
 	local phase = event.phase
 	local row = event.target
-	currentTrip = user.trips[row.index];
-	currentTrip.ui = {}
+	local trip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
 		-- Update the item selected text
-		itemSelected.text = currentTrip.displayName
-
-		currentTrip.ui.image = imagesManager.drawImage(view, currentTrip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+		tripSelectedText.text = trip.displayName
+		tripSelectedImage = imagesManager.drawImage(view, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
 
 		--Transition out the list, transition in the item selected text and the back button
 		transition.to( list, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
 		transition.to( syncwith, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
 		transition.to( tripitButton, { x = - list.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( itemSelected, { x = display.contentCenterX, time = 400, transition = easing.outExpo } )
+		transition.to( tripSelectedText, { x = display.contentCenterX, time = 400, transition = easing.outExpo } )
 		transition.to( backButton, { alpha = 1, time = 400, transition = easing.outQuad } )
 	end
 end
@@ -205,21 +219,19 @@ function onBackRelease()
 	transition.to( list, { x = 0, time = 400, transition = easing.outExpo } )
 	transition.to( syncwith, { x = syncwithX, time = 400, transition = easing.outExpo } )
 	transition.to( tripitButton, { x = tripitButtonX, time = 400, transition = easing.outExpo } )
-	transition.to( itemSelected, { x = display.contentWidth + itemSelected.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
+	transition.to( tripSelectedText, { x = display.contentWidth + tripSelectedText.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
 	transition.to( backButton, { alpha = 0, time = 400, transition = easing.outQuad } )
 	
-	if(currentTrip ~= nil) then
-		imagesManager.hideImage(currentTrip.ui.image)
-	end
+	imagesManager.hideImage(tripSelectedImage)
 end
 -----------------------------------------------------------------------------------------
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	local view = self.view
+	hideNoTrips();
+	self:refreshScene(view);
 	onBackRelease();	
-
-	-- Do nothing
 end
 
 -- Called when scene is about to move offscreen:

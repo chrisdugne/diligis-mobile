@@ -47,6 +47,8 @@ function drawHeader(group)
 	}
 	group:insert( homeButton )
 	
+	--------------------------------
+	-- linkedin logout
 	local logoutAction = function() return linkedIn.deauthorise() end;
 	local logoutButton = ui.newButton{
 		default="images/buttons/home.png", 
@@ -56,6 +58,18 @@ function drawHeader(group)
 		y = titleBar.y
 	}
 	group:insert( logoutButton )
+
+	--------------------------------
+	-- tripit logout
+	local tripitLogoutAction = function() return tripit.logout() end;
+	local tripitLogoutButton = ui.newButton{
+		default="images/buttons/home.png", 
+		over="images/buttons/home.png", 
+		onRelease=tripitLogoutAction, 
+		x = 220,
+		y = titleBar.y
+	}
+	group:insert( tripitLogoutButton )
 	
 	--
 	--	--- top logo

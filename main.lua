@@ -24,6 +24,7 @@ ui 				= require "libs.ui"
 xml 			= require "libs.Xml"
 utils 			= require "libs.Utils"
 linkedIn 		= require "libs.social.LinkedIn"
+tripit 			= require "libs.social.Tripit"
 
 ---- Server access Managers
 accountManager 	= require "managers.AccountManager"

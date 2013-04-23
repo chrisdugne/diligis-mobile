@@ -9,7 +9,7 @@ local images = {}
 -----------------------------------------------------------------------------------------
 
 function fetchImage( url, next, fileName )
-    if(fileName == nil) then 
+    if not fileName then 
     	fileName = utils.imageName(url)
     end
     

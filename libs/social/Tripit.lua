@@ -7,7 +7,7 @@
 --
 -- File name: Tripit.lua
 --
--- Author: Chris Dugne of Uralys - www.uralys.com
+-- Author: Chris Dugne @ Uralys - www.uralys.com
 --
 ----------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ local callBackAuthorisationDone;
 
 ----------------------------------------------------------------------------------------------------
 
---- Initiates a new data object.
+--- Initiates a new tripit object.
 -- @param consumerKey The consumer key of your app.
 -- @param consumerSecret The consumer secret of your app.
 function init()
@@ -42,7 +42,7 @@ function init()
 	data.accessToken = nil
 	data.accessTokenSecret = nil
 
-	data.profile = nil
+	data.profile = {}
 
 end
 
@@ -135,30 +135,33 @@ function accessTokenListener( event )
 end
 
 -----------------------------------------------------------------------------------------
---- Data pulling
---- Require all data we want with the [accessToken + accessTokenSecret]
+--- tripit pulling
+--- Require all tripit we want with the [accessToken + accessTokenSecret]
 -----------------------------------------------------------------------------------------
 
---- profile request
+--- all trips + profile request
 function getTrips()
-
-	local profileUrl = "https://api.tripit.com/v1/list/trip";
+	local profileUrl = "https://api.tripit.com/v1/list/trip/past/true";
 	local customParams = {} 
 
 	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", tripsListener)
-        
 end
 
---- profile reception
+--- reception
 function tripsListener( event )
 
 	if ( not event.isError ) then
-	
 		local response = xml.parseXML(event.response).Response
+		data.profile.ref = response.Profile.ref
+		data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress.address.value;
 		data.trips = response.Trip
-		
 	end
 	
 	callBackAuthorisationDone();
 	
+end
+
+function logout()
+	local logoutUrl = "https://m.tripit.com/account/logout"
+	network.request(logoutUrl, "GET")
 end
