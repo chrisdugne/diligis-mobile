@@ -28,6 +28,7 @@ tripit 			= require "libs.social.Tripit"
 
 ---- Server access Managers
 accountManager 	= require "managers.AccountManager"
+eventManager 	= require "managers.EventManager"
 
 ---- App Tools
 router 			= require "tools.Router"

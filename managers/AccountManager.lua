@@ -10,48 +10,28 @@ user = {}
 --
 --
 function getAccount()
-	local serverUrl = SERVER_URL .. "/getAccount"
-
-	local postData = 
-	{
+	router.callServer({
 		user = user;
-	}
-
-	local headers = {}
-	headers["Content-Type"] = "application/json"
-
-	local params = {}
-	params.headers = headers
-	params.body = json.encode(postData)
-
-	network.request(serverUrl, "POST", getAccountListener, params)
+	},
+	"getAccount", 
+	getAccountListener)
 end
 
 function getAccountListener( event )
 	user = json.decode(event.response);
-	router.openHome();
+	eventManager.getStream();
 end
 
 -----------------------------------------------------------------------------------------
 --
 --
 function verifyTripitProfile()
-	local serverUrl = SERVER_URL .. "/verifyTripitProfile"
-	
-	local postData = 
-	{
-		user = user,
-		tripitProfile = tripit.data.profile;
-	}
-
-	local headers = {}
-	headers["Content-Type"] = "application/json"
-
-	local params = {}
-	params.headers = headers
-	params.body = json.encode(postData)
-	
-	network.request(serverUrl, "POST", verifyTripitListener, params)
+	router.callServer({
+		user 			= user,
+		tripitProfile 	= tripit.data.profile;
+	},
+	"verifyTripitProfile", 
+	verifyTripitListener)
 end
 
 function verifyTripitListener( event )
@@ -104,26 +84,10 @@ end
 --
 --
 function refreshTripsOnServer()
-	
-	local serverUrl = SERVER_URL .. "/refreshTrips"
-
-	local postData = 
-	{
-		user = accountManager.user;
-	}
-
-	local headers = {}
-	headers["Content-Type"] = "application/json"
-
-	local params = {}
-	params.headers = headers
-	params.body = json.encode(postData)
-
-	network.request(serverUrl, "POST", refreshTripsListener, params)
+	router.callServer({
+		user = user,
+	},
+	"refreshTrips", 
+	function() return router.openTrips() end)
 end
-
-function refreshTripsListener( event )
-	router.openTrips()
-end
-
 

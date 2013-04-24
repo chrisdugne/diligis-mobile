@@ -54,6 +54,7 @@ function scene:createScene( event )
 		onRelease=signinAction, 
 --		onRelease=openHomeForDummyAction, 
 		x = display.contentWidth/2, y = 3*display.contentHeight/4+20,
+		alpha = 1
 	}
 	
 	-- Create a spinner widget
@@ -76,9 +77,8 @@ end
 ------------------------------------------
 
 function linkedInConnect()
-	signInButton.alpha = 0
-
 	loadingSpinner:start()
+	transition.to( signInButton, { alpha = 0 } )
 	transition.to( loadingSpinner, { alpha = 1.0 } )
 	
 	linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET);

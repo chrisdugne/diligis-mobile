@@ -7,13 +7,13 @@
 local scene = storyboard.newScene()
 
 --- The elements
-local list, syncwith, tripitButton, noTripText, details
+local tripView, details
 
 --- Many settings
-local syncwithX = display.contentWidth * 0.38
-local syncwithY = display.contentHeight * 0.93
-local tripitButtonX = display.contentWidth * 0.67
-local tripitButtonY = display.contentHeight * 0.93
+local syncwithX 		= display.contentWidth 	* 0.38
+local syncwithY 		= display.contentHeight * 0.93
+local tripitButtonX 	= display.contentWidth 	* 0.67
+local tripitButtonY 	= display.contentHeight * 0.93
 
 -----------------------------------------------------------------------------------------
 -- NOTE: Code outside of listener functions (below) will only be executed once,
@@ -34,87 +34,17 @@ function scene:createScene( event )
  	
  	----------------------
 
-	details = display.newGroup()
-	
-	----------------------
-	
-	self:refreshScene()
-	
+	tripView = display.newGroup()
+	details  = display.newGroup()
 end
 
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
-
 	local view = self.view
-
 	----------------------
 
-	hideNoTrips();
-
-	----------------------
-	
-	if(list ~= nil) then list:removeSelf() end
-	list = nil
-
-	if(noTripText ~= nil) then noTripText:removeSelf() end
-	noTripText = nil
-
-	if(syncwith ~= nil) then syncwith:removeSelf() end
-	syncwith = nil
-
-	if(tripitButton ~= nil) then tripitButton:removeSelf() end
-	tripitButton = nil
-
-	----------------------
-	
-	noTripText = display.newText( "No Trip", 0, 0, native.systemFontBold, 28 )
-	noTripText:setTextColor( 0 )
-	noTripText.x = display.contentWidth/2
-	noTripText.y = display.contentCenterY
-	noTripText.alpha = 0;
-	view:insert( noTripText )
-
-	----------------------
-	
-	--- 'sync with' text
-	syncwith = display.newText( "sync with", 0, 0, native.systemFont, 21 )
-	syncwith:setTextColor( 0 )	
-	syncwith:setReferencePoint( display.CenterReferencePoint )
-	syncwith.x = syncwithX
-	syncwith.y = syncwithY
-	view:insert( syncwith )
-
-	---- Add demo button to screen
-	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) 
-	end
-	tripitButton = ui.newButton{
-		default="images/buttons/tripit.png", 
-		over="images/buttons/tripit.png", 
-		onRelease=importFromTripit, 
-		x = tripitButtonX,
-		y = tripitButtonY 
-	}
-	view:insert( tripitButton )
-
-	----------------------
-	-- Create a tableView
-
-	list = widget.newTableView
-	{
-		top = 38,
-		width = 320, 
-		height = 348,
-		hideBackground = true,
-		maskFile = "images/masks/mask-320x348.png",
-		onRowRender = onRowRender,
-		onRowTouch = onRowTouch,
-	}
-
-	--Insert widgets/images into a view
-	view:insert( list )
-	----------------------
-
+	self:buildTripView();
 	self:buildDetails();
 	
 	----------------------
@@ -131,7 +61,7 @@ function scene:refreshScene()
 end
 
 function createRow()
-	list:insertRow
+	tripView.list:insertRow
 	{
 		height = 72,
 		rowColor = 
@@ -139,6 +69,68 @@ function createRow()
 			default = { 255, 255, 255, 0 },
 		}
 	}
+end
+
+-----------------------------------------------------------------------------------------
+
+function scene:buildTripView()
+	local view = self.view
+	hideNoTrips()
+
+	----------------------
+	
+	utils.emptyGroup(tripView)
+
+	----------------------
+	local noTripText = display.newText( "No Trip", 0, 0, native.systemFontBold, 28 )
+	noTripText:setTextColor( 0 )
+	noTripText.x = display.contentWidth/2
+	noTripText.y = display.contentCenterY
+	noTripText.alpha = 0
+	
+	tripView:insert( noTripText )
+
+	----------------------
+	
+	--- 'sync with' text
+	local syncwith = display.newText( "sync with", 0, 0, native.systemFont, 21 )
+	syncwith:setTextColor( 0 )	
+	syncwith:setReferencePoint( display.CenterReferencePoint )
+	syncwith.x = syncwithX
+	syncwith.y = syncwithY
+	
+	tripView:insert( syncwith )
+
+	---- Add demo button to screen
+	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) end
+	local tripitButton = ui.newButton{
+		default="images/buttons/tripit.png", 
+		over="images/buttons/tripit.png", 
+		onRelease=importFromTripit, 
+		x = tripitButtonX,
+		y = tripitButtonY 
+	}
+	
+	tripView:insert( tripitButton )
+
+	----------------------
+	-- Create a tableView
+
+	local list = widget.newTableView{
+		top = 38,
+		width = 320, 
+		height = 348,
+		hideBackground = true,
+		maskFile = "images/masks/mask-320x348.png",
+		onRowRender = onRowRender,
+		onRowTouch = onRowTouch,
+	}
+
+	tripView:insert( list )
+	
+	----------------------
+
+	view:insert(tripView)
 end
 
 -----------------------------------------------------------------------------------------
@@ -210,18 +202,6 @@ function scene:buildDetails()
 	details.x = display.contentWidth + display.contentWidth * 0.5
 	details.y = 0
 	
---	startDate 			= "startDate",
---	endDate 			= "endDate"
-	--Text to show which item we selected
---	local tripSelectedText = display.newText( "Trip ", 0, 0, native.systemFontBold, 28 )
---	tripSelectedText:setTextColor( 0 )
---	tripSelectedText.x = display.contentWidth + tripSelectedText.contentWidth * 0.5
---	tripSelectedText.y = display.contentCenterY
---	view:insert( tripSelectedText )
---	
---	details:insert( backButton )
---	details.backButton = backButton
-	 
 	----------------------
 	
 	view:insert(details)
@@ -274,7 +254,7 @@ function onRowTouch( event )
 
 		--Transition out the list, transition in the item selected text and the back button
 		transition.to( list, 					{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( syncwith, 				{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
+		transition.to( tripView.syncwith, 				{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
 		transition.to( tripitButton, 			{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
 		transition.to( details, 				{ x = 0, time = 400, transition = easing.outExpo } )
 		transition.to( details.backButton, 		{ alpha = 1, time = 400, transition = easing.outQuad } )
@@ -287,7 +267,7 @@ end
 function onBackRelease()
 	--Transition in the list, transition out the item selected text and the back button
 	transition.to( list, 						{ x = 0, time = 400, transition = easing.outExpo } )
-	transition.to( syncwith, 					{ x = syncwithX, time = 400, transition = easing.outExpo } )
+	transition.to( tripView.syncwith, 			{ x = tripView.syncwithX, time = 400, transition = easing.outExpo } )
 	transition.to( tripitButton,				{ x = tripitButtonX, time = 400, transition = easing.outExpo } )
 	transition.to( details, 					{ x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
 	transition.to( details.backButton, 			{ alpha = 0, time = 400, transition = easing.outQuad } )
