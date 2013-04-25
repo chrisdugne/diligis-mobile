@@ -91,3 +91,29 @@ function refreshTripsOnServer()
 	function() return router.openTrips() end)
 end
 
+
+------------------------------------------
+--- LinkedIn
+-- 
+
+function linkedInConnect()
+	linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET);
+	linkedIn.authorise(linkedInConnected, linkedInCancel);
+end
+
+function linkedInCancel()
+	router.openTopHome()
+end
+
+function linkedInConnected()
+	user =	{
+		linkedinId = linkedIn.data.profile.id,
+		email = linkedIn.data.profile.emailAddress,
+		name = linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
+		headline = linkedIn.data.profile.headline,
+		industry = linkedIn.data.profile.industry
+	}
+
+	local next = function() return getAccount() end	
+	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next, "profilePicture.png");
+end

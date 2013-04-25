@@ -23,14 +23,12 @@ local tripitButtonY 	= display.contentHeight * 0.93
 
 --- Called when the scene's view does not exist:
 function scene:createScene( event )
-	local view = self.view
-	
 	----------------------
 	tripit.init();
 
 	----------------------
 	--- reset + header
-	viewTools.drawHeader(view);
+	viewTools.drawHeader(self.view);
  	
  	----------------------
 
@@ -46,17 +44,6 @@ function scene:refreshScene()
 	
 	self:buildTripView();
 	self:buildDetails();
-	
-	----------------------
-	-- insert rows into list (tableView widget)
-	-- 
- 	if(accountManager.user.trips == nil or table.getn(accountManager.user.trips) == 0) then
- 		showNoTrips();
- 	else
-		for i in pairs(accountManager.user.trips) do
-			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, createRow) 
-		end
- 	end		
 
 	----------------------
 	
@@ -111,14 +98,15 @@ function scene:buildTripView()
 	-- Create a tableView
 
 	local list = widget.newTableView{
-		top = 38,
-		width = 320, 
-		height = 348,
-		hideBackground = true,
-		maskFile = "images/masks/mask-320x348.png",
-		onRowRender = onRowRender,
-		onRowTouch = onRowTouch,
+		top 			= 38,
+		width 			= 320, 
+		height 			= 348,
+		hideBackground 	= true,
+		maskFile 		= "images/masks/mask-320x348.png",
+		onRowRender 	= function(event) return self:onRowRender(event) end,
+		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
+	
 
 	tripView:insert( list )
 	tripView.list = list
@@ -126,9 +114,22 @@ function scene:buildTripView()
 	----------------------
 
 	self.view:insert(tripView)
+	
+	----------------------
+	-- insert rows into list (tableView widget)
+	-- 
+ 	if(accountManager.user.trips == nil or table.getn(accountManager.user.trips) == 0) then
+ 		showNoTrips();
+ 	else
+		for i in pairs(accountManager.user.trips) do
+			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, self.createRow) 
+		end
+ 	end		
 end
 
-function createRow()
+-----------------------------------------------------------------------------------------
+--- List tools : row creation + touch events
+function scene:createRow()
 	tripView.list:insertRow
 	{
 		height = 72,
@@ -137,6 +138,45 @@ function createRow()
 			default = { 255, 255, 255, 0 },
 		}
 	}
+end
+
+----------------------
+--- Handle row rendering
+function scene:onRowRender( event )
+	local phase = event.phase
+	local row = event.row
+	local tripRendered = accountManager.user.trips[row.index];
+
+	local title = display.newText( tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
+	title:setTextColor( 0 )
+	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
+	title.y = row.contentHeight * 0.5
+	row:insert(title)
+
+	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
+	arrow.x = row.x + ( row.contentWidth * 0.5 ) - arrow.contentWidth
+	arrow.y = row.contentHeight * 0.5
+	row:insert(arrow)
+
+	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
+end
+
+----------------------
+-- Handle row touch events
+function scene:onRowTouch( event )
+	local phase = event.phase
+	local row = event.target
+	local trip = accountManager.user.trips[row.index];
+
+	if "release" == phase then
+		details.tripSelectedText.text 	= trip.displayName
+		details.address.text 			= trip.address
+		details.startDate.text 			= "From " .. trip.startDate
+		details.endDate.text 			= "To "   .. trip.endDate
+		details.tripSelectedImage 		= imagesManager.drawImage(details, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+		
+		showDetails()
+	end
 end
 
 -----------------------------------------------------------------------------------------
@@ -214,7 +254,7 @@ function scene:buildDetails()
 end
 
 -----------------------------------------------------------------------------------------
-
+--- states/transitions
 
 function showNoTrips()
 	transition.to( tripView.noTripText, { alpha = 1.0 } )
@@ -224,48 +264,6 @@ function hideNoTrips()
 	transition.to( tripView.noTripText, { alpha = 0 } )
 end
 
------------------------------------------------------------------------------------------
--- Handle row rendering
-function onRowRender( event )
-	local phase = event.phase
-	local row = event.row
-	local tripRendered = accountManager.user.trips[row.index];
-
-	local title = display.newText( tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
-	title:setTextColor( 0 )
-	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
-	title.y = row.contentHeight * 0.5
-	row:insert(title)
-
-	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
-	arrow.x = row.x + ( row.contentWidth * 0.5 ) - arrow.contentWidth
-	arrow.y = row.contentHeight * 0.5
-	row:insert(arrow)
-
-	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
-end
-
-----------------------
--- Handle row touch events
-function onRowTouch( event )
-	local phase = event.phase
-	local row = event.target
-	local trip = accountManager.user.trips[row.index];
-
-	if "release" == phase then
-		details.tripSelectedText.text 	= trip.displayName
-		details.address.text 			= trip.address
-		details.startDate.text 			= "From " .. trip.startDate
-		details.endDate.text 			= "To "   .. trip.endDate
-		details.tripSelectedImage 		= imagesManager.drawImage(details, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
-		
-		showDetails()
-	end
-end
-
-
-----------------------
---Handle the back button release event
 function showDetails()
 	transition.to( tripView, { x = - display.contentWidth, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = 0, time = 400, transition = easing.outExpo } )
@@ -285,17 +283,10 @@ end
 
 --- Called when scene is about to move offscreen:
 function scene:exitScene( event )
-	local view = self.view
-	-- INSERT code here (e.g. stop timers, remove listenets, unload sounds, etc.)
-
 end
 
 --- If scene's view is removed, scene:destroyScene() will be called just prior to:
 function scene:destroyScene( event )
-	local view = self.view
-
-	-- INSERT code here (e.g. remove listeners, remove widgets, save state variables, etc.)
-
 end
 
 -----------------------------------------------------------------------------------------

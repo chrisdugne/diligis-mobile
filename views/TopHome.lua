@@ -25,12 +25,12 @@ local loadingSpinner
 
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
-	local group = self.view
+	local view = self.view
 	
 	--- reset
 	local bg = display.newRect( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
 	bg:setFillColor( 255 )
-	group:insert( bg )
+	view:insert( bg )
 	
 	--- logo
 	local logo = display.newImage( "images/logos/d_logo.png" )
@@ -38,23 +38,21 @@ function scene:createScene( event )
 	logo.y = display.contentHeight/4
 	
 	--- sign in text
-	signin = display.newText( "sign in", 0, 0, native.systemFont, 21 )
-	signin:setTextColor( 0 )	
-	signin:setReferencePoint( display.CenterReferencePoint )
-	signin.x = display.contentWidth * 0.5
-	signin.y = 3*display.contentHeight/4 - 45
+	local signinText = display.newText( "sign in", 0, 0, native.systemFont, 21 )
+	signinText:setTextColor( 0 )	
+	signinText:setReferencePoint( display.CenterReferencePoint )
+	signinText.x = display.contentWidth * 0.5
+	signinText.y = 3*display.contentHeight/4 - 45
 		
 	--- in button
-	local signinAction = function() return linkedInConnect() end
-	local openHomeAction = function() return router.openHome() end
-	local openHomeForDummyAction = function() return dummyLinkedIn() end
+	local signinAction = function() return signIn() end
 	signInButton = ui.newButton{
-		default="images/buttons/linkedin.medium.png", 
-		over="images/buttons/linkedin.medium.png", 
-		onRelease=signinAction, 
---		onRelease=openHomeForDummyAction, 
-		x = display.contentWidth/2, y = 3*display.contentHeight/4+20,
-		alpha = 1
+		default		= "images/buttons/linkedin.medium.png", 
+		over		= "images/buttons/linkedin.medium.png", 
+		onRelease	= signinAction, 
+		alpha 		= 1,
+		x 			= display.contentWidth/2, 
+		y 			= 3*display.contentHeight/4+20
 	}
 	
 	-- Create a spinner widget
@@ -66,65 +64,37 @@ function scene:createScene( event )
 		height = 50,
 	}
 	loadingSpinner.alpha = 0
-	group:insert( loadingSpinner )
+	view:insert( loadingSpinner )
 	
 	--- all objects must be added to group (e.g. self.view)
-	group:insert( logo )
-	group:insert( signin )
-	group:insert( signInButton )
+	view:insert( logo )
+	view:insert( signinText )
+	view:insert( signInButton )
 end
 
 ------------------------------------------
 
-function linkedInConnect()
+function signIn()
 	loadingSpinner:start()
 	transition.to( signInButton, { alpha = 0 } )
 	transition.to( loadingSpinner, { alpha = 1.0 } )
-	
-	linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET);
-	linkedIn.authorise(linkedInConnected, linkedInCancel);
-end
-
-function linkedInCancel()
-	router.openTopHome()
-end
-
-function linkedInConnected()
-	accountManager.user =	{
-		linkedinId = linkedIn.data.profile.id,
-		email = linkedIn.data.profile.emailAddress,
-		name = linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
-		headline = linkedIn.data.profile.headline,
-		industry = linkedIn.data.profile.industry
-	}
-
-	local next = function() return accountManager.getAccount() end	
-	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next, "profilePicture.png");
+	accountManager.linkedInConnect()
 end
 
 ------------------------------------------
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	local group = self.view
 	loadingSpinner.alpha = 0
 	transition.to( signInButton, { alpha = 1.0 } )
 end
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )
-	local group = self.view
-	
-	-- INSERT code here (e.g. stop timers, remove listenets, unload sounds, etc.)
-	
 end
 
 -- If scene's view is removed, scene:destroyScene() will be called just prior to:
 function scene:destroyScene( event )
-	local group = self.view
-	
-	-- INSERT code here (e.g. remove listeners, remove widgets, save state variables, etc.)
-	
 end
 
 -----------------------------------------------------------------------------------------
