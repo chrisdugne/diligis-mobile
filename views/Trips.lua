@@ -41,9 +41,9 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
-	local view = self.view
-	----------------------
 
+	----------------------
+	
 	self:buildTripView();
 	self:buildDetails();
 	
@@ -57,28 +57,19 @@ function scene:refreshScene()
 			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, createRow) 
 		end
  	end		
- 	
-end
 
-function createRow()
-	tripView.list:insertRow
-	{
-		height = 72,
-		rowColor = 
-		{ 
-			default = { 255, 255, 255, 0 },
-		}
-	}
+	----------------------
+	
+	showTrips()
 end
 
 -----------------------------------------------------------------------------------------
 
 function scene:buildTripView()
-	local view = self.view
-	hideNoTrips()
 
 	----------------------
 	
+	hideNoTrips()
 	utils.emptyGroup(tripView)
 
 	----------------------
@@ -89,6 +80,7 @@ function scene:buildTripView()
 	noTripText.alpha = 0
 	
 	tripView:insert( noTripText )
+	tripView.noTripText = noTripText
 
 	----------------------
 	
@@ -100,6 +92,7 @@ function scene:buildTripView()
 	syncwith.y = syncwithY
 	
 	tripView:insert( syncwith )
+	tripView.syncwith = syncwith
 
 	---- Add demo button to screen
 	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) end
@@ -112,6 +105,7 @@ function scene:buildTripView()
 	}
 	
 	tripView:insert( tripitButton )
+	tripView.tripitButton = tripitButton
 
 	----------------------
 	-- Create a tableView
@@ -127,17 +121,30 @@ function scene:buildTripView()
 	}
 
 	tripView:insert( list )
+	tripView.list = list
 	
 	----------------------
 
-	view:insert(tripView)
+	self.view:insert(tripView)
+end
+
+function createRow()
+	tripView.list:insertRow
+	{
+		height = 72,
+		rowColor = 
+		{ 
+			default = { 255, 255, 255, 0 },
+		}
+	}
 end
 
 -----------------------------------------------------------------------------------------
 
 function scene:buildDetails()
 
-	local view = self.view
+	----------------------
+
 	utils.emptyGroup(details)
 	
 	----------------------
@@ -147,10 +154,9 @@ function scene:buildDetails()
 		height = 56,
 		label = "Back", 
 		labelYOffset = - 1,
-		onRelease = onBackRelease
+		onRelease = showTrips
 	}
 	
-	backButton.alpha = 0
 	backButton.x = display.contentCenterX
 	backButton.y = display.contentHeight - backButton.contentHeight
 	
@@ -204,18 +210,18 @@ function scene:buildDetails()
 	
 	----------------------
 	
-	view:insert(details)
+	self.view:insert(details)
 end
 
 -----------------------------------------------------------------------------------------
 
 
 function showNoTrips()
-	transition.to( noTripText, { alpha = 1.0 } )
+	transition.to( tripView.noTripText, { alpha = 1.0 } )
 end
 
 function hideNoTrips()
-	transition.to( noTripText, { alpha = 0 } )
+	transition.to( tripView.noTripText, { alpha = 0 } )
 end
 
 -----------------------------------------------------------------------------------------
@@ -225,14 +231,16 @@ function onRowRender( event )
 	local row = event.row
 	local tripRendered = accountManager.user.trips[row.index];
 
-	local rowTitle = display.newText( row, tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
-	rowTitle:setTextColor( 0 )
-	rowTitle.x = row.x - ( row.contentWidth * 0.5 ) + ( rowTitle.contentWidth * 0.5 ) + 50
-	rowTitle.y = row.contentHeight * 0.5
+	local title = display.newText( tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
+	title:setTextColor( 0 )
+	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
+	title.y = row.contentHeight * 0.5
+	row:insert(title)
 
-	local rowArrow = display.newImage( row, "images/buttons/rowArrow.png", false )
-	rowArrow.x = row.x + ( row.contentWidth * 0.5 ) - rowArrow.contentWidth
-	rowArrow.y = row.contentHeight * 0.5
+	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
+	arrow.x = row.x + ( row.contentWidth * 0.5 ) - arrow.contentWidth
+	arrow.y = row.contentHeight * 0.5
+	row:insert(arrow)
 
 	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
 end
@@ -245,35 +253,29 @@ function onRowTouch( event )
 	local trip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
-		-- Update the item selected text
 		details.tripSelectedText.text 	= trip.displayName
 		details.address.text 			= trip.address
 		details.startDate.text 			= "From " .. trip.startDate
 		details.endDate.text 			= "To "   .. trip.endDate
 		details.tripSelectedImage 		= imagesManager.drawImage(details, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
-
-		--Transition out the list, transition in the item selected text and the back button
-		transition.to( list, 					{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( tripView.syncwith, 				{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( tripitButton, 			{ x = - display.contentWidth, time = 400, transition = easing.outExpo } )
-		transition.to( details, 				{ x = 0, time = 400, transition = easing.outExpo } )
-		transition.to( details.backButton, 		{ alpha = 1, time = 400, transition = easing.outQuad } )
+		
+		showDetails()
 	end
 end
 
 
 ----------------------
 --Handle the back button release event
-function onBackRelease()
-	--Transition in the list, transition out the item selected text and the back button
-	transition.to( list, 						{ x = 0, time = 400, transition = easing.outExpo } )
-	transition.to( tripView.syncwith, 			{ x = tripView.syncwithX, time = 400, transition = easing.outExpo } )
-	transition.to( tripitButton,				{ x = tripitButtonX, time = 400, transition = easing.outExpo } )
-	transition.to( details, 					{ x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
-	transition.to( details.backButton, 			{ alpha = 0, time = 400, transition = easing.outQuad } )
-	
-	imagesManager.hideImage(details.tripSelectedImage)
+function showDetails()
+	transition.to( tripView, { x = - display.contentWidth, time = 400, transition = easing.outExpo } )
+	transition.to( details,  { x = 0, time = 400, transition = easing.outExpo } )
 end
+
+function showTrips()
+	transition.to( tripView, { x = 0, time = 400, transition = easing.outExpo } )
+	transition.to( details,  { x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
+end
+
 -----------------------------------------------------------------------------------------
 
 --- Called immediately after scene has moved onscreen:
