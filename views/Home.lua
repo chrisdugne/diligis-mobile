@@ -116,8 +116,10 @@ function scene:buildStream()
 
 	----------------------
 	-- 
-	for i in pairs(eventManager.stream) do
-		self:createRow() 
+	if(eventManager.stream ~= nil and table.getn(eventManager.stream) > 0 ) then
+		for i in pairs(eventManager.stream) do
+			self:createRow() 
+		end
 	end
 end
 

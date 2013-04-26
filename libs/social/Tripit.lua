@@ -96,7 +96,7 @@ function webviewListener( event )
 		if string.find(string.lower(event.url), "https://m.tripit.com/oauth/backtodiligis") then
 
 			getAccessToken()
-		
+
 			webView:removeSelf()
 			webView = nil;
 		end
@@ -117,7 +117,7 @@ function getAccessToken()
 	local customParams = {} 
 
 	oAuth.networkRequest(accessTokenUrl, customParams, data.consumerKey, data.requestToken, data.consumerSecret, data.requestTokenSecret, "POST", accessTokenListener)
-        
+
 end
 
 
@@ -130,9 +130,9 @@ function accessTokenListener( event )
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
 		getTripitProfile();
-		
+
 	end
-	
+
 end
 
 -----------------------------------------------------------------------------------------
@@ -152,10 +152,8 @@ end
 function tripitProfileListener( event )
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
-		
+
 		if(response.Error ~= nil) then
-			print("Error")
-			print(response.Error.description)
 			native.showAlert("Connection impossible", response.Error.description.value)
 			callBackCancel();
 			native.setActivityIndicator( false )
@@ -167,9 +165,9 @@ function tripitProfileListener( event )
 	end
 end
 
---- all trips + profile request
+--- trips to come
 function getTrips()
-	local tripsUrl = "https://api.tripit.com/v1/list/trip/past/true"
+	local tripsUrl = "https://api.tripit.com/v1/list/trip"
 	local customParams = {} 
 
 	oAuth.networkRequest(tripsUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", tripsListener)
@@ -180,9 +178,29 @@ function tripsListener( event )
 
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
-		data.trips = response.Trip
+		xml.asTable(response.Trip)
+		data.trips = response.Trip; 
+		getPastTrips()
 	end
-	
+end
+
+--- past trips
+function getPastTrips()
+	local tripsUrl = "https://api.tripit.com/v1/list/trip/past/true"
+	local customParams = {} 
+
+	oAuth.networkRequest(tripsUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", pastTripsListener)
+end
+
+--- reception
+function pastTripsListener( event )
+
+	if ( not event.isError ) then
+		local response = xml.parseXML(event.response).Response
+		xml.asTable(response.Trip)
+		utils.joinTables(data.trips, response.Trip)
+	end
+
 	callBackAuthorisationDone();
 	native.setActivityIndicator( false )
 end

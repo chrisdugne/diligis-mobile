@@ -68,6 +68,17 @@ end
 
 -----------------------------------------------------------------------------------------
 
+function joinTables(t1, t2)
+	if(t1 == nil) then t1 = {} end
+	if(t2 == nil) then t2 = {} end
+	for k,v in pairs(t2) do
+		 table.insert(t1, v) 
+	end 
+	return t1
+end
+
+-----------------------------------------------------------------------------------------
+
 function imageName( url )
 	local index = string.find(url,"/")
 	

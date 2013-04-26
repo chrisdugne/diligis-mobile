@@ -52,3 +52,18 @@ function parseXML( s )
 	end
 	return stack[1]
 end
+
+---
+-- if a list has 1 element, it wont be a table : call this to create a "list" with one element
+-- o : object that should be table
+function asTable(o)
+	if(o ~= nil) then
+		if(# o < 2) then
+			o = {o}
+		end
+	else
+		o = {}
+	end
+end
+
+

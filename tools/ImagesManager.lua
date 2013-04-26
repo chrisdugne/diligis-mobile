@@ -27,9 +27,6 @@ end
 
 function drawImage( group, url, x, y, positionFrom, scale, smooth )
 	
-	print("draw")
-	print(url)
-	
     local name = utils.imageName(url)
 	local image = display.newImage( group, name, system.TemporaryDirectory)
 	image.xScale = scale
