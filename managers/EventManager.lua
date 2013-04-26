@@ -8,9 +8,8 @@ stream = {}
 
 -----------------------------------------------------------------------------------------
 --
---
-function getStream()
 
+function getStream()
 	router.callServer({
 		user = accountManager.user;
 	},
@@ -19,7 +18,6 @@ function getStream()
 end
 
 function getStreamListener( event )
-	print(event.response)
 	stream = json.decode(event.response);
 	router.openHome();
 end

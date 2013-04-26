@@ -22,24 +22,20 @@ local menu, stream
 
 --- Called when the scene's view does not exist:
 function scene:createScene( event )
-
-	----------------------
-	--- reset + header
-	viewTools.drawHeader(self.view);
- 	
- 	----------------------
-
 	menu 	= display.newGroup()
 	stream  = display.newGroup()
-
- 	----------------------
-	
-	self:buildMenu();
 end
 	
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
+	----------------------
+	--- reset + header
+	viewTools.drawHeader(self.view);
+
+ 	----------------------
+	
+	self:buildMenu();
 	self:buildStream();
 end
 		

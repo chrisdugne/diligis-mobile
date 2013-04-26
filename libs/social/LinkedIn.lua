@@ -34,7 +34,7 @@ local callBackCancel;
 -- @param consumerKey The consumer key of your app.
 -- @param consumerSecret The consumer secret of your app.
 function init(consumerKey, consumerSecret)
-
+	
 	data.consumerKey = consumerKey
 	data.consumerSecret = consumerSecret
 
@@ -125,7 +125,6 @@ end
 
 --- 3 - Request the accessToken
 function getAccessToken(oauthVerifier)
-
 	local accessTokenUrl = "https://api.linkedin.com/uas/oauth/accessToken"
 
 	local customParams = 
@@ -147,7 +146,7 @@ function accessTokenListener( event )
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
 		getProfile();
-
+		--deauthorise()
 	end
 
 end

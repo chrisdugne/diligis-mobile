@@ -49,7 +49,7 @@ function drawHeader(group)
 	
 	--------------------------------
 	-- linkedin logout
-	local logoutAction = function() return linkedIn.deauthorise() end;
+	local logoutAction = function() return accountManager.logout() end;
 	local logoutButton = ui.newButton{
 		default="images/buttons/home.png", 
 		over="images/buttons/home.png", 
@@ -78,7 +78,7 @@ function drawHeader(group)
 --	logo.y = titleBar.y
 
 	-- linkedin picture
-	local profileImage = imagesManager.drawImage(group, "profilePicture.png", display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
+	local profileImage = imagesManager.drawImage(group, linkedIn.data.profile.pictureUrl, display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
 end
 
 function drawLoadingSpinner(group)

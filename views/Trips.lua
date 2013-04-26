@@ -26,10 +26,6 @@ function scene:createScene( event )
 	----------------------
 	tripit.init();
 
-	----------------------
-	--- reset + header
-	viewTools.drawHeader(self.view);
- 	
  	----------------------
 
 	tripView = display.newGroup()
@@ -40,6 +36,10 @@ end
 
 function scene:refreshScene()
 
+	----------------------
+	--- reset + header
+	viewTools.drawHeader(self.view);
+ 	
 	----------------------
 	
 	self:buildTripView();
@@ -82,7 +82,7 @@ function scene:buildTripView()
 	tripView.syncwith = syncwith
 
 	---- Add demo button to screen
-	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile) end
+	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile, self.cancelTripit) end
 	local tripitButton = ui.newButton{
 		default="images/buttons/tripit.png", 
 		over="images/buttons/tripit.png", 
@@ -125,6 +125,10 @@ function scene:buildTripView()
 			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, self.createRow) 
 		end
  	end		
+end
+
+function scene:cancelTripit()
+	print('cancel tripit')
 end
 
 -----------------------------------------------------------------------------------------

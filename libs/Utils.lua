@@ -58,11 +58,23 @@ end
 
 -----------------------------------------------------------------------------------------
 
+function string.startsWith(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
+function string.endsWith(String,End)
+   return End=='' or string.sub(String,-string.len(End))==End
+end
+
+-----------------------------------------------------------------------------------------
+
 function imageName( url )
-	
 	local index = string.find(url,"/")
 	
 	if(index == nil) then 
+		if(not string.endsWith(url, ".png")) then
+			url = url .. ".png"
+		end
 		return url;
 	else
 		local subURL = url:sub(index+1, string.len(url))

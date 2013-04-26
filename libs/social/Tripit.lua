@@ -25,6 +25,7 @@ local oAuth = require( "libs.oauth.oAuth" )
 
 local webView;
 local callBackAuthorisationDone;
+local callBackCancel;
 
 ----------------------------------------------------------------------------------------------------
 
@@ -52,9 +53,10 @@ end
 --
 
 --- 1 - Request a requestToken
-function authorise(callBack)
+function authorise(callBack, cancel)
 	native.setActivityIndicator( true )
 	callBackAuthorisationDone = callBack;
+	callBackCancel = cancel;
 	getRequestToken();
 end
 
@@ -77,12 +79,10 @@ function requestTokenListener( event )
 		-- need to add a dummy callBack to go to authListener (else go to the linkedIn OOB page)
 		local authenticateUrl = "https://m.tripit.com/oauth/authorize?oauth_token=" .. data.requestToken .."&oauth_callback=backtodiligis"
 
-		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
---		webView = native.newWebView( 0, 0, 320, 480 )
+		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight)
 		webView:request( authenticateUrl )
 
 		webView:addEventListener( "urlRequest", webviewListener )
-
 	end
 end
 
@@ -129,7 +129,7 @@ function accessTokenListener( event )
 		data.accessToken = event.response:match('oauth_token=([^&]+)')
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
-		getTrips();
+		getTripitProfile();
 		
 	end
 	
@@ -140,12 +140,39 @@ end
 --- Require all tripit we want with the [accessToken + accessTokenSecret]
 -----------------------------------------------------------------------------------------
 
---- all trips + profile request
-function getTrips()
-	local profileUrl = "https://api.tripit.com/v1/list/trip/past/true";
+--- profile request
+function getTripitProfile()
+	local profileUrl = "https://api.tripit.com/v1/get/profile"
 	local customParams = {} 
 
-	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", tripsListener)
+	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", tripitProfileListener)
+end
+
+--- reception
+function tripitProfileListener( event )
+	if ( not event.isError ) then
+		local response = xml.parseXML(event.response).Response
+		
+		if(response.Error ~= nil) then
+			print("Error")
+			print(response.Error.description)
+			native.showAlert("Connection impossible", response.Error.description.value)
+			callBackCancel();
+			native.setActivityIndicator( false )
+		else
+			data.profile.ref = response.Profile.ref
+			data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress.address.value;
+			getTrips()
+		end
+	end
+end
+
+--- all trips + profile request
+function getTrips()
+	local tripsUrl = "https://api.tripit.com/v1/list/trip/past/true"
+	local customParams = {} 
+
+	oAuth.networkRequest(tripsUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", tripsListener)
 end
 
 --- reception
@@ -153,8 +180,6 @@ function tripsListener( event )
 
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
-		data.profile.ref = response.Profile.ref
-		data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress.address.value;
 		data.trips = response.Trip
 	end
 	

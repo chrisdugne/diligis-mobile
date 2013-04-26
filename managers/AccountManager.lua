@@ -79,7 +79,6 @@ function refreshTrips()
 	refreshTripsOnServer()
 end
 
-
 -----------------------------------------------------------------------------------------
 --
 --
@@ -107,13 +106,21 @@ end
 
 function linkedInConnected()
 	user =	{
-		linkedinId = linkedIn.data.profile.id,
-		email = linkedIn.data.profile.emailAddress,
-		name = linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
-		headline = linkedIn.data.profile.headline,
-		industry = linkedIn.data.profile.industry
+		linkedinId 		= linkedIn.data.profile.id,
+		email 			= linkedIn.data.profile.emailAddress,
+		name 			= linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
+		headline 		= linkedIn.data.profile.headline,
+		industry 		= linkedIn.data.profile.industry
 	}
 
 	local next = function() return getAccount() end	
-	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next, "profilePicture.png");
+	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next);
+end
+
+-----------------------------------------------------------------------------------------
+--
+
+function logout()
+	linkedIn.deauthorise()
+	tripit.logout()
 end

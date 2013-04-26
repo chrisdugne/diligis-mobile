@@ -18,15 +18,18 @@ function fetchImage( url, next, fileName )
 end
 
 function storeImage( name, image, next)
-	image.alpha = 0;
+	image.alpha = 0
 	images[name] = image
 	next();
 end
 
 ------------------------------------------------------------
 
-function drawImage( group, url, x, y, positionFrom, scale )
-
+function drawImage( group, url, x, y, positionFrom, scale, smooth )
+	
+	print("draw")
+	print(url)
+	
     local name = utils.imageName(url)
 	local image = display.newImage( group, name, system.TemporaryDirectory)
 	image.xScale = scale
@@ -40,8 +43,11 @@ function drawImage( group, url, x, y, positionFrom, scale )
 		image.y = y
 	end
 
-	image.alpha = 0
-	transition.to( image, { alpha = 1.0 } )
+	if(smooth) then
+		transition.to( image, { alpha = 1.0 } )
+	else
+		image.alpha = 1
+	end
 	
 	return image;
 end
