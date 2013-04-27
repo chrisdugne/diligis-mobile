@@ -178,10 +178,10 @@ function tripsListener( event )
 
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
-		xml.asTable(response.Trip)
-		data.trips = response.Trip; 
+		data.trips = xml.asTable(response.Trip)
 		getPastTrips()
 	end
+	
 end
 
 --- past trips
@@ -197,12 +197,12 @@ function pastTripsListener( event )
 
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
-		xml.asTable(response.Trip)
-		utils.joinTables(data.trips, response.Trip)
+		utils.joinTables(data.trips, xml.asTable(response.Trip))
 	end
 
 	callBackAuthorisationDone();
 	native.setActivityIndicator( false )
+	
 end
 
 function logout()

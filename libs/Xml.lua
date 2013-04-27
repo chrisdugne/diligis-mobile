@@ -59,10 +59,10 @@ end
 function asTable(o)
 	if(o ~= nil) then
 		if(# o < 2) then
-			o = {o}
+			return {o}
 		end
 	else
-		o = {}
+		return {}
 	end
 end
 
