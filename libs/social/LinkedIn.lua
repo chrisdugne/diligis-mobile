@@ -115,10 +115,6 @@ function webviewListener( event )
 		end
 	end
 
-	if event.errorCode then
-		native.showAlert( "Error!", event.errorMessage, { "OK" } )
-	end
-
 end
 
 -----------------------------------------------------

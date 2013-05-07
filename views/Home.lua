@@ -10,7 +10,7 @@ local tripit = require("libs.social.Tripit")
 
 --- The elements
 -- 
-local menu, stream
+local stream
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -22,68 +22,14 @@ local menu, stream
 
 --- Called when the scene's view does not exist:
 function scene:createScene( event )
-	menu 	= display.newGroup()
 	stream  = display.newGroup()
 end
 	
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
-	----------------------
-	--- reset + header
-	viewTools.drawHeader(self.view);
-
- 	----------------------
-	
-	self:buildMenu();
+	viewTools.setupView(self.view);
 	self:buildStream();
-end
-		
------------------------------------------------------------------------------------------
-
-function scene:buildMenu()
-
-	utils.emptyGroup(menu)
-	
-	--- trips button
-	local openTripsAction = function() return router.openTrips() end;
-	local tripsButton = ui.newButton{
-		default="images/buttons/trips.medium.png", 
-		over="images/buttons/trips.medium.png", 
-		onRelease=openTripsAction, 
-		x = display.contentWidth * (25/100), y = display.contentHeight - 40,
-	}
-
-	menu:insert( tripsButton )
-	menu.tripsButton = tripsButton;
-
-	--- find button
-	local openFinderAction = function() return router.openFinder() end;
-	local findButton = ui.newButton{
-		default="images/buttons/find.medium.png", 
-		over="images/buttons/find.medium.png", 
-		onRelease=openFinderAction, 
-		x = display.contentWidth * (50/100), y = display.contentHeight - 40,
-	}
-
-	menu:insert( findButton )
-	menu.findButton = findButton;
-
-	--- messages button
-	local openMessagesAction = function() return router.openMessages() end;
-	local messagesButton = ui.newButton{
-		default="images/buttons/messages.medium.png", 
-		over="images/buttons/messages.medium.png", 
-		onRelease=openMessagesAction, 
-		x = display.contentWidth * (75/100), y = display.contentHeight - 40,
-	}
-
-	menu:insert( messagesButton )
-	menu.messagesButton = messagesButton;
-	
-	--- all objects must be added to group (e.g. self.view)
-
-	self.view:insert( menu )
 end
 	
 -----------------------------------------------------------------------------------------
@@ -98,10 +44,10 @@ function scene:buildStream()
 	-- Create a tableView
 	
 	local list = widget.newTableView{
-		top 			= 38,
+		top 				= 38,
 		width 			= 320, 
 		height			= 348,
-		hideBackground 	= true,
+		hideBackground = true,
 		maskFile 		= "images/masks/mask-320x348.png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end

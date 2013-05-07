@@ -108,7 +108,7 @@ function linkedInConnected()
 	user =	{
 		linkedinId 		= linkedIn.data.profile.id,
 		email 			= linkedIn.data.profile.emailAddress,
-		name 			= linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
+		name 				= linkedIn.data.profile.firstName .. " " .. linkedIn.data.profile.lastName,
 		headline 		= linkedIn.data.profile.headline,
 		industry 		= linkedIn.data.profile.industry
 	}

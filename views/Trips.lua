@@ -36,17 +36,11 @@ end
 
 function scene:refreshScene()
 
-	----------------------
-	--- reset + header
-	viewTools.drawHeader(self.view);
+	viewTools.setupView(self.view);
  	
-	----------------------
-	
 	self:buildTripView();
 	self:buildDetails();
 
-	----------------------
-	
 	showTrips()
 end
 
@@ -98,10 +92,10 @@ function scene:buildTripView()
 	-- Create a tableView
 
 	local list = widget.newTableView{
-		top 			= 38,
+		top 				= 38,
 		width 			= 320, 
 		height 			= 348,
-		hideBackground 	= true,
+		hideBackground = true,
 		maskFile 		= "images/masks/mask-320x348.png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end
@@ -136,7 +130,7 @@ end
 function scene:createRow()
 	tripView.list:insertRow
 	{
-		height = 72,
+		rowHeight = 104,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -154,15 +148,29 @@ function scene:onRowRender( event )
 	local title = display.newText( tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
-	title.y = row.contentHeight * 0.5
+	title.y = 22
 	row:insert(title)
 
 	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
-	arrow.x = row.x + ( row.contentWidth * 0.5 ) - arrow.contentWidth
+	arrow.x = row.x + ( display.contentWidth * 0.5 ) - arrow.contentWidth
 	arrow.y = row.contentHeight * 0.5
 	row:insert(arrow)
 
 	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
+	
+	--- find button (diligis)
+	local findButton = display.newImage ( "images/icons/diligis.icon.png", false) 
+	findButton.x = row.x + 10 
+	findButton.y = row.contentHeight - 35
+
+	row:insert( findButton )
+
+	--- messages button (messages)
+	local messagesButton = display.newImage ( "images/icons/messages.icon.png", false) 
+	messagesButton.x = row.x + 50
+	messagesButton.y = row.contentHeight - 35
+
+	row:insert( messagesButton )
 end
 
 ----------------------
@@ -173,7 +181,7 @@ function scene:onRowTouch( event )
 	local trip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
-		details.tripSelectedText.text 	= trip.displayName
+		details.tripSelectedText.text = trip.displayName
 		details.address.text 			= trip.address
 		details.startDate.text 			= "From " .. trip.startDate
 		details.endDate.text 			= "To "   .. trip.endDate

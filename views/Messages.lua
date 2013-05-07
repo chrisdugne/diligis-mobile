@@ -17,18 +17,13 @@ local scene = storyboard.newScene()
 
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
-	local group = self.view
-
-	--- reset + header
-	viewTools.drawHeader(group);
-
+	local view = self.view
 end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	local group = self.view
-
-	-- Do nothing
+	local view = self.view
+	viewTools.setupView(view);
 end
 
 -- Called when scene is about to move offscreen:
