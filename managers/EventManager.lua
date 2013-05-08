@@ -10,10 +10,10 @@ stream = {}
 --
 
 function getStream()
-	router.callServer({
+	utils.postWithJSON({
 		user = accountManager.user;
 	},
-	"getStream", 
+	SERVER_URL .. "/getStream", 
 	getStreamListener)
 end
 

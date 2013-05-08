@@ -10,10 +10,10 @@ user = {}
 --
 --
 function getAccount()
-	router.callServer({
+	utils.postWithJSON({
 		user = user;
 	},
-	"getAccount", 
+	SERVER_URL .. "/getAccount", 
 	getAccountListener)
 end
 
@@ -26,11 +26,11 @@ end
 --
 --
 function verifyTripitProfile()
-	router.callServer({
-		user 			= user,
+	utils.postWithJSON({
+		user 				= user,
 		tripitProfile 	= tripit.data.profile;
 	},
-	"verifyTripitProfile", 
+	SERVER_URL .. "/verifyTripitProfile", 
 	verifyTripitListener)
 end
 
@@ -83,10 +83,10 @@ end
 --
 --
 function refreshTripsOnServer()
-	router.callServer({
+	utils.postWithJSON({
 		user = user,
 	},
-	"refreshTrips", 
+	SERVER_URL .. "/refreshTrips", 
 	function() return router.openTrips() end)
 end
 
@@ -101,7 +101,7 @@ function linkedInConnect()
 end
 
 function linkedInCancel()
-	router.openTopHome()
+	router.openAppHome()
 end
 
 function linkedInConnected()

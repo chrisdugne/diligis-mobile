@@ -4,6 +4,11 @@
 --
 -----------------------------------------------------------------------------------------
 
+APP_NAME 	= "Diligis"
+APP_VERSION = "0.9.0"
+
+-----------------------------------------------------------------------------------------
+
 --SERVER_URL 		= "http://192.168.0.7:9000" 
 SERVER_URL 		= "http://localhost:9000" 
 
@@ -18,6 +23,12 @@ IMAGE_CENTER		= "IMAGE_CENTER";
 IMAGE_TOP_LEFT 	= "IMAGE_TOP_LEFT";
 
 -----------------------------------------------------------------------------------------
+
+ANALYTICS_VERSION 		= 1
+ANALYTICS_TRACKING_ID 	= "UA-40736136-1"
+ANALYTICS_PROFILE_ID 	= "72169019"
+
+-----------------------------------------------------------------------------------------
 --- Corona's libraries
 json 				= require "json"
 widget 			= require "widget"
@@ -29,6 +40,7 @@ xml 				= require "libs.Xml"
 utils 			= require "libs.Utils"
 linkedIn 		= require "libs.social.LinkedIn"
 tripit 			= require "libs.social.Tripit"
+analytics 		= require("libs.google.Analytics")
 
 ---- Server access Managers
 accountManager 	= require "managers.AccountManager"
@@ -44,15 +56,11 @@ imagesManager 	= require "tools.ImagesManager"
 menu = display.newGroup()
 
 -----------------------------------------------------------------------------------------
-
 print("-----------------------------------------------------");
-
 -----------------------------------------------------------------------------------------
 
 display.setStatusBar( display.HiddenStatusBar ) 
-
-------------------------------------------
-
-router.openTopHome();
+analytics.init(ANALYTICS_VERSION, ANALYTICS_TRACKING_ID, ANALYTICS_PROFILE_ID, APP_NAME, APP_VERSION)
+router.openAppHome()
 
 ------------------------------------------

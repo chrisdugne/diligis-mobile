@@ -1,15 +1,13 @@
 -----------------------------------------------------------------------------------------
 --
--- tophome.lua
+-- AppHome.lua
 --
-
 -----------------------------------------------------------------------------------------
 
-local scene = storyboard.newScene()
-local tripit = require("libs.social.Tripit")
+local scene 		= storyboard.newScene()
+local tripit 		= require("libs.social.Tripit")
 
 -----------------------------------------------------------------------------------------
---
 
 local linkedInImage
 local signInButton
@@ -25,6 +23,11 @@ local loadingSpinner
 
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
+
+	--- analytics
+	analytics.pageview("AppHome")
+	--- 
+	
 	local view = self.view
 	
 	--- reset
