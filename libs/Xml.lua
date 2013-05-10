@@ -60,6 +60,8 @@ function asTable(o)
 	if(o ~= nil) then
 		if(# o < 2) then
 			return {o}
+		else
+			return o
 		end
 	else
 		return {}

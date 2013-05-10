@@ -103,42 +103,64 @@ function drawMenu(view)
 	bg:setFillColor( 255 )
 	menu:insert( bg )
 
-	local t = display.newText( "Menu", 0, 40, native.systemFont, 20 )
-	t:setReferencePoint( display.CenterReferencePoint )
-	t:setTextColor( 000 )
-	menu:insert( t )
-	
 	--- trips button
-	local openTripsAction = function() return router.openTrips() end;
+
+	local openTripsAction = function() return router.openTrips() end
+
+	local tripsText = display.newText( "Trips", 160, 130, native.systemFont, 20 )
+	tripsText:setReferencePoint( display.CenterReferencePoint )
+	tripsText:setTextColor( 000 )
+	tripsText:addEventListener("tap", openTripsAction)
+	menu:insert( tripsText )
+
 	local tripsButton = ui.newButton{
 		default="images/buttons/trips.medium.png", 
 		over="images/buttons/trips.medium.png", 
 		onRelease=openTripsAction, 
-		x = display.contentWidth * (25/100), y = display.contentHeight - 40,
+		x = 90,
+		y = 140,
 	}
 
 	menu:insert( tripsButton )
 	menu.tripsButton = tripsButton;
 
-	--- find button
-	local openFinderAction = function() return router.openFinder() end;
-	local findButton = ui.newButton{
+	--- stream button
+
+	local openStreamAction = function() return router.openHome() end
+	
+	local streamText = display.newText( "Stream", 160, 230, native.systemFont, 20 )
+	streamText:setReferencePoint( display.CenterReferencePoint )
+	streamText:setTextColor( 000 )
+	streamText:addEventListener("tap", openStreamAction)
+	menu:insert( streamText )
+	
+	local streamButton = ui.newButton{
 		default="images/buttons/find.medium.png", 
 		over="images/buttons/find.medium.png", 
-		onRelease=openFinderAction, 
-		x = display.contentWidth * (50/100), y = display.contentHeight - 40,
+		onRelease=openStreamAction, 
+		x = 90,
+		y = 240,
 	}
 
-	menu:insert( findButton )
-	menu.findButton = findButton;
+	menu:insert( streamButton )
+	menu.streamButton = streamButton;
 
 	--- messages button
-	local openMessagesAction = function() return router.openMessages() end;
+
+	local openMessagesAction = function() return router.openMessages() end
+	 
+	local messagesText = display.newText( "Messages", 160, 330, native.systemFont, 20 )
+	messagesText:setReferencePoint( display.CenterReferencePoint )
+	messagesText:setTextColor( 000 )
+	messagesText:addEventListener("tap", openMessagesAction)
+	menu:insert( messagesText )
+	
 	local messagesButton = ui.newButton{
 		default="images/buttons/messages.medium.png", 
 		over="images/buttons/messages.medium.png", 
 		onRelease=openMessagesAction, 
-		x = display.contentWidth * (75/100), y = display.contentHeight - 40,
+		x = 90,
+		y = 340,
 	}
 
 	menu:insert( messagesButton )
