@@ -61,7 +61,7 @@ function authorise(callBack, cancel)
 end
 
 function getRequestToken()
-
+	print("getRequestToken")
 	local requestTokenUrl = "https://api.tripit.com/oauth/request_token"
 	local customParams = {}
 
@@ -79,6 +79,7 @@ function requestTokenListener( event )
 		-- need to add a dummy callBack to go to authListener (else go to the linkedIn OOB page)
 		local authenticateUrl = "https://m.tripit.com/oauth/authorize?oauth_token=" .. data.requestToken .."&oauth_callback=backtodiligis"
 
+		native.setActivityIndicator( false )
 		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight)
 		webView:request( authenticateUrl )
 
@@ -92,19 +93,23 @@ end
 --- 2 - Authorisation via LinkedIn Popup in the webView
 function webviewListener( event )
 
+	print(event.url)
+
 	if event.url then
-		if string.find(string.lower(event.url), "https://m.tripit.com/oauth/backtodiligis") then
-
+		if (string.lower(event.url) == "https://m.tripit.com/") then
+      	webView:removeSelf()
+      	webView = nil;
+		elseif string.find(string.lower(event.url), "https://m.tripit.com/oauth/backtodiligis") then
 			getAccessToken()
-
-			webView:removeSelf()
-			webView = nil;
+      	webView:removeSelf()
+      	webView = nil;
 		end
 	end
 
 	if event.errorCode then
 		native.showAlert( "Error!", event.errorMessage, { "OK" } )
 	end
+
 
 end
 
@@ -113,6 +118,8 @@ end
 --- 3 - Request the accessToken
 function getAccessToken()
 
+	native.setActivityIndicator( true )
+	
 	local accessTokenUrl = "https://api.tripit.com/oauth/access_token"
 	local customParams = {} 
 
@@ -125,14 +132,13 @@ end
 function accessTokenListener( event )
 
 	if ( not event.isError ) then
-
 		data.accessToken = event.response:match('oauth_token=([^&]+)')
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
-		getTripitProfile();
-
+		callBackAuthorisationDone();
 	end
-
+	
+	native.setActivityIndicator( false )
 end
 
 -----------------------------------------------------------------------------------------
@@ -140,8 +146,13 @@ end
 --- Require all tripit we want with the [accessToken + accessTokenSecret]
 -----------------------------------------------------------------------------------------
 
+local afterProfile
+
 --- profile request
-function getTripitProfile()
+function getTripitProfile(next)
+	
+	afterProfile = next
+
 	local profileUrl = "https://api.tripit.com/v1/get/profile"
 	local customParams = {} 
 
@@ -159,14 +170,29 @@ function tripitProfileListener( event )
 			native.setActivityIndicator( false )
 		else
 			data.profile.ref = response.Profile.ref
-			data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress.address.value;
-			getTrips()
+			
+			if(table.getn(response.Profile.ProfileEmailAddresses.ProfileEmailAddress) > 0) then
+				data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress[1].address.value;
+			else
+				data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress.address.value;
+			end
+			
+      	if(afterProfile ~= nil) then
+      		afterProfile()
+			end
 		end
 	end
 end
 
+-----------------------------------------------------------------------------------------
+
+local afterTrips
+
 --- trips to come
-function getTrips()
+function getTrips(next)
+	
+	afterTrips = next
+
 	local tripsUrl = "https://api.tripit.com/v1/list/trip"
 	local customParams = {} 
 
@@ -179,6 +205,7 @@ function tripsListener( event )
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
 		data.trips = xml.asTable(response.Trip)
+		
 		getPastTrips()
 	end
 	
@@ -199,13 +226,57 @@ function pastTripsListener( event )
 		local response = xml.parseXML(event.response).Response
 		utils.joinTables(data.trips, xml.asTable(response.Trip))
 	end
-
-	callBackAuthorisationDone();
-	native.setActivityIndicator( false )
 	
+   if(afterTrips ~= nil) then
+   	afterTrips()
+   end
+		
+	native.setActivityIndicator( false )
 end
 
 function logout()
 	local logoutUrl = "https://m.tripit.com/account/logout"
 	network.request(logoutUrl, "GET")
+end
+
+-----------------------------------------------------------------------------------------
+--- Tripit : create a Trip !
+-- 
+-- 
+-- 
+local afterCreateTrip 
+
+--- requestToken reception
+function openNewTripWindow(next)
+
+	afterCreateTrip = next
+
+	local createTripUrl = "https://m.tripit.com/trip/create"
+
+	webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight)
+	webView:request( createTripUrl )
+
+	webView:addEventListener( "urlRequest", createTripListener )
+end
+
+-----------------------------------------------------
+--
+
+--- 2 - Authorisation via LinkedIn Popup in the webView
+function createTripListener( event )
+
+	print("createTripListener : " .. event.url)
+	
+	if event.url == "https://m.tripit.com/home" 
+	or string.find(string.lower(event.url), "https://m.tripit.com/trip/show/id/") 
+	then
+	
+      if(afterCreateTrip ~= nil) then
+      	afterCreateTrip()
+      end
+		
+		webView:removeSelf()
+		webView = nil;
+	end
+
 end

@@ -23,6 +23,17 @@ function getAccountListener( event )
 end
 
 -----------------------------------------------------------------------------------------
+
+function getTripitProfileAndTrips()
+	tripit.getTripitProfile(verifyTripitProfile)
+end
+
+function syncTripsWithTripit()
+	print("syncTripsWithTripit")
+	tripit.getTrips(refreshTrips)
+end
+
+-----------------------------------------------------------------------------------------
 --
 --
 function verifyTripitProfile()
@@ -37,7 +48,7 @@ end
 function verifyTripitListener( event )
 
 	if(event.response == "ok") then
-		refreshTrips()
+ 		syncTripsWithTripit()
 	elseif(event.response == "exist") then
 		wrongTripit("Wrong Diligis account", "We have found another Diligis account linked with this Tripit account. Try another Tripit account or Login with your other Diligis account.")
 	else

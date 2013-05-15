@@ -9,8 +9,8 @@ APP_VERSION = "0.9.0"
 
 -----------------------------------------------------------------------------------------
 
---SERVER_URL 		= "http://192.168.0.7:9000" 
-SERVER_URL 		= "http://localhost:9000" 
+SERVER_URL 		= "http://192.168.0.8:9000" 
+--SERVER_URL 		= "http://localhost:9000" 
 
 -----------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ tripit 			= require "libs.social.Tripit"
 analytics 		= require("libs.google.Analytics")
 
 ---- Server access Managers
-accountManager 	= require "managers.AccountManager"
+accountManager = require "managers.AccountManager"
 eventManager 	= require "managers.EventManager"
 
 ---- App Tools

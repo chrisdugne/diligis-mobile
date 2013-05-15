@@ -51,11 +51,11 @@ function scene:createScene( event )
 	local signinAction = function() return signIn() end
 	signInButton = ui.newButton{
 		default		= "images/buttons/linkedin.medium.png", 
-		over		= "images/buttons/linkedin.medium.png", 
+		over			= "images/buttons/linkedin.medium.png", 
 		onRelease	= signinAction, 
 		alpha 		= 1,
-		x 			= display.contentWidth/2, 
-		y 			= 3*display.contentHeight/4+20
+		x 				= display.contentWidth/2, 
+		y 				= 3*display.contentHeight/4+20
 	}
 	
 	-- Create a spinner widget
@@ -73,6 +73,7 @@ function scene:createScene( event )
 	view:insert( logo )
 	view:insert( signinText )
 	view:insert( signInButton )
+	
 end
 
 ------------------------------------------

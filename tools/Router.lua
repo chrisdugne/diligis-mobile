@@ -27,8 +27,8 @@ end
 
 ---------------------------------------------
 
-function openHome()
-	storyboard.gotoScene( "views.Home" )
+function openStream()
+	storyboard.gotoScene( "views.Stream" )
 end
 
 ---------------------------------------------

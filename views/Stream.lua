@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- view1.lua
+-- Streams.lua
 --
 
 -----------------------------------------------------------------------------------------
@@ -75,7 +75,7 @@ end
 function scene:createRow()
 	stream.list:insertRow
 	{
-		rowHeight = 120,
+		rowHeight = 50,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -85,15 +85,36 @@ end
 
 ----------------------
 --- Handle row rendering
+--	
+
 function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local eventRendered = eventManager.stream[row.index];
 
-	local title = display.newText( eventRendered.text, 0, 0, 200, 100, native.systemFont, 14 )
+	local image
+	if(eventRendered.type == eventManager.ANNOUNCEMENT) then
+		image = "images/buttons/message.png"
+	elseif (eventRendered.type == eventManager.DILIGIS) then
+		image = "images/buttons/diligis.png"
+	elseif (eventRendered.type == eventManager.MESSAGE) then
+		image = "images/buttons/message.png"
+	elseif (eventRendered.type == eventManager.INVITATION) then
+		image = "images/buttons/diligis.png"
+--	elseif (eventRendered.type == eventManager.MEETING) then
+--		image = "images/buttons/diligis.png"
+	end
+	
+
+	local icon = display.newImage( image, false )
+	icon.x = icon.contentWidth/2 + 10
+	icon.y = row.height * 0.5
+	row:insert(icon)
+
+	local title = display.newText( eventRendered.text, 0, 0, 200, 50, native.systemFont, 14 )
 	title:setTextColor( 0 )
-	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
-	title.y = row.contentHeight * 0.5
+	title.x = 180
+	title.y = row.height * 0.5
 	row:insert(title)
 
 end

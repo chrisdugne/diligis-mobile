@@ -12,7 +12,7 @@ local tripView, details
 --- Many settings
 local syncwithX 		= display.contentWidth 	* 0.38
 local syncwithY 		= display.contentHeight * 0.93
-local tripitButtonX 	= display.contentWidth 	* 0.67
+local tripitButtonX 	= 50
 local tripitButtonY 	= display.contentHeight * 0.93
 
 -----------------------------------------------------------------------------------------
@@ -64,29 +64,33 @@ function scene:buildTripView()
 	tripView.noTripText = noTripText
 
 	----------------------
-	
-	--- 'sync with' text
-	local syncwith = display.newText( "sync with", 0, 0, native.systemFont, 21 )
-	syncwith:setTextColor( 0 )	
-	syncwith:setReferencePoint( display.CenterReferencePoint )
-	syncwith.x = syncwithX
-	syncwith.y = syncwithY
-	
-	tripView:insert( syncwith )
-	tripView.syncwith = syncwith
-
-	---- Add demo button to screen
-	local importFromTripit = function() return tripit.authorise(accountManager.verifyTripitProfile, self.cancelTripit) end
+	---- tripit sync button
+	local syncWithTripit = function() return tripit.authorise(accountManager.getTripitProfileAndTrips, self.cancelTripit) end
 	local tripitButton = ui.newButton{
-		default="images/buttons/tripit.png", 
-		over="images/buttons/tripit.png", 
-		onRelease=importFromTripit, 
-		x = tripitButtonX,
-		y = tripitButtonY 
+		default		= "images/buttons/refresh.png", 
+		over			= "images/buttons/refresh.png", 
+		onRelease	= syncWithTripit, 
+		x 				= tripitButtonX,
+		y 				= tripitButtonY 
 	}
 	
 	tripView:insert( tripitButton )
 	tripView.tripitButton = tripitButton
+
+	---- tripit create button
+	local afterCreateTrip 	= function() return tripit.openNewTripWindow(accountManager.syncTripsWithTripit) end
+	local createTrip 			= function() return tripit.authorise(afterCreateTrip, self.cancelTripit) end
+	
+	local createTripButton = ui.newButton{
+		default		= "images/buttons/add.png", 
+		over			= "images/buttons/add.png", 
+		onRelease	= createTrip, 
+		x 				= display.contentWidth - tripitButtonX,
+		y 				= tripitButtonY 
+	}
+	
+	tripView:insert( createTripButton )
+	tripView.createTripButton = createTripButton
 
 	----------------------
 	-- Create a tableView
@@ -100,7 +104,6 @@ function scene:buildTripView()
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
-	
 
 	tripView:insert( list )
 	tripView.list = list
