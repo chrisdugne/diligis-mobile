@@ -224,7 +224,7 @@ function pastTripsListener( event )
 
 	if ( not event.isError ) then
 		local response = xml.parseXML(event.response).Response
-		utils.joinTables(data.trips, xml.asTable(response.Trip))
+		data.trips = utils.joinTables(xml.asTable(response.Trip), data.trips)
 	end
 	
    if(afterTrips ~= nil) then

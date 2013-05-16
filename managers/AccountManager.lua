@@ -19,6 +19,7 @@ end
 
 function getAccountListener( event )
 	user = json.decode(event.response);
+	utils.tprint(user)
 	eventManager.getStream();
 end
 
@@ -29,7 +30,6 @@ function getTripitProfileAndTrips()
 end
 
 function syncTripsWithTripit()
-	print("syncTripsWithTripit")
 	tripit.getTrips(refreshTrips)
 end
 
@@ -37,6 +37,9 @@ end
 --
 --
 function verifyTripitProfile()
+
+	native.setActivityIndicator( true )
+	
 	utils.postWithJSON({
 		user 				= user,
 		tripitProfile 	= tripit.data.profile;
@@ -60,22 +63,26 @@ end
 
 function wrongTripit(title, message)
 	native.showAlert(title, message)
+	native.setActivityIndicator( false )
 	tripit.logout();
 end
+
+-----------------------------------------------------------------------------------------
 
 function refreshTrips()
 	local trips = {}
 	
+	native.setActivityIndicator( true )
 	if(tripit.data.trips ~= nil) then
 		for i in pairs(tripit.data.trips) do
 			local trip = {
 				displayName	 	= tripit.data.trips[i].display_name.value,
 				id 				= tripit.data.trips[i].id.value,
 				startDate 		= tripit.data.trips[i].start_date.value,
-				endDate 		= tripit.data.trips[i].end_date.value,
+				endDate 			= tripit.data.trips[i].end_date.value,
 				country		 	= tripit.data.trips[i].PrimaryLocationAddress.country.value,
-				city 			= tripit.data.trips[i].PrimaryLocationAddress.city.value,
-				address 		= tripit.data.trips[i].PrimaryLocationAddress.address.value,
+				city 				= tripit.data.trips[i].PrimaryLocationAddress.city.value,
+				address 			= tripit.data.trips[i].PrimaryLocationAddress.address.value,
 				latitude 		= tripit.data.trips[i].PrimaryLocationAddress.latitude.value,
 				longitude 		= tripit.data.trips[i].PrimaryLocationAddress.longitude.value,
 				imageUrl 		= tripit.data.trips[i].image_url.value,
@@ -98,9 +105,15 @@ function refreshTripsOnServer()
 		user = user,
 	},
 	SERVER_URL .. "/refreshTrips", 
-	function() return router.openTrips() end)
+	receivedTrips)
 end
 
+function receivedTrips( event )
+	user.trips = json.decode(event.response);
+	native.setActivityIndicator( false )
+	utils.tprint(user.trips)
+	return router.openTrips() 
+end
 
 ------------------------------------------
 --- LinkedIn

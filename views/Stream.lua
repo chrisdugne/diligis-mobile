@@ -46,9 +46,9 @@ function scene:buildStream()
 	local list = widget.newTableView{
 		top 				= 38,
 		width 			= 320, 
-		height			= 348,
+		height			= 448,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x348.png",
+		maskFile 		= "images/masks/mask-320x448.png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
@@ -94,7 +94,7 @@ function scene:onRowRender( event )
 
 	local image
 	if(eventRendered.type == eventManager.ANNOUNCEMENT) then
-		image = "images/buttons/message.png"
+		image = "images/buttons/trip.png"
 	elseif (eventRendered.type == eventManager.DILIGIS) then
 		image = "images/buttons/diligis.png"
 	elseif (eventRendered.type == eventManager.MESSAGE) then
@@ -105,7 +105,6 @@ function scene:onRowRender( event )
 --		image = "images/buttons/diligis.png"
 	end
 	
-
 	local icon = display.newImage( image, false )
 	icon.x = icon.contentWidth/2 + 10
 	icon.y = row.height * 0.5

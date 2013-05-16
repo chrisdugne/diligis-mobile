@@ -80,12 +80,20 @@ end
 -----------------------------------------------------------------------------------------
 
 function joinTables(t1, t2)
+	
+	local result = {}
 	if(t1 == nil) then t1 = {} end
 	if(t2 == nil) then t2 = {} end
-	for k,v in pairs(t2) do
-		table.insert(t1, v) 
+	
+	for k,v in pairs(t1) do
+		table.insert(result, v) 
 	end 
-	return t1
+
+	for k,v in pairs(t2) do
+		table.insert(result, v) 
+	end 
+
+	return result
 end
 
 -----------------------------------------------------------------------------------------

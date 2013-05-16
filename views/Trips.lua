@@ -133,7 +133,7 @@ end
 function scene:createRow()
 	tripView.list:insertRow
 	{
-		rowHeight = 104,
+		rowHeight = 70,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -155,25 +155,55 @@ function scene:onRowRender( event )
 	row:insert(title)
 
 	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
-	arrow.x = row.x + ( display.contentWidth * 0.5 ) - arrow.contentWidth
+	arrow.x = row.contentWidth - arrow.contentWidth
 	arrow.y = row.contentHeight * 0.5
 	row:insert(arrow)
 
 	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
+
+	if(#tripRendered.events > 0) then
 	
-	--- find button (diligis)
-	local findButton = display.newImage ( "images/icons/diligis.icon.png", false) 
-	findButton.x = row.x + 10 
-	findButton.y = row.contentHeight - 35
+		local nbMessages 	= 0
+		local nbDiligis 	= 0
+		
+		for i in pairs(tripRendered.events) do
+			if(tripRendered.events[i].content.type == eventManager.MESSAGE) then
+				nbMessages = nbMessages + 1
+			elseif(tripRendered.events[i].content.type == eventManager.DILIGIS) then
+				nbDiligis = nbDiligis + 1
+			end
+		end
 
-	row:insert( findButton )
+		if(nbMessages > 0) then
+      	--- messages icon
+      	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
+      	messagesIcon.x = row.contentWidth - 130 
+      	messagesIcon.y = row.contentHeight - 25
+      
+      	row:insert( messagesIcon )
+      	
+      	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 16 )
+      	messagesCount:setTextColor( 0 )
+      	messagesCount.x = messagesIcon.x - 30
+      	messagesCount.y = row.contentHeight - 25
+      	row:insert(messagesCount)
+   	end
+   	
+		if(nbDiligis > 0) then
+      	--- diligis icon
+      	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
+      	diligisIcon.x = row.contentWidth - 50 
+      	diligisIcon.y = row.contentHeight - 25
+      
+      	row:insert( diligisIcon )
 
-	--- messages button (messages)
-	local messagesButton = display.newImage ( "images/icons/messages.icon.png", false) 
-	messagesButton.x = row.x + 50
-	messagesButton.y = row.contentHeight - 35
-
-	row:insert( messagesButton )
+      	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 16 )
+      	diligisCount:setTextColor( 0 )
+      	diligisCount.x = diligisIcon.x - 30
+      	diligisCount.y = row.contentHeight - 25
+      	row:insert(diligisCount)
+   	end
+	end
 end
 
 ----------------------
@@ -190,6 +220,22 @@ function scene:onRowTouch( event )
 		details.endDate.text 			= "To "   .. trip.endDate
 		details.tripSelectedImage 		= imagesManager.drawImage(details, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
 		
+		local nbMessages 	= 0
+		local nbDiligis 	= 0
+   	
+   	if(#trip.events > 0) then
+   		for i in pairs(trip.events) do
+   			if(trip.events[i].content.type == eventManager.MESSAGE) then
+   				nbMessages = nbMessages + 1
+   			elseif(trip.events[i].content.type == eventManager.DILIGIS) then
+   				nbDiligis = nbDiligis + 1
+   			end
+   		end
+   	end
+   	
+		details.diligisCount.text 	= nbDiligis
+		details.messagesCount.text = nbMessages
+   	
 		showDetails()
 	end
 end
@@ -243,7 +289,7 @@ function scene:buildDetails()
 	local startDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	startDate:setTextColor( 0 )
 	startDate.x = display.contentWidth * 0.5
-	startDate.y = 320
+	startDate.y = 290
 
 	details:insert( startDate )
 	details.startDate = startDate
@@ -253,12 +299,46 @@ function scene:buildDetails()
 	local endDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	endDate:setTextColor( 0 )
 	endDate.x = display.contentWidth * 0.5
-	endDate.y = 360
+	endDate.y = 330
 
 	details:insert( endDate )
 	details.endDate = endDate 
 
 	----------------------
+
+	--- messages icon
+	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
+	messagesIcon.x = 100 
+	messagesIcon.y = 400
+
+	details:insert( messagesIcon )
+	details.messagesIcon = messagesIcon 
+	
+	local messagesCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	messagesCount:setTextColor( 0 )
+	messagesCount.x = messagesIcon.x - 30
+	messagesCount.y = 400
+
+	details:insert(messagesCount)
+	details.messagesCount = messagesCount 
+
+	--- diligis icon
+	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
+	diligisIcon.x = 250 
+	diligisIcon.y = 400
+
+	details:insert(diligisIcon)
+	details.diligisIcon = diligisIcon 
+
+	local diligisCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	diligisCount:setTextColor( 0 )
+	diligisCount.x = diligisIcon.x - 30
+	diligisCount.y = 400
+	
+	details:insert(diligisCount)
+	details.diligisCount = diligisCount 
+
+	------------------------------------------------
 	
 	details.x = display.contentWidth + display.contentWidth * 0.5
 	details.y = 0
