@@ -39,8 +39,14 @@ end
 
 ---------------------------------------------
 
-function openFinder()
-	storyboard.gotoScene( "views.Finder" )
+function openTripDiligis()
+	storyboard.gotoScene( "views.TripDiligis" )
+end
+
+---------------------------------------------
+
+function openWriteMessage()
+	storyboard.gotoScene( "views.WriteMessage" )
 end
 
 ---------------------------------------------

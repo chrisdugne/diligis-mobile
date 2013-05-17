@@ -117,6 +117,7 @@ end
 --a tester  https://gist.github.com/874792
 
 function tprint (tbl, indent)
+	if not tbl then print("Table nil") return end
 	if not indent then indent = 0 end
 	for k, v in pairs(tbl) do
 		formatting = string.rep("  ", indent) .. k .. ": "

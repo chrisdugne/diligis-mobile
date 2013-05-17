@@ -161,7 +161,7 @@ function scene:onRowRender( event )
 
 	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
 
-	if(#tripRendered.events > 0) then
+	if(tripRendered.events ~= nil and #tripRendered.events > 0) then
 	
 		local nbMessages 	= 0
 		local nbDiligis 	= 0
@@ -211,23 +211,22 @@ end
 function scene:onRowTouch( event )
 	local phase = event.phase
 	local row = event.target
-	local trip = accountManager.user.trips[row.index];
+	selectedTrip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
-		details.tripSelectedText.text = trip.displayName
-		details.address.text 			= trip.address
-		details.startDate.text 			= "From " .. trip.startDate
-		details.endDate.text 			= "To "   .. trip.endDate
-		details.tripSelectedImage 		= imagesManager.drawImage(details, trip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+		details.address.text 			= selectedTrip.address
+		details.startDate.text 			= "From " .. selectedTrip.startDate
+		details.endDate.text 			= "To "   .. selectedTrip.endDate
+		details.tripSelectedImage 		= imagesManager.drawImage(details, selectedTrip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
 		
 		local nbMessages 	= 0
 		local nbDiligis 	= 0
    	
-   	if(#trip.events > 0) then
-   		for i in pairs(trip.events) do
-   			if(trip.events[i].content.type == eventManager.MESSAGE) then
+   	if(selectedTrip.events ~= nil and #selectedTrip.events > 0) then
+   		for i in pairs(selectedTrip.events) do
+   			if(selectedTrip.events[i].content.type == eventManager.MESSAGE) then
    				nbMessages = nbMessages + 1
-   			elseif(trip.events[i].content.type == eventManager.DILIGIS) then
+   			elseif(selectedTrip.events[i].content.type == eventManager.DILIGIS) then
    				nbDiligis = nbDiligis + 1
    			end
    		end
@@ -252,7 +251,7 @@ function scene:buildDetails()
 
 	local backButton = widget.newButton	{
 		width = display.contentWidth/3,
-		height = 56,
+		height = 46,
 		label = "Back", 
 		labelYOffset = - 1,
 		onRelease = showTrips
@@ -266,20 +265,10 @@ function scene:buildDetails()
 
 	----------------------
 	
-	local tripSelectedText = display.newText( "", 0, 0, native.systemFontBold, 28 )
-	tripSelectedText:setTextColor( 0 )
-	tripSelectedText.x = display.contentWidth * 0.5
-	tripSelectedText.y = 200
-
-	details:insert( tripSelectedText )
-	details.tripSelectedText = tripSelectedText 
-
-	----------------------
-
-	local address = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	local address = display.newText( "", 0, 0, native.systemFontBold, 28 )
 	address:setTextColor( 0 )
 	address.x = display.contentWidth * 0.5
-	address.y = 240
+	address.y = 200
 
 	details:insert( address )
 	details.address = address 
@@ -289,7 +278,7 @@ function scene:buildDetails()
 	local startDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	startDate:setTextColor( 0 )
 	startDate.x = display.contentWidth * 0.5
-	startDate.y = 290
+	startDate.y = 250
 
 	details:insert( startDate )
 	details.startDate = startDate
@@ -299,7 +288,7 @@ function scene:buildDetails()
 	local endDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	endDate:setTextColor( 0 )
 	endDate.x = display.contentWidth * 0.5
-	endDate.y = 330
+	endDate.y = 290
 
 	details:insert( endDate )
 	details.endDate = endDate 
@@ -309,7 +298,7 @@ function scene:buildDetails()
 	--- messages icon
 	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
 	messagesIcon.x = 100 
-	messagesIcon.y = 400
+	messagesIcon.y = 360
 
 	details:insert( messagesIcon )
 	details.messagesIcon = messagesIcon 
@@ -317,7 +306,7 @@ function scene:buildDetails()
 	local messagesCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	messagesCount:setTextColor( 0 )
 	messagesCount.x = messagesIcon.x - 30
-	messagesCount.y = 400
+	messagesCount.y = 360
 
 	details:insert(messagesCount)
 	details.messagesCount = messagesCount 
@@ -325,7 +314,8 @@ function scene:buildDetails()
 	--- diligis icon
 	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
 	diligisIcon.x = 250 
-	diligisIcon.y = 400
+	diligisIcon.y = 360
+	diligisIcon:addEventListener("tap", router.openTripDiligis)
 
 	details:insert(diligisIcon)
 	details.diligisIcon = diligisIcon 
@@ -333,7 +323,8 @@ function scene:buildDetails()
 	local diligisCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	diligisCount:setTextColor( 0 )
 	diligisCount.x = diligisIcon.x - 30
-	diligisCount.y = 400
+	diligisCount.y = 360
+	diligisCount:addEventListener("tap", router.openTripDiligis)
 	
 	details:insert(diligisCount)
 	details.diligisCount = diligisCount 

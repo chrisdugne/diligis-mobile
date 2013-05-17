@@ -61,7 +61,6 @@ function authorise(callBack, cancel)
 end
 
 function getRequestToken()
-	print("getRequestToken")
 	local requestTokenUrl = "https://api.tripit.com/oauth/request_token"
 	local customParams = {}
 
@@ -92,8 +91,6 @@ end
 
 --- 2 - Authorisation via LinkedIn Popup in the webView
 function webviewListener( event )
-
-	print(event.url)
 
 	if event.url then
 		if (string.lower(event.url) == "https://m.tripit.com/") then
@@ -265,8 +262,6 @@ end
 --- 2 - Authorisation via LinkedIn Popup in the webView
 function createTripListener( event )
 
-	print("createTripListener : " .. event.url)
-	
 	if event.url == "https://m.tripit.com/home" 
 	or string.find(string.lower(event.url), "https://m.tripit.com/trip/show/id/") 
 	then
