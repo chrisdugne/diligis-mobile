@@ -34,3 +34,23 @@ function getStreamListener( event )
 end
 
 -----------------------------------------------------------------------------------------
+
+function sendMessage(text, contentUID, tripFromId)
+	native.setActivityIndicator( true )
+	utils.postWithJSON({
+		message = {
+			text 			= text,
+			contentUID 	= contentUID,
+			tripFromId 	= tripFromId
+		}
+	},
+	SERVER_URL .. "/sendMessage", 
+	messageSent)
+end
+
+function messageSent( event )
+	answer = event.response;
+	print(answer)
+	native.setActivityIndicator( false )
+	router.openTrips();
+end

@@ -22,6 +22,11 @@ end
 
 function drawHeader(view)
 
+	utils.emptyGroup(header)
+	header.x = 0
+	header.y = 0
+	header.buttons = {}
+	
 	--- header background
 	-- The gradient used by the title bar
 	local titleGradient = graphics.newGradient( 
@@ -32,7 +37,9 @@ function drawHeader(view)
 	local titleBar = display.newRect( 0, 0, display.contentWidth, 32 )
 	titleBar:setFillColor( titleGradient )
 	titleBar.y = display.screenOriginY + titleBar.contentHeight * 0.5
-	view:insert( titleBar )
+	titleBar.y = display.screenOriginY + titleBar.contentHeight * 0.5
+	header:insert( titleBar )
+	header.titleBar = titleBar
 
 	-- create embossed text to go on toolbar
 	local titleText = display.newText( "Diligis", 0, 0, native.systemFont, 20 )
@@ -40,22 +47,12 @@ function drawHeader(view)
 	titleText:setTextColor( 255 )
 	titleText.x = 160
 	titleText.y = titleBar.y
-	view:insert( titleBar )
 
-	--	local bgheader = display.newRect( 0, 0, display.contentWidth, (display.contentHeight)*(15/100) )
-	--	bgheader:setFillColor( 23,55,94 )
+	header:insert( titleText )
+	header.titleText = titleText
 
-	---- pour les dimensions de lecran....adapter a chaque device.... : http://developer.coronalabs.com/reference/index/systemgetinfo
 	--- home button
-	local toggleMenu = function() return router.toggleMenu() end;
-	local homeButton = ui.newButton{
-		default		= "images/buttons/home.png", 
-		over			= "images/buttons/home.png", 
-		onRelease	= toggleMenu, 
-		x 				= 25,
-		y 				= titleBar.y
-	}
-	view:insert( homeButton )
+	addHomeButton()
 	
 	--------------------------------
 	-- linkedin logout
@@ -67,7 +64,9 @@ function drawHeader(view)
 		x = 250,
 		y = titleBar.y
 	}
-	view:insert( logoutButton )
+	
+	header:insert( logoutButton )
+	header.logoutButton = logoutButton
 
 	--------------------------------
 	-- tripit logout
@@ -79,7 +78,9 @@ function drawHeader(view)
 		x = 220,
 		y = titleBar.y
 	}
-	view:insert( tripitLogoutButton )
+	
+	header:insert( tripitLogoutButton )
+	header.tripitLogoutButton = tripitLogoutButton
 	
 	--
 	--	--- top logo
@@ -89,6 +90,9 @@ function drawHeader(view)
 
 	-- linkedin picture
 	local profileImage = imagesManager.drawImage(view, linkedIn.data.profile.pictureUrl, display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
+	
+	header:insert( profileImage )
+	header.tripitLogoutButton = profileImage
 end
 
 ------------------------------------------------------------------------------------------
@@ -96,8 +100,8 @@ end
 function drawMenu(view)
 
 	utils.emptyGroup(menu)
-	menu.x = display.contentWidth + display.contentWidth * 0.5
-	menu.y = 0
+	menu.x = 0
+	menu.y = display.contentHeight + display.contentHeight * 0.5
 	
 	local bg = display.newRect( display.screenOriginX, display.screenOriginY + 38, display.contentWidth, display.contentHeight - 38 )
 	bg:setFillColor( 255 )
@@ -166,7 +170,6 @@ function drawMenu(view)
 	menu:insert( messagesButton )
 	menu.messagesButton = messagesButton;
 	
-	view:insert( menu )
 end
 
 ------------------------------------------------------------------------------
@@ -185,3 +188,53 @@ function drawLoadingSpinner(view)
 	spinner:start()
 
 end
+
+---------------------------------------------
+
+function toggleMenu()
+
+	menu:toFront()
+	
+	if(menu.y == 0) then
+		transition.to( menu,  { y = display.contentHeight + display.contentHeight * 0.5, time = 400, transition = easing.outExpo } )
+	else
+		transition.to( menu,  { y = 0, time = 400, transition = easing.outExpo } )
+	end
+end
+
+---------------------------------------------
+
+function addHomeButton()
+	addCustomButton("images/buttons/home2.png", toggleMenu)
+end
+
+---------------------------------------------
+
+function addCustomButton(image, action)
+
+	local newButton = ui.newButton{
+		default		= image, 
+		over			= image, 
+		onRelease	= action, 
+		x 				= 25,
+		y 				= header.titleBar.y
+	}
+	
+	for i in pairs(header.buttons) do
+   	transition.to( header.buttons[i],  { x = header.buttons[i].x + 40*i , time = 400, transition = easing.outExpo } )
+	end
+
+	header:insert( newButton )	
+	table.insert(header.buttons, 1, newButton)
+end
+
+---------------------------------------------
+
+function removeAllButtons()
+	for i in pairs(header.buttons) do
+   	header.buttons[i]:removeSelf()
+	end
+	
+	addHomeButton()
+end
+

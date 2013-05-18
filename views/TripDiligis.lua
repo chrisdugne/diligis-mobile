@@ -26,6 +26,7 @@ end
 
 function scene:refreshScene()
 	viewTools.setupView(self.view);
+	viewTools.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
 	self:buildDiligis();
 end
 	
@@ -33,21 +34,6 @@ end
 
 function scene:buildDiligis()
 
-	----------------------
-
-	local backButton = widget.newButton	{
-		width = display.contentWidth/3,
-		height = 46,
-		label = "Back", 
-		labelYOffset = - 1,
-		onRelease = router.openTrips
-	}
-	
-	backButton.x = display.contentCenterX
-	backButton.y = display.contentHeight - backButton.contentHeight
-	
-	self.view:insert( backButton )
-	
 	----------------------
 
 	list = widget.newTableView{
@@ -67,7 +53,7 @@ function scene:buildDiligis()
 
 	if(selectedTrip ~= nil and #selectedTrip.events > 0 ) then
 		for i in pairs(selectedTrip.events) do
-			if(selectedTrip.events[i].content.type > 0) then
+			if(selectedTrip.events[i].content.type == eventManager.DILIGIS) then
 				table.insert(events, selectedTrip.events[i])
    		end
 		end
@@ -130,7 +116,7 @@ function scene:onRowRender( event )
 	writeTo.y = 120
 	row:insert(writeTo)
 
-	local write = function() openWriter(diligis.travelerLinkedinUID, diligis.travelerName, diligis.travelerProfile) end
+	local write = function() openWriter(diligis) end
 	local message = display.newImage( "images/icons/messages.icon.png", false )
 	message.x = writeTo.x + 50
 	message.y = writeTo.y - 15
@@ -139,11 +125,8 @@ function scene:onRowRender( event )
 	
 end
 
-function openWriter(linkedinUID, name, profile)
-	selectedTraveler = {}
-	selectedTraveler.linkedinUID 	= linkedinUID
-	selectedTraveler.name 			= name
-	selectedTraveler.profile 		= profile
+function openWriter(diligis)
+	selectedDiligis = diligis
 	router.openWriteMessage()
 end
 

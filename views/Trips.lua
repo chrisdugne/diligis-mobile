@@ -36,12 +36,31 @@ end
 
 function scene:refreshScene()
 
-	viewTools.setupView(self.view);
- 	
-	self:buildTripView();
-	self:buildDetails();
+	viewTools.setupView(self.view)
+	addTripsButtons()
+	
+	self:buildTripView()
+	self:buildDetails()
 
 	showTrips()
+end
+
+-----------------------------------------------------------------------------------------
+
+function syncWithTripit()
+	 tripit.authorise(accountManager.getTripitProfileAndTrips, cancelTripit)
+end
+
+function afterCreateTrip()
+	tripit.openNewTripWindow(accountManager.syncTripsWithTripit)
+end
+
+function createTrip()
+	tripit.authorise(afterCreateTrip, cancelTripit)
+end
+
+function cancelTripit()
+	print('cancel tripit')
 end
 
 -----------------------------------------------------------------------------------------
@@ -64,43 +83,14 @@ function scene:buildTripView()
 	tripView.noTripText = noTripText
 
 	----------------------
-	---- tripit sync button
-	local syncWithTripit = function() return tripit.authorise(accountManager.getTripitProfileAndTrips, self.cancelTripit) end
-	local tripitButton = ui.newButton{
-		default		= "images/buttons/refresh.png", 
-		over			= "images/buttons/refresh.png", 
-		onRelease	= syncWithTripit, 
-		x 				= tripitButtonX,
-		y 				= tripitButtonY 
-	}
-	
-	tripView:insert( tripitButton )
-	tripView.tripitButton = tripitButton
-
-	---- tripit create button
-	local afterCreateTrip 	= function() return tripit.openNewTripWindow(accountManager.syncTripsWithTripit) end
-	local createTrip 			= function() return tripit.authorise(afterCreateTrip, self.cancelTripit) end
-	
-	local createTripButton = ui.newButton{
-		default		= "images/buttons/add.png", 
-		over			= "images/buttons/add.png", 
-		onRelease	= createTrip, 
-		x 				= display.contentWidth - tripitButtonX,
-		y 				= tripitButtonY 
-	}
-	
-	tripView:insert( createTripButton )
-	tripView.createTripButton = createTripButton
-
-	----------------------
 	-- Create a tableView
 
 	local list = widget.newTableView{
 		top 				= 38,
 		width 			= 320, 
-		height 			= 348,
+		height 			= 448,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x348.png",
+		maskFile 		= "images/masks/mask-320x448.png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
@@ -122,10 +112,6 @@ function scene:buildTripView()
 			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, self.createRow) 
 		end
  	end		
-end
-
-function scene:cancelTripit()
-	print('cancel tripit')
 end
 
 -----------------------------------------------------------------------------------------
@@ -249,22 +235,6 @@ function scene:buildDetails()
 	
 	----------------------
 
-	local backButton = widget.newButton	{
-		width = display.contentWidth/3,
-		height = 46,
-		label = "Back", 
-		labelYOffset = - 1,
-		onRelease = showTrips
-	}
-	
-	backButton.x = display.contentCenterX
-	backButton.y = display.contentHeight - backButton.contentHeight
-	
-	details:insert( backButton )
-	details.backButton = backButton 
-
-	----------------------
-	
 	local address = display.newText( "", 0, 0, native.systemFontBold, 28 )
 	address:setTextColor( 0 )
 	address.x = display.contentWidth * 0.5
@@ -340,6 +310,13 @@ function scene:buildDetails()
 end
 
 -----------------------------------------------------------------------------------------
+
+function addTripsButtons()
+	viewTools.addCustomButton("images/buttons/refresh.png", syncWithTripit);
+	viewTools.addCustomButton("images/buttons/add.png", createTrip);
+end
+
+-----------------------------------------------------------------------------------------
 --- states/transitions
 
 function showNoTrips()
@@ -353,11 +330,15 @@ end
 function showDetails()
 	transition.to( tripView, { x = - display.contentWidth, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = 0, time = 400, transition = easing.outExpo } )
+	viewTools.removeAllButtons()
+	viewTools.addCustomButton("images/buttons/leftArrow.png", showTrips);
 end
 
 function showTrips()
 	transition.to( tripView, { x = 0, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
+	viewTools.removeAllButtons()
+	addTripsButtons()
 end
 
 -----------------------------------------------------------------------------------------

@@ -63,7 +63,7 @@ function scene:buildWriter()
 	if not textBox then
       textBox = native.newTextBox( 25, - display.contentHeight, display.contentWidth-50, 220 )
    	textBox.font = native.newFont( native.systemFont, 14 )
-      textBox.text = "Hello " .. selectedTraveler.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
+      textBox.text = "Hello " .. selectedDiligis.travelerName .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
    	textBox.isEditable = true
       textBox:addEventListener( "userInput", inputListener )
 	end
@@ -101,9 +101,20 @@ function inputListener( event )
 end
 
 function sendMessage()
+
+--	selectedTraveler = {}
+--	selectedTraveler.linkedinUID 	= linkedinUID
+--	selectedTraveler.name 			= name
+--	selectedTraveler.profile 		= profile
+-- diligis.travelerLinkedinUID, diligis.travelerName, diligis.travelerProfile
+
 	print("------")
-	print("sending message to " .. selectedTraveler.linkedinUID)
+	print("sending message to " .. selectedDiligis.travelerLinkedinUID)
 	print(textBox.text)
+	print("contentUID : " .. selectedDiligis.content.uid)
+	print("tripFromId : " .. selectedTrip.tripitId)
+	
+	eventManager.sendMessage(textBox.text, selectedDiligis.content.uid, selectedTrip.tripitId)
 end
 
 -----------------------------------------------------------------------------------------

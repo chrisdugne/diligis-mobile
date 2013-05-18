@@ -53,13 +53,13 @@ imagesManager 	= require "tools.ImagesManager"
 
 ---- App views
 
+header = display.newGroup()
 menu = display.newGroup()
 
 ---- App globals
---
 
 selectedTrip 		= nil
-selectedTraveler 	= nil
+selectedDiligis 	= nil
 
 -----------------------------------------------------------------------------------------
 print("-----------------------------------------------------");

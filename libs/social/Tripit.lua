@@ -259,12 +259,16 @@ end
 -----------------------------------------------------
 --
 
---- 2 - Authorisation via LinkedIn Popup in the webView
 function createTripListener( event )
 
-	if event.url == "https://m.tripit.com/home" 
-	or string.find(string.lower(event.url), "https://m.tripit.com/trip/show/id/") 
+	if string.lower(event.url) == "https://m.tripit.com/"
+	or string.lower(event.url) == "https://m.tripit.com/home"
 	then
+		webView:removeSelf()
+		webView = nil;
+	end
+	
+	if string.find(string.lower(event.url), "https://m.tripit.com/trip/show/id/") then
 	
       if(afterCreateTrip ~= nil) then
       	afterCreateTrip()

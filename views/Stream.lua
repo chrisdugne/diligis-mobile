@@ -29,22 +29,16 @@ end
 
 function scene:refreshScene()
 	viewTools.setupView(self.view);
+	viewTools.addCustomButton("images/buttons/refresh.png", sync);
 	self:buildStream();
-	
-	----------------------
-	---- sync button
-	local sync = function() return eventManager.getStream() end
-	local syncButton = ui.newButton{
-		default		= "images/buttons/refresh.png", 
-		over			= "images/buttons/refresh.png", 
-		onRelease	= sync, 
-		x 				= display.contentWidth/2,
-		y 				= display.contentHeight - 30 
-	}
-	
-	self.view:insert( syncButton )
 end
-	
+
+-----------------------------------------------------------------------------------------
+
+function sync()
+	return eventManager.getStream() 
+end
+
 -----------------------------------------------------------------------------------------
 
 function scene:buildStream()
