@@ -1,16 +1,13 @@
 -----------------------------------------------------------------------------------------
 --
--- Streams.lua
+-- TripMessages.lua
 --
 
 -----------------------------------------------------------------------------------------
 
 local scene = storyboard.newScene()
-local tripit = require("libs.social.Tripit")
-
---- The elements
--- 
-local stream
+local list
+local events
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -22,51 +19,49 @@ local stream
 
 --- Called when the scene's view does not exist:
 function scene:createScene( event )
-	stream  = display.newGroup()
+
 end
 	
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
 	viewManager.setupView(self.view);
-	viewManager.addCustomButton("images/buttons/refresh.png", eventManager.getStream);
-	self:buildStream();
+	viewManager.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
+	viewManager.addCustomButton("images/icons/messages.icon.png", openWriter);
+	self:buildMessages();
 end
-
+	
 -----------------------------------------------------------------------------------------
 
-function scene:buildStream()
+function scene:buildMessages()
 
 	----------------------
 
-	utils.emptyGroup(stream)
-	
-	----------------------
-	-- Create a tableView
-	
-	local list = widget.newTableView{
+	list = widget.newTableView{
 		top 				= 38,
 		width 			= 320, 
 		height			= 448,
 		hideBackground = true,
 		maskFile 		= "images/masks/mask-320x448.png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
-		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
 
-	stream:insert( list )
-	stream.list = list
+	self.view:insert( list )
 
 	----------------------
 	
-	self.view:insert( stream )
+	events = {}
 
-	----------------------
-	-- 
-	if(eventManager.stream ~= nil and table.getn(eventManager.stream) > 0 ) then
-		for i in pairs(eventManager.stream) do
-			self:createRow() 
+	if(selectedTrip ~= nil and #selectedTrip.events > 0 ) then
+		for i in pairs(selectedTrip.events) do
+			if(selectedTrip.events[i].content.type == eventManager.MESSAGE) then
+				table.insert(events, selectedTrip.events[i])
+   		end
 		end
+	end
+
+	for i in pairs(events) do
+		self:createRow() 
 	end
 end
 
@@ -74,9 +69,9 @@ end
 -----------------------------------------------------------------------------------------
 --- List tools : row creation + touch events
 function scene:createRow()
-	stream.list:insertRow
+	list:insertRow
 	{
-		rowHeight = 54,
+		rowHeight = 144,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -91,43 +86,32 @@ end
 function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
-	local eventRendered = eventManager.stream[row.index];
+	local message = events[row.index];
 
-	local image
-	if(eventRendered.content.type == eventManager.ANNOUNCEMENT) then
-		image = "images/buttons/trip.png"
-	elseif (eventRendered.content.type == eventManager.DILIGIS) then
-		image = "images/buttons/diligis.png"
-	elseif (eventRendered.content.type == eventManager.MESSAGE) then
-		image = "images/buttons/message.png"
-	elseif (eventRendered.content.type == eventManager.INVITATION) then
-		image = "images/buttons/diligis.png"
---	elseif (eventRendered.type == eventManager.MEETING) then
---		image = "images/buttons/diligis.png"
-	end
-	
-	local icon = display.newImage( image, false )
+	local icon = display.newImage( "images/buttons/message.png", false )
 	icon.x = icon.contentWidth/2 + 10
 	icon.y = row.height * 0.5
 	row:insert(icon)
 
-	local title = display.newText( eventRendered.content.text, 0, 0, 200, 50, native.systemFont, 14 )
-	title:setTextColor( 0 )
-	title.x = 180
-	title.y = row.height * 0.5
-	row:insert(title)
+	local travelerName = display.newText( "From " .. message.travelerName, 205, 30, 270, 50, native.systemFontBold, 14 )
+	travelerName:setTextColor( 0 )
+	row:insert(travelerName)
 
+	local travelerProfile = display.newText( message.travelerProfile, 205, 50, 270, 50, native.systemFont, 14 )
+	travelerProfile:setTextColor( 0 )
+	row:insert(travelerProfile)
+
+	local text = display.newText( message.content.text, 205, 110, 270, 50, native.systemFont, 14 )
+	text:setTextColor( 0 )
+	row:insert(text)
+	
 end
 
-----------------------
--- Handle row touch events
-function scene:onRowTouch( event )
-	local phase = event.phase
-	local row = event.target
-	local eventRendered = eventManager.stream[row.index];
 
-	if "release" == phase then
-	end
+function openWriter(message)
+	-- todo : create the selectedevent with eventSender = user
+	selectedEvent = message
+	router.openWriteMessage()
 end
 
 -----------------------------------------------------------------------------------------

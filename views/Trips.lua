@@ -36,7 +36,7 @@ end
 
 function scene:refreshScene()
 
-	viewTools.setupView(self.view)
+	viewManager.setupView(self.view)
 	addTripsButtons()
 	
 	self:buildTripView()
@@ -269,6 +269,7 @@ function scene:buildDetails()
 	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
 	messagesIcon.x = 100 
 	messagesIcon.y = 360
+	messagesIcon:addEventListener("tap", router.openTripMessages)
 
 	details:insert( messagesIcon )
 	details.messagesIcon = messagesIcon 
@@ -277,6 +278,7 @@ function scene:buildDetails()
 	messagesCount:setTextColor( 0 )
 	messagesCount.x = messagesIcon.x - 30
 	messagesCount.y = 360
+	messagesCount:addEventListener("tap", router.openTripMessages)
 
 	details:insert(messagesCount)
 	details.messagesCount = messagesCount 
@@ -312,8 +314,8 @@ end
 -----------------------------------------------------------------------------------------
 
 function addTripsButtons()
-	viewTools.addCustomButton("images/buttons/refresh.png", syncWithTripit);
-	viewTools.addCustomButton("images/buttons/add.png", createTrip);
+	viewManager.addCustomButton("images/buttons/refresh.png", syncWithTripit);
+	viewManager.addCustomButton("images/buttons/add.png", createTrip);
 end
 
 -----------------------------------------------------------------------------------------
@@ -330,14 +332,14 @@ end
 function showDetails()
 	transition.to( tripView, { x = - display.contentWidth, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = 0, time = 400, transition = easing.outExpo } )
-	viewTools.removeAllButtons()
-	viewTools.addCustomButton("images/buttons/leftArrow.png", showTrips);
+	viewManager.removeAllButtons()
+	viewManager.addCustomButton("images/buttons/leftArrow.png", showTrips);
 end
 
 function showTrips()
 	transition.to( tripView, { x = 0, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
-	viewTools.removeAllButtons()
+	viewManager.removeAllButtons()
 	addTripsButtons()
 end
 

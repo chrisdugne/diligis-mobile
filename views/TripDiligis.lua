@@ -25,8 +25,8 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
-	viewTools.setupView(self.view);
-	viewTools.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
+	viewManager.setupView(self.view);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
 	self:buildDiligis();
 end
 	
@@ -51,7 +51,10 @@ function scene:buildDiligis()
 	
 	events = {}
 
-	if(selectedTrip ~= nil and #selectedTrip.events > 0 ) then
+	if( selectedTrip ~= nil 
+	and selectedTrip.events ~= nil 
+	and #selectedTrip.events > 0 )
+	then
 		for i in pairs(selectedTrip.events) do
 			if(selectedTrip.events[i].content.type == eventManager.DILIGIS) then
 				table.insert(events, selectedTrip.events[i])
@@ -86,7 +89,8 @@ function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local diligis = events[row.index];
-
+	if type(diligis.sender) ~= "table" then diligis.sender = json.decode(diligis.sender) end
+	
 	local icon = display.newImage( "images/buttons/diligis.png", false )
 	icon.x = icon.contentWidth/2 + 10
 	icon.y = row.height * 0.5
@@ -98,17 +102,17 @@ function scene:onRowRender( event )
 	text.y = 30
 	row:insert(text)
 
-	local travelerName = display.newText( diligis.travelerName, 0, 0, 270, 50, native.systemFontBold, 14 )
-	travelerName:setTextColor( 0 )
-	travelerName.x = 205
-	travelerName.y = 70
-	row:insert(travelerName)
+	local senderName = display.newText( diligis.sender.name, 0, 0, 270, 50, native.systemFontBold, 14 )
+	senderName:setTextColor( 0 )
+	senderName.x = 205
+	senderName.y = 70
+	row:insert(senderName)
 
-	local travelerProfile = display.newText( diligis.travelerProfile, 0, 0, 270, 50, native.systemFont, 14 )
-	travelerProfile:setTextColor( 0 )
-	travelerProfile.x = 205
-	travelerProfile.y = 90
-	row:insert(travelerProfile)
+	local senderProfile = display.newText( diligis.sender.headline, 0, 0, 270, 50, native.systemFont, 14 )
+	senderProfile:setTextColor( 0 )
+	senderProfile.x = 205
+	senderProfile.y = 90
+	row:insert(senderProfile)
 
 	local writeTo = display.newText( "Write a message : ", 0, 0, 270, 50, native.systemFont, 14 )
 	writeTo:setTextColor( 0 )
@@ -117,17 +121,20 @@ function scene:onRowRender( event )
 	row:insert(writeTo)
 
 	local write = function() openWriter(diligis) end
-	local message = display.newImage( "images/icons/messages.icon.png", false )
-	message.x = writeTo.x + 50
-	message.y = writeTo.y - 15
-	message:addEventListener("tap", write)
+	local message = ui.newButton{
+		default		= "images/icons/messages.icon.png", 
+		over			= "images/icons/messages.icon.png", 
+		onRelease	= write, 
+		x 				= writeTo.x + 50,
+		y 				= writeTo.y - 15
+	}
+	
 	row:insert(message)
 	
 end
 
 function openWriter(diligis)
-	selectedDiligis = diligis
-	router.openWriteMessage()
+	router.openWriteMessage(diligis)
 end
 
 -----------------------------------------------------------------------------------------

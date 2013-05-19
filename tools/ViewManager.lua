@@ -4,9 +4,9 @@ module(..., package.seeall)
 
 -----------------------------------------------------------------------------------------
 
-function setupView(view)
+function setupView(view, showMenuCustomAction)
 	reset			(view)
-	drawHeader	(view)
+	drawHeader	(view, showMenuCustomAction)
 	drawMenu		(view)
 end
 
@@ -19,8 +19,10 @@ function reset(view)
 end
 
 ------------------------------------------------------------------------------------------
+-- 																										HEADER
+------------------------------------------------------------------------------------------
 
-function drawHeader(view)
+function drawHeader(view, showMenuCustomAction)
 
 	utils.emptyGroup(header)
 	header.x = 0
@@ -52,17 +54,17 @@ function drawHeader(view)
 	header.titleText = titleText
 
 	--- home button
-	addHomeButton()
+	addHomeButton(showMenuCustomAction)
 	
 	--------------------------------
 	-- linkedin logout
-	local logoutAction = function() return accountManager.logout() end;
+	
 	local logoutButton = ui.newButton{
-		default="images/buttons/home.png", 
-		over="images/buttons/home.png", 
-		onRelease=logoutAction, 
-		x = 250,
-		y = titleBar.y
+		default		= "images/buttons/home.png", 
+		over			= "images/buttons/home.png", 
+		onRelease	= function() accountManager.logout() hideMenu() if (showMenuCustomAction) then showMenuCustomAction() end end, 
+		x 				= 250,
+		y 				= titleBar.y
 	}
 	
 	header:insert( logoutButton )
@@ -70,13 +72,12 @@ function drawHeader(view)
 
 	--------------------------------
 	-- tripit logout
-	local tripitLogoutAction = function() return tripit.logout() end;
 	local tripitLogoutButton = ui.newButton{
-		default="images/buttons/home.png", 
-		over="images/buttons/home.png", 
-		onRelease=tripitLogoutAction, 
-		x = 220,
-		y = titleBar.y
+		default		= "images/buttons/home.png", 
+		over			= "images/buttons/home.png", 
+		onRelease	= function() tripit.logout() hideMenu() if (showMenuCustomAction) then showMenuCustomAction() end end, 
+		x 				= 220,
+		y 				= titleBar.y
 	}
 	
 	header:insert( tripitLogoutButton )
@@ -93,8 +94,24 @@ function drawHeader(view)
 	
 	header:insert( profileImage )
 	header.tripitLogoutButton = profileImage
+	
+	showHeader()
 end
 
+---------------------------------------------
+
+function showHeader()
+	transition.to( header,  { alpha = 1 , time = 400, transition = easing.outExpo } )
+end
+
+function removeHeader()
+	transition.to( header,  { alpha = 0 , time = 400, transition = easing.outExpo } )
+end
+
+
+
+------------------------------------------------------------------------------------------
+-- 																								MENU
 ------------------------------------------------------------------------------------------
 
 function drawMenu(view)
@@ -130,7 +147,7 @@ function drawMenu(view)
 
 	--- stream button
 
-	local openStreamAction = function() return router.openStream() end
+	local openStreamAction = function() return router.openStream(true) end
 	
 	local streamText = display.newText( "Stream", 160, 230, native.systemFont, 20 )
 	streamText:setReferencePoint( display.CenterReferencePoint )
@@ -139,39 +156,122 @@ function drawMenu(view)
 	menu:insert( streamText )
 	
 	local streamButton = ui.newButton{
-		default="images/buttons/find.medium.png", 
-		over="images/buttons/find.medium.png", 
-		onRelease=openStreamAction, 
-		x = 90,
-		y = 240,
+		default		= "images/buttons/find.medium.png", 
+		over			= "images/buttons/find.medium.png", 
+		onRelease	= openStreamAction, 
+		x 				= 90,
+		y 				= 240,
 	}
 
 	menu:insert( streamButton )
 	menu.streamButton = streamButton;
 
 	--- messages button
-
-	local openMessagesAction = function() return router.openMessages() end
-	 
-	local messagesText = display.newText( "Messages", 160, 330, native.systemFont, 20 )
-	messagesText:setReferencePoint( display.CenterReferencePoint )
-	messagesText:setTextColor( 000 )
-	messagesText:addEventListener("tap", openMessagesAction)
-	menu:insert( messagesText )
-	
-	local messagesButton = ui.newButton{
-		default="images/buttons/messages.medium.png", 
-		over="images/buttons/messages.medium.png", 
-		onRelease=openMessagesAction, 
-		x = 90,
-		y = 340,
-	}
-
-	menu:insert( messagesButton )
-	menu.messagesButton = messagesButton;
+--
+--	local openMessagesAction = function() return router.openMessages() end
+--	 
+--	local messagesText = display.newText( "Messages", 160, 330, native.systemFont, 20 )
+--	messagesText:setReferencePoint( display.CenterReferencePoint )
+--	messagesText:setTextColor( 000 )
+--	messagesText:addEventListener("tap", openMessagesAction)
+--	menu:insert( messagesText )
+--	
+--	local messagesButton = ui.newButton{
+--		default="images/buttons/messages.medium.png", 
+--		over="images/buttons/messages.medium.png", 
+--		onRelease=openMessagesAction, 
+--		x = 90,
+--		y = 340,
+--	}
+--
+--	menu:insert( messagesButton )
+--	menu.messagesButton = messagesButton;
 	
 end
 
+---------------------------------------------
+
+function toggleMenu()
+
+	menu:toFront()
+
+	if(menu.y == 0) then
+		hideMenu()
+	else
+		showMenu()
+	end
+end
+
+function showMenu()
+	transition.to( menu, { 
+		y 				= 0, 
+		time 			= 400, 
+		transition 	= easing.outExpo 
+	})
+end
+
+function hideMenu()
+	transition.to( menu, { 
+		y 				= display.contentHeight + 1.5, 
+		time 			= 250, 
+		transition 	= easing.inExpo 
+	})
+end
+
+------------------------------------------------------------------------------
+-- 																					BUTTONS
+------------------------------------------------------------------------------
+
+function addHomeButton(showMenuCustomAction)
+	addCustomButton("images/buttons/home2.png", toggleMenu, showMenuCustomAction, true)
+end
+
+---------------------------------------------
+
+function addCustomButton(image, action, showMenuCustomAction, isShowMenuButton)
+
+	local pushButton = function() 
+		action()
+		if not isShowMenuButton then hideMenu() end 
+		if isShowMenuButton and showMenuCustomAction then showMenuCustomAction() end 
+	end
+	
+	local newButton = ui.newButton{
+		default		= image, 
+		over			= image, 
+		onRelease	= pushButton, 
+		x 				= 25,
+		y 				= header.titleBar.y
+	}
+	
+	for i in pairs(header.buttons) do
+   	transition.to( 
+   		header.buttons[i], { 
+      		x 				= header.buttons[i].x + 40*i, 
+      		time 			= 400, 
+      		transition 	= easing.outExpo 
+   		}
+   	)
+	end
+
+	header:insert( newButton )	
+	table.insert(header.buttons, 1, newButton)
+end
+
+---------------------------------------------
+
+function removeAllButtons()
+	for i in pairs(header.buttons) do
+   	header.buttons[i]:removeSelf()
+	end
+	
+	addHomeButton()
+end
+
+
+
+------------------------------------------------------------------------------
+-- 																					SPINNER
 ------------------------------------------------------------------------------
 
 function drawLoadingSpinner(view)
@@ -189,52 +289,4 @@ function drawLoadingSpinner(view)
 
 end
 
----------------------------------------------
-
-function toggleMenu()
-
-	menu:toFront()
-	
-	if(menu.y == 0) then
-		transition.to( menu,  { y = display.contentHeight + display.contentHeight * 0.5, time = 400, transition = easing.outExpo } )
-	else
-		transition.to( menu,  { y = 0, time = 400, transition = easing.outExpo } )
-	end
-end
-
----------------------------------------------
-
-function addHomeButton()
-	addCustomButton("images/buttons/home2.png", toggleMenu)
-end
-
----------------------------------------------
-
-function addCustomButton(image, action)
-
-	local newButton = ui.newButton{
-		default		= image, 
-		over			= image, 
-		onRelease	= action, 
-		x 				= 25,
-		y 				= header.titleBar.y
-	}
-	
-	for i in pairs(header.buttons) do
-   	transition.to( header.buttons[i],  { x = header.buttons[i].x + 40*i , time = 400, transition = easing.outExpo } )
-	end
-
-	header:insert( newButton )	
-	table.insert(header.buttons, 1, newButton)
-end
-
----------------------------------------------
-
-function removeAllButtons()
-	for i in pairs(header.buttons) do
-   	header.buttons[i]:removeSelf()
-	end
-	
-	addHomeButton()
-end
 

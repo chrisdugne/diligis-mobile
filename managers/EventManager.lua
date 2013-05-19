@@ -30,7 +30,7 @@ function getStreamListener( event )
 	stream = json.decode(event.response);
 	utils.tprint(stream)
 	native.setActivityIndicator( false )
-	router.openStream();
+	router.openStream(false);
 end
 
 -----------------------------------------------------------------------------------------

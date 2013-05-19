@@ -48,8 +48,8 @@ eventManager 	= require "managers.EventManager"
 
 ---- App Tools
 router 			= require "tools.Router"
-viewTools		= require "tools.ViewTools"
 imagesManager 	= require "tools.ImagesManager"
+viewManager		= require "tools.ViewManager"
 
 ---- App views
 
@@ -59,7 +59,7 @@ menu = display.newGroup()
 ---- App globals
 
 selectedTrip 		= nil
-selectedDiligis 	= nil
+selectedEvent 		= nil
 
 -----------------------------------------------------------------------------------------
 print("-----------------------------------------------------");

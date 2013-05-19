@@ -23,7 +23,7 @@ end
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	local view = self.view
-	viewTools.setupView(view);
+	viewManager.setupView(view);
 end
 
 -- Called when scene is about to move offscreen:

@@ -91,6 +91,8 @@ end
 function scene:enterScene( event )
 	loadingSpinner.alpha = 0
 	transition.to( signInButton, { alpha = 1.0 } )
+	
+	viewManager.removeHeader()
 end
 
 -- Called when scene is about to move offscreen:

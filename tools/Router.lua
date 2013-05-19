@@ -14,8 +14,12 @@ end
 
 ---------------------------------------------
 
-function openStream()
-	storyboard.gotoScene( "views.Stream" )
+function openStream(fromMenu)
+	if(fromMenu) then 
+		eventManager.getStream()
+	else
+   	storyboard.gotoScene( "views.Stream" )
+	end
 end
 
 ---------------------------------------------
@@ -30,14 +34,15 @@ function openTripDiligis()
 	storyboard.gotoScene( "views.TripDiligis" )
 end
 
----------------------------------------------
-
-function openWriteMessage()
-	storyboard.gotoScene( "views.WriteMessage" )
+function openTripMessages()
+	storyboard.gotoScene( "views.TripMessages" )
 end
 
 ---------------------------------------------
 
-function openMessages()
-	storyboard.gotoScene( "views.Messages" )
+function openWriteMessage(event)
+	local options = {params = {event = event}}
+	storyboard.gotoScene( "views.WriteMessage", options )
 end
+
+---------------------------------------------

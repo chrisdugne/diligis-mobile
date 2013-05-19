@@ -23,14 +23,15 @@ end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene()
-	viewTools.setupView(self.view);
-	self:buildWriter();
+--- here 'event' is a Diligis Event + content + sender
+function scene:refreshScene(event)
+	viewManager.setupView(self.view, back);
+	self:buildWriter(event);
 end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:buildWriter()
+function scene:buildWriter(event)
 	
 	local backButton = widget.newButton	{
 		width = display.contentWidth/3,
@@ -60,10 +61,11 @@ function scene:buildWriter()
 
 	----------------------
 
+	--- note : a message is always an answer. Answer to another message, or answer to a diligis...
 	if not textBox then
       textBox = native.newTextBox( 25, - display.contentHeight, display.contentWidth-50, 220 )
    	textBox.font = native.newFont( native.systemFont, 14 )
-      textBox.text = "Hello " .. selectedDiligis.travelerName .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
+      textBox.text = "Hello " .. event.sender.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
    	textBox.isEditable = true
       textBox:addEventListener( "userInput", inputListener )
 	end
@@ -109,23 +111,24 @@ function sendMessage()
 -- diligis.travelerLinkedinUID, diligis.travelerName, diligis.travelerProfile
 
 	print("------")
-	print("sending message to " .. selectedDiligis.travelerLinkedinUID)
+	print("sending message to " .. selectedEvent.travelerLinkedinUID)
 	print(textBox.text)
-	print("contentUID : " .. selectedDiligis.content.uid)
+	print("contentUID : " .. selectedEvent.content.uid)
 	print("tripFromId : " .. selectedTrip.tripitId)
 	
-	eventManager.sendMessage(textBox.text, selectedDiligis.content.uid, selectedTrip.tripitId)
+	eventManager.sendMessage(textBox.text, selectedEvent.content.uid, selectedTrip.tripitId)
 end
 
 -----------------------------------------------------------------------------------------
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene();
+	self:refreshScene(event.params.event);
 end
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )
+
 end
 
 -- If scene's view is removed, scene:destroyScene() will be called just prior to:
