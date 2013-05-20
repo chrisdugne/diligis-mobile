@@ -49,22 +49,24 @@ function scene:createScene( event )
 		
 	--- in button
 	local signinAction = function() return signIn() end
-	signInButton = ui.newButton{
-		default		= "images/buttons/linkedin.medium.png", 
-		over			= "images/buttons/linkedin.medium.png", 
-		onRelease	= signinAction, 
-		alpha 		= 1,
-		x 				= display.contentWidth/2, 
-		y 				= 3*display.contentHeight/4+20
-	}
 	
+	signInButton = widget.newButton{
+		defaultFile	= "images/buttons/linkedin.medium.png", 
+		overFile		= "images/buttons/linkedin.medium.png", 
+		onRelease	= signinAction ,
+		alpha 		= 1
+   }
+   
+   signInButton.x = display.contentWidth/2
+   signInButton.y =  3*display.contentHeight/4+20
+   
 	-- Create a spinner widget
 	loadingSpinner = widget.newSpinner
 	{
-		left = display.contentCenterX - 25,
-		top = 3*display.contentHeight/4,
-		width = 50,
-		height = 50,
+		left 		= display.contentCenterX - 25,
+		top 		= 3*display.contentHeight/4,
+		width 	= 50,
+		height	= 50,
 	}
 	loadingSpinner.alpha = 0
 	view:insert( loadingSpinner )
@@ -80,8 +82,8 @@ end
 
 function signIn()
 	loadingSpinner:start()
-	transition.to( signInButton, { alpha = 0 } )
 	transition.to( loadingSpinner, { alpha = 1.0 } )
+	transition.to( signInButton, 	 { alpha = 0 } )
 	accountManager.linkedInConnect()
 end
 

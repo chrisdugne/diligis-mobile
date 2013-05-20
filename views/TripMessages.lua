@@ -27,7 +27,7 @@ end
 function scene:refreshScene()
 	viewManager.setupView(self.view);
 	viewManager.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
-	viewManager.addCustomButton("images/icons/messages.icon.png", openWriter);
+	viewManager.addCustomButton("images/icons/messages.icon.png", self.openWriter);
 	self:buildMessages();
 end
 	
@@ -35,6 +35,8 @@ end
 
 function scene:buildMessages()
 
+	native.setActivityIndicator( true )
+	
 	----------------------
 
 	list = widget.newTableView{
@@ -79,6 +81,8 @@ function scene:drawList()
 	for i in pairs(events) do
 		self:createRow() 
 	end
+	
+	native.setActivityIndicator( false )
 end
 
 -----------------------------------------------------------------------------------------
@@ -129,7 +133,7 @@ function scene:onRowRender( event )
 end
 
 
-function openWriter()
+function scene:openWriter()
 	if(#events > 0) then
 		router.openWriteMessage(events[#events], false)
 	end

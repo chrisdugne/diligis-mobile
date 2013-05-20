@@ -35,6 +35,8 @@ end
 function scene:buildWriter(event, requireDefaultText)
 	
 	selectedEvent = event
+	print("buildWriter")
+	utils.tprint(selectedEvent)
 	
 	local backButton = widget.newButton	{
 		width = display.contentWidth/3,
@@ -65,12 +67,12 @@ function scene:buildWriter(event, requireDefaultText)
 	----------------------
 
 	--- note : a message is always an answer. Answer to another message, or answer to a diligis...
-	if not textBox then
+--	if not textBox then
       textBox = native.newTextBox( 25, - display.contentHeight, display.contentWidth-50, 220 )
    	textBox.font = native.newFont( native.systemFont, 14 )
    	textBox.isEditable = true
       textBox:addEventListener( "userInput", inputListener )
-	end
+--	end
 
 	----------------------
 

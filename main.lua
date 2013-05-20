@@ -35,7 +35,7 @@ widget 			= require "widget"
 storyboard 		= require "storyboard"
 
 ---- Additional libs
-ui 				= require "libs.ui"
+--ui 				= require "libs.ui"
 xml 				= require "libs.Xml"
 utils 			= require "libs.Utils"
 linkedIn 		= require "libs.social.LinkedIn"

@@ -120,8 +120,6 @@ function refreshTripsFromServer()
 end
 
 function receivedTrips( event )
-	print("###########################")
-	print(event.repsonse)
 	user.trips = json.decode(event.response);
 	native.setActivityIndicator( false )
 	return router.openTrips() 
@@ -150,8 +148,6 @@ function linkedInConnected()
 	}
 
 	getAccount()
---	local next = function() return getAccount() end	
---	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next);
 end
 
 -----------------------------------------------------------------------------------------

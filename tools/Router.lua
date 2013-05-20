@@ -41,6 +41,9 @@ end
 ---------------------------------------------
 
 function openWriteMessage(event, requireDefaultText)
+	print("openWriteMessage")
+	utils.tprint(event)
+	print(requireDefaultText)
 	local options = {
 		params = {
 			event = event,

@@ -62,12 +62,14 @@ function scene:buildStream()
 	self.view:insert( stream )
 
 	----------------------
-	-- 
+
 	if(eventManager.stream ~= nil and table.getn(eventManager.stream) > 0 ) then
 		for i in pairs(eventManager.stream) do
 			self:createRow() 
 		end
 	end
+	
+	transition.to( stream,  { x = 0 , time = 400, transition = easing.outExpo } )
 end
 
 
@@ -92,6 +94,7 @@ function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local eventRendered = eventManager.stream[row.index];
+	if type(eventRendered.sender) ~= "table" then eventRendered.sender = json.decode(eventRendered.sender) end
 
 	local image
 	if(eventRendered.content.type == eventManager.ANNOUNCEMENT) then
@@ -100,8 +103,8 @@ function scene:onRowRender( event )
 		image = "images/buttons/diligis.png"
 	elseif (eventRendered.content.type == eventManager.MESSAGE) then
 		image = "images/buttons/message.png"
-	elseif (eventRendered.content.type == eventManager.INVITATION) then
-		image = "images/buttons/diligis.png"
+--	elseif (eventRendered.content.type == eventManager.INVITATION) then
+--		image = "images/buttons/diligis.png"
 --	elseif (eventRendered.type == eventManager.MEETING) then
 --		image = "images/buttons/diligis.png"
 	end
@@ -121,12 +124,43 @@ end
 
 ----------------------
 -- Handle row touch events
-function scene:onRowTouch( event )
-	local phase = event.phase
-	local row = event.target
-	local eventRendered = eventManager.stream[row.index];
+function scene:onRowTouch( _event )
+	local phase = _event.phase
+	local row = _event.target
+	local event = eventManager.stream[row.index];
 
 	if "release" == phase then
+		local go = function() showEvent(event) end
+   	transition.to( stream,  { x = -display.contentWidth * 1.5 , time = 400, transition = easing.inExpo, onComplete = go } )
+	end
+end
+
+function showEvent(event)
+	
+	if(event.content.type == eventManager.ANNOUNCEMENT) then
+		print("show profile " .. event.sender.name)
+	elseif (event.content.type == eventManager.DILIGIS) then
+		selectedTrip = getTrip(event)
+		router.openTripDiligis()
+	elseif (event.content.type == eventManager.MESSAGE) then
+		selectedTrip = getTrip(event)
+		router.openTripMessages()
+--	elseif (event.content.type == eventManager.INVITATION) then
+--		image = "images/buttons/diligis.png"
+--	elseif (event.type == eventManager.MEETING) then
+--		image = "images/buttons/diligis.png"
+	end
+	
+end
+
+
+function getTrip(diligis)
+	for i in pairs(accountManager.user.trips) do
+   	for j in pairs(accountManager.user.trips[i].events) do
+			if(accountManager.user.trips[i].events[j].uid == diligis.uid) then
+				return accountManager.user.trips[i]
+      	end
+   	end
 	end
 end
 

@@ -120,20 +120,23 @@ function scene:onRowRender( event )
 	writeTo.y = 120
 	row:insert(writeTo)
 
-	local write = function() openWriter(diligis) end
-	local message = ui.newButton{
-		default		= "images/icons/messages.icon.png", 
-		over			= "images/icons/messages.icon.png", 
-		onRelease	= write, 
-		x 				= writeTo.x + 50,
-		y 				= writeTo.y - 15
-	}
+	local write = function() self:openWriter(diligis) end
 	
+	local message = widget.newButton{
+		defaultFile	= "images/icons/messages.icon.png", 
+		overFile		= "images/icons/messages.icon.png", 
+		onRelease	= write,
+		left 			= writeTo.x + 50, 
+		top 			= writeTo.y - 15
+   }
+   
 	row:insert(message)
 	
 end
 
-function openWriter(diligis)
+function scene:openWriter(diligis)
+	print("openWriter from tripdiligis")
+	print(diligis)
 	router.openWriteMessage(diligis, true)
 end
 

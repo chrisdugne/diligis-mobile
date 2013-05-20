@@ -196,6 +196,9 @@ function getProfiles(ids, next)
    	getPeopleProfile(ids[i], profileReceived) 
 	end
 
+	if(#ids == 0) then
+		next()
+	end
 end
 
 function profileReceived()
@@ -235,8 +238,6 @@ function peopleProfileListener( event )
 	if ( not event.isError ) then
 		local profile = json.decode(event.response)
 		data.people[profile.id] = profile
-		
-		utils.tprint(data.people)
 	end
 
 	peopleProfileReceived();
