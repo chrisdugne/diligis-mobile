@@ -49,8 +49,5 @@ function sendMessage(text, contentUID, tripFromId)
 end
 
 function messageSent( event )
-	answer = event.response;
-	print(answer)
-	native.setActivityIndicator( false )
-	router.openTrips();
+	accountManager.refreshTripsFromServer()
 end

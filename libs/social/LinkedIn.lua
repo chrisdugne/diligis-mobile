@@ -17,6 +17,7 @@ module(..., package.seeall)
 ----------------------------------------------------------------------------------------------------
 
 data = {}
+data.people = {}
 
 ----------------------------------------------------------------------------------------------------
 
@@ -174,6 +175,71 @@ function profileListener( event )
 	end
 
 	callBackAuthorisationDone();
+
+end
+
+------------------------------------------------------
+--
+-- Get a list of profiles, then proceed to afterProfilesReceived
+	
+local nbProfilesReceived
+local nbProfilesToGet
+local afterProfilesReceived
+
+function getProfiles(ids, next)
+	
+	afterProfilesReceived = next
+	nbProfilesReceived = 0
+	nbProfilesToGet = #ids
+	
+	for i in pairs(ids) do
+   	getPeopleProfile(ids[i], profileReceived) 
+	end
+
+end
+
+function profileReceived()
+	nbProfilesReceived = nbProfilesReceived + 1
+	
+	if(nbProfilesReceived == nbProfilesToGet
+	and afterProfilesReceived ~= nil) 
+	then
+   	afterProfilesReceived()
+	end
+end
+
+------------------------------------------------------
+--- profile request
+
+local peopleProfileReceived
+function getPeopleProfile(id, next)
+	
+	if(data.people[id] ~= nil) then
+		next()
+	else
+   	peopleProfileReceived = next;
+   	
+   	local profileUrl = "http://api.linkedin.com/v1/people/id=".. id ..":(id,first-name,last-name,picture-url,headline,industry,email-address)";
+   	local customParams = {
+   		format = "json"
+   	}
+   
+   	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", peopleProfileListener)
+   end
+
+end
+
+--- profile reception
+function peopleProfileListener( event )
+
+	if ( not event.isError ) then
+		local profile = json.decode(event.response)
+		data.people[profile.id] = profile
+		
+		utils.tprint(data.people)
+	end
+
+	peopleProfileReceived();
 
 end
 

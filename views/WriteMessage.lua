@@ -7,6 +7,7 @@
 
 local scene = storyboard.newScene()
 local textBox, charLeftText
+local selectedEvent
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -24,14 +25,16 @@ end
 -----------------------------------------------------------------------------------------
 
 --- here 'event' is a Diligis Event + content + sender
-function scene:refreshScene(event)
+function scene:refreshScene(event, requireDefaultText)
 	viewManager.setupView(self.view, back);
-	self:buildWriter(event);
+	self:buildWriter(event, requireDefaultText);
 end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:buildWriter(event)
+function scene:buildWriter(event, requireDefaultText)
+	
+	selectedEvent = event
 	
 	local backButton = widget.newButton	{
 		width = display.contentWidth/3,
@@ -65,10 +68,19 @@ function scene:buildWriter(event)
 	if not textBox then
       textBox = native.newTextBox( 25, - display.contentHeight, display.contentWidth-50, 220 )
    	textBox.font = native.newFont( native.systemFont, 14 )
-      textBox.text = "Hello " .. event.sender.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
    	textBox.isEditable = true
       textBox:addEventListener( "userInput", inputListener )
 	end
+
+	----------------------
+
+	if(requireDefaultText) then
+   	textBox.text = "Hello " .. selectedEvent.sender.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
+   else
+		textBox.text = ""   
+   end
+
+	----------------------
 
 	transition.to( textBox, { y = 60 + textBox.contentHeight/2, time = 400, transition = easing.outExpo } )
    native.setKeyboardFocus( textBox )
@@ -103,27 +115,23 @@ function inputListener( event )
 end
 
 function sendMessage()
-
---	selectedTraveler = {}
---	selectedTraveler.linkedinUID 	= linkedinUID
---	selectedTraveler.name 			= name
---	selectedTraveler.profile 		= profile
--- diligis.travelerLinkedinUID, diligis.travelerName, diligis.travelerProfile
-
 	print("------")
-	print("sending message to " .. selectedEvent.travelerLinkedinUID)
-	print(textBox.text)
 	print("contentUID : " .. selectedEvent.content.uid)
 	print("tripFromId : " .. selectedTrip.tripitId)
 	
-	eventManager.sendMessage(textBox.text, selectedEvent.content.uid, selectedTrip.tripitId)
+	-- BUG with copy paste we may go over 200 :s
+	if(#textBox.text < 201) then
+		eventManager.sendMessage(textBox.text, selectedEvent.content.uid, selectedTrip.tripitId)
+   	back()
+	end
+	
 end
 
 -----------------------------------------------------------------------------------------
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene(event.params.event);
+	self:refreshScene(event.params.event, event.params.requireDefaultText);
 end
 
 -- Called when scene is about to move offscreen:

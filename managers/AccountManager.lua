@@ -100,6 +100,8 @@ end
 -----------------------------------------------------------------------------------------
 --
 --
+
+--- after a call to tripit, refresh data on the server
 function refreshTripsOnServer()
 	utils.postWithJSON({
 		user = user,
@@ -108,10 +110,20 @@ function refreshTripsOnServer()
 	receivedTrips)
 end
 
+--- after a message sent, refresh the trips from the server to get events
+function refreshTripsFromServer()
+	utils.postWithJSON({
+		user = user,
+	},
+	SERVER_URL .. "/getTrips",
+	receivedTrips)
+end
+
 function receivedTrips( event )
+	print("###########################")
+	print(event.repsonse)
 	user.trips = json.decode(event.response);
 	native.setActivityIndicator( false )
-	utils.tprint(user.trips)
 	return router.openTrips() 
 end
 
@@ -137,8 +149,9 @@ function linkedInConnected()
 		industry 		= linkedIn.data.profile.industry
 	}
 
-	local next = function() return getAccount() end	
-	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next);
+	getAccount()
+--	local next = function() return getAccount() end	
+--	imagesManager.fetchImage(linkedIn.data.profile.pictureUrl, next);
 end
 
 -----------------------------------------------------------------------------------------

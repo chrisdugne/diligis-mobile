@@ -40,8 +40,13 @@ end
 
 ---------------------------------------------
 
-function openWriteMessage(event)
-	local options = {params = {event = event}}
+function openWriteMessage(event, requireDefaultText)
+	local options = {
+		params = {
+			event = event,
+			requireDefaultText = requireDefaultText
+		}
+	}
 	storyboard.gotoScene( "views.WriteMessage", options )
 end
 

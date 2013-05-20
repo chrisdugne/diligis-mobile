@@ -59,19 +59,34 @@ function scene:buildMessages()
    		end
 		end
 	end
+	
+	--- json to table for the event.sender
+	for i in pairs(events) do
+		if type(events[i].sender) ~= "table" then events[i].sender = json.decode(events[i].sender) end
+	end
+	
+	--- get all linkedin profiles
+	local ids = {}
+	for i in pairs(events) do
+		table.insert(ids, events[i].sender.linkedinUID)
+	end
 
+	linkedIn.getProfiles(ids, function(event) return self:drawList() end) 
+
+end
+
+function scene:drawList()
 	for i in pairs(events) do
 		self:createRow() 
 	end
 end
-
 
 -----------------------------------------------------------------------------------------
 --- List tools : row creation + touch events
 function scene:createRow()
 	list:insertRow
 	{
-		rowHeight = 144,
+		rowHeight = 164,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -87,31 +102,37 @@ function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local message = events[row.index];
+	
+	if(message.sender.linkedinUID == accountManager.user.linkedinUID) then
+		local icon = imagesManager.drawImage( 
+			row, 
+			linkedIn.data.profile.pictureUrl, 
+			5, 5,	IMAGE_TOP_LEFT, 0.4
+		)
+   else
+		imagesManager.drawImage( 
+			row, 
+			linkedIn.data.people[message.sender.linkedinUID].pictureUrl, 
+			5, 5,	
+			IMAGE_TOP_LEFT, 0.4
+		)
+	end
 
-	local icon = display.newImage( "images/buttons/message.png", false )
-	icon.x = icon.contentWidth/2 + 10
-	icon.y = row.height * 0.5
-	row:insert(icon)
-
-	local travelerName = display.newText( "From " .. message.travelerName, 205, 30, 270, 50, native.systemFontBold, 14 )
+	local travelerName = display.newText( message.sender.name .. " :", 50, 10, 205, 30, native.systemFontBold, 14 )
 	travelerName:setTextColor( 0 )
 	row:insert(travelerName)
 
-	local travelerProfile = display.newText( message.travelerProfile, 205, 50, 270, 50, native.systemFont, 14 )
-	travelerProfile:setTextColor( 0 )
-	row:insert(travelerProfile)
-
-	local text = display.newText( message.content.text, 205, 110, 270, 50, native.systemFont, 14 )
+	local text = display.newText( message.content.text, 50, 50, 205, 100, native.systemFont, 14 )
 	text:setTextColor( 0 )
 	row:insert(text)
-	
+
 end
 
 
-function openWriter(message)
-	-- todo : create the selectedevent with eventSender = user
-	selectedEvent = message
-	router.openWriteMessage()
+function openWriter()
+	if(#events > 0) then
+		router.openWriteMessage(events[#events], false)
+	end
 end
 
 -----------------------------------------------------------------------------------------

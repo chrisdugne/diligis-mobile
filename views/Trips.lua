@@ -109,7 +109,7 @@ function scene:buildTripView()
  		showNoTrips();
  	else
 		for i in pairs(accountManager.user.trips) do
-			imagesManager.fetchImage(accountManager.user.trips[i].imageUrl, self.createRow) 
+			self.createRow()
 		end
  	end		
 end
@@ -145,7 +145,12 @@ function scene:onRowRender( event )
 	arrow.y = row.contentHeight * 0.5
 	row:insert(arrow)
 
-	imagesManager.drawImage( row, tripRendered.imageUrl, 10, 5, IMAGE_TOP_LEFT, 0.3)
+	imagesManager.drawImage( 
+		row, 
+		tripRendered.imageUrl, 
+		10, 15, 
+		IMAGE_TOP_LEFT, 0.3
+	)
 
 	if(tripRendered.events ~= nil and #tripRendered.events > 0) then
 	

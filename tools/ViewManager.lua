@@ -90,10 +90,15 @@ function drawHeader(view, showMenuCustomAction)
 --	logo.y = titleBar.y
 
 	-- linkedin picture
-	local profileImage = imagesManager.drawImage(view, linkedIn.data.profile.pictureUrl, display.contentWidth - 40, 0, IMAGE_TOP_LEFT, 0.4)
+	imagesManager.drawImage(
+		header, 
+		linkedIn.data.profile.pictureUrl, 
+		display.contentWidth - 40, 0, 
+		IMAGE_TOP_LEFT, 0.4
+	)
 	
-	header:insert( profileImage )
-	header.tripitLogoutButton = profileImage
+--	header:insert( profileImage )
+--	header.profileImage = profileImage
 	
 	showHeader()
 end
@@ -107,8 +112,6 @@ end
 function removeHeader()
 	transition.to( header,  { alpha = 0 , time = 400, transition = easing.outExpo } )
 end
-
-
 
 ------------------------------------------------------------------------------------------
 -- 																								MENU

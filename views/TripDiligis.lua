@@ -134,7 +134,7 @@ function scene:onRowRender( event )
 end
 
 function openWriter(diligis)
-	router.openWriteMessage(diligis)
+	router.openWriteMessage(diligis, true)
 end
 
 -----------------------------------------------------------------------------------------

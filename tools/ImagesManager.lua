@@ -8,27 +8,28 @@ local images = {}
 
 -----------------------------------------------------------------------------------------
 
-function fetchImage( url, next, fileName )
-    if not fileName then 
-    	fileName = utils.imageName(url)
-    end
-    
-	local imageReceived = function(event) return storeImage(fileName, event.target, next)  end
-	display.loadRemoteImage( url, "GET", imageReceived, fileName, system.TemporaryDirectory )
-end
-
-function storeImage( name, image, next)
-	image.alpha = 0
-	images[name] = image
-	next();
-end
+--function fetchImage( url, next, fileName )
+--	if not fileName then 
+--		fileName = utils.imageName(url)
+--	end
+--
+--	local imageReceived = function(event) return storeImage(fileName, event.target, next)  end
+--	display.loadRemoteImage( url, "GET", imageReceived, fileName, system.TemporaryDirectory )
+--end
+--
+--function storeImage( name, image, next)
+--	image.alpha = 0
+--	images[name] = image
+--	next();
+--end
 
 ------------------------------------------------------------
 
 function drawImage( group, url, x, y, positionFrom, scale, smooth )
-	
-    local name = utils.imageName(url)
+
+	local name 	= utils.imageName(url)
 	local image = display.newImage( group, name, system.TemporaryDirectory)
+	
 	image.xScale = scale
 	image.yScale = scale
 
@@ -45,8 +46,6 @@ function drawImage( group, url, x, y, positionFrom, scale, smooth )
 	else
 		image.alpha = 1
 	end
-	
-	return image;
 end
 
 function hideImage( image )
