@@ -24,9 +24,11 @@ end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene()
+function scene:refreshScene(back)
+	print("tripmessages")
+	print(back)
 	viewManager.setupView(self.view);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
 	viewManager.addCustomButton("images/icons/messages.icon.png", self.openWriter);
 	self:buildMessages();
 end
@@ -106,21 +108,20 @@ function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local message = events[row.index];
+
+	---------
+		
+	local picture = imagesManager.drawImage( 
+		row, 
+		linkedIn.data.people[message.sender.linkedinUID].pictureUrl, 
+		5, 5,	
+		IMAGE_TOP_LEFT, 0.4
+	)
 	
-	if(message.sender.linkedinUID == accountManager.user.linkedinUID) then
-		local icon = imagesManager.drawImage( 
-			row, 
-			linkedIn.data.profile.pictureUrl, 
-			5, 5,	IMAGE_TOP_LEFT, 0.4
-		)
-   else
-		imagesManager.drawImage( 
-			row, 
-			linkedIn.data.people[message.sender.linkedinUID].pictureUrl, 
-			5, 5,	
-			IMAGE_TOP_LEFT, 0.4
-		)
-	end
+	local openProfile = function() router.displayProfile(message.sender.linkedinUID, router.openTripMessages) end
+	picture:addEventListener("tap", openProfile)
+
+	---------
 
 	local travelerName = display.newText( message.sender.name .. " :", 50, 10, 205, 30, native.systemFontBold, 14 )
 	travelerName:setTextColor( 0 )
@@ -135,7 +136,7 @@ end
 
 function scene:openWriter()
 	if(#events > 0) then
-		router.openWriteMessage(events[#events], false)
+		router.openWriteMessage(events[#events], false, router.openTripMessages)
 	end
 end
 
@@ -143,7 +144,7 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene();
+	self:refreshScene(event.params.back);
 end
 
 -- Called when scene is about to move offscreen:

@@ -274,7 +274,7 @@ function scene:buildDetails()
 	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
 	messagesIcon.x = 100 
 	messagesIcon.y = 360
-	messagesIcon:addEventListener("tap", router.openTripMessages)
+	messagesIcon:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
 
 	details:insert( messagesIcon )
 	details.messagesIcon = messagesIcon 
@@ -283,7 +283,7 @@ function scene:buildDetails()
 	messagesCount:setTextColor( 0 )
 	messagesCount.x = messagesIcon.x - 30
 	messagesCount.y = 360
-	messagesCount:addEventListener("tap", router.openTripMessages)
+	messagesCount:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
 
 	details:insert(messagesCount)
 	details.messagesCount = messagesCount 
@@ -292,7 +292,7 @@ function scene:buildDetails()
 	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
 	diligisIcon.x = 250 
 	diligisIcon.y = 360
-	diligisIcon:addEventListener("tap", router.openTripDiligis)
+	diligisIcon:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
 
 	details:insert(diligisIcon)
 	details.diligisIcon = diligisIcon 
@@ -301,7 +301,7 @@ function scene:buildDetails()
 	diligisCount:setTextColor( 0 )
 	diligisCount.x = diligisIcon.x - 30
 	diligisCount.y = 360
-	diligisCount:addEventListener("tap", router.openTripDiligis)
+	diligisCount:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
 	
 	details:insert(diligisCount)
 	details.diligisCount = diligisCount 

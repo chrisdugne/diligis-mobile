@@ -8,6 +8,13 @@
 local scene = storyboard.newScene()
 local textBox, charLeftText
 local selectedEvent
+local back
+
+----------------------
+
+function effectBack() 
+	transition.to( textBox, { y = - display.contentHeight, time = 400, transition = easing.inExpo, onComplete = back } )
+end
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -25,8 +32,9 @@ end
 -----------------------------------------------------------------------------------------
 
 --- here 'event' is a Diligis Event + content + sender
-function scene:refreshScene(event, requireDefaultText)
-	viewManager.setupView(self.view, back);
+function scene:refreshScene(event, requireDefaultText, fromView)
+	back = fromView
+	viewManager.setupView(self.view, effectBack);
 	self:buildWriter(event, requireDefaultText);
 end
 	
@@ -43,7 +51,7 @@ function scene:buildWriter(event, requireDefaultText)
 		height = 46,
 		label = "Back", 
 		labelYOffset = - 1,
-		onRelease = back
+		onRelease = effectBack
 	}
 	
 	backButton.x = display.contentCenterX - 70
@@ -97,11 +105,6 @@ end
 
 ----------------------
 
-function back() 
-	transition.to( textBox, { y = - display.contentHeight, time = 400, transition = easing.inExpo } )
-	router.openTrips() 
-end
-	
 function inputListener( event )
 	if event.phase == "began" then
 	elseif event.phase == "ended" then
@@ -117,9 +120,6 @@ function inputListener( event )
 end
 
 function sendMessage()
-	print("------")
-	print("contentUID : " .. selectedEvent.content.uid)
-	print("tripFromId : " .. selectedTrip.tripitId)
 	
 	-- BUG with copy paste we may go over 200 :s
 	if(#textBox.text < 201) then
@@ -133,7 +133,7 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene(event.params.event, event.params.requireDefaultText);
+	self:refreshScene(event.params.event, event.params.requireDefaultText, event.params.back);
 end
 
 -- Called when scene is about to move offscreen:

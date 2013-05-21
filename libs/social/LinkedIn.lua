@@ -3,7 +3,7 @@
 --
 -- Date: January 28, 2013
 --
--- Version: 1.2
+-- Version: 1.3
 --
 -- File name	: LinkedIn.lua
 -- Require 		: Utils.lua

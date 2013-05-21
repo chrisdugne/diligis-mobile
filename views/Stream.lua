@@ -103,10 +103,6 @@ function scene:onRowRender( event )
 		image = "images/buttons/diligis.png"
 	elseif (eventRendered.content.type == eventManager.MESSAGE) then
 		image = "images/buttons/message.png"
---	elseif (eventRendered.content.type == eventManager.INVITATION) then
---		image = "images/buttons/diligis.png"
---	elseif (eventRendered.type == eventManager.MEETING) then
---		image = "images/buttons/diligis.png"
 	end
 	
 	local icon = display.newImage( image, false )
@@ -138,17 +134,16 @@ end
 function showEvent(event)
 	
 	if(event.content.type == eventManager.ANNOUNCEMENT) then
-		print("show profile " .. event.sender.name)
+		router.displayProfile(event.sender.linkedinUID, router.openStream)
+		
 	elseif (event.content.type == eventManager.DILIGIS) then
 		selectedTrip = getTrip(event)
-		router.openTripDiligis()
+		router.openTripDiligis(router.openStream)
+		
 	elseif (event.content.type == eventManager.MESSAGE) then
 		selectedTrip = getTrip(event)
-		router.openTripMessages()
---	elseif (event.content.type == eventManager.INVITATION) then
---		image = "images/buttons/diligis.png"
---	elseif (event.type == eventManager.MEETING) then
---		image = "images/buttons/diligis.png"
+		router.openTripMessages(router.openStream)
+		
 	end
 	
 end

@@ -46,6 +46,8 @@ function drawImage( group, url, x, y, positionFrom, scale, smooth )
 	else
 		image.alpha = 1
 	end
+	
+	return image
 end
 
 function hideImage( image )

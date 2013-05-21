@@ -24,9 +24,9 @@ end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene()
+function scene:refreshScene(back)
 	viewManager.setupView(self.view);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", router.openTrips);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
 	self:buildDiligis();
 end
 	
@@ -34,6 +34,8 @@ end
 
 function scene:buildDiligis()
 
+	native.setActivityIndicator( true )
+	
 	----------------------
 
 	list = widget.newTableView{
@@ -62,9 +64,24 @@ function scene:buildDiligis()
 		end
 	end
 
+
+	--- get all linkedin profiles
+	local ids = {}
+	for i in pairs(events) do
+		if type(events[i].sender) ~= "table" then events[i].sender = json.decode(events[i].sender) end
+		table.insert(ids, events[i].sender.linkedinUID)
+	end
+
+	linkedIn.getProfiles(ids, function(event) return self:drawList() end) 
+
+end
+
+function scene:drawList()
 	for i in pairs(events) do
 		self:createRow() 
 	end
+	
+	native.setActivityIndicator( false )
 end
 
 
@@ -89,19 +106,27 @@ function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local diligis = events[row.index];
-	if type(diligis.sender) ~= "table" then diligis.sender = json.decode(diligis.sender) end
-	
-	local icon = display.newImage( "images/buttons/diligis.png", false )
-	icon.x = icon.contentWidth/2 + 10
-	icon.y = row.height * 0.5
-	row:insert(icon)
 
+	---------
+	
+	local picture = imagesManager.drawImage( 
+		row, 
+		linkedIn.data.people[diligis.sender.linkedinUID].pictureUrl, 
+		30, row.height * 0.5,
+		IMAGE_CENTER, 0.6
+	)
+	
+	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, router.openTripDiligis) end
+	picture:addEventListener("tap", openProfile)
+
+	---------
+	
 	local text = display.newText( diligis.content.text, 0, 0, 270, 50, native.systemFont, 14 )
 	text:setTextColor( 0 )
 	text.x = 205
 	text.y = 30
 	row:insert(text)
-
+	
 	local senderName = display.newText( diligis.sender.name, 0, 0, 270, 50, native.systemFontBold, 14 )
 	senderName:setTextColor( 0 )
 	senderName.x = 205
@@ -114,6 +139,8 @@ function scene:onRowRender( event )
 	senderProfile.y = 90
 	row:insert(senderProfile)
 
+	---------
+	
 	local writeTo = display.newText( "Write a message : ", 0, 0, 270, 50, native.systemFont, 14 )
 	writeTo:setTextColor( 0 )
 	writeTo.x = 235
@@ -144,7 +171,7 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene();
+	self:refreshScene(event.params.back);
 end
 
 -- Called when scene is about to move offscreen:
