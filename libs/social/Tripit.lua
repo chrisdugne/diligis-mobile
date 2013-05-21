@@ -54,6 +54,9 @@ end
 
 --- 1 - Request a requestToken
 function authorise(callBack, cancel)
+
+   analytics.event("Tripit", "authorise")
+    
 	native.setActivityIndicator( true )
 	callBackAuthorisationDone = callBack;
 	callBackCancel = cancel;
@@ -97,6 +100,7 @@ function webviewListener( event )
       	webView:removeSelf()
       	webView = nil;
 		elseif string.find(string.lower(event.url), "https://m.tripit.com/oauth/backtodiligis") then
+   		analytics.event("Tripit", "accessOK") 
 			getAccessToken()
       	webView:removeSelf()
       	webView = nil;
@@ -148,6 +152,7 @@ local afterProfile
 --- profile request
 function getTripitProfile(next)
 	
+   analytics.event("Tripit", "getProfile") 
 	afterProfile = next
 
 	local profileUrl = "https://api.tripit.com/v1/get/profile"
@@ -174,6 +179,7 @@ function tripitProfileListener( event )
 				data.profile.email = response.Profile.ProfileEmailAddresses.ProfileEmailAddress.address.value;
 			end
 			
+         analytics.event("Tripit", "profileFetch") 
       	if(afterProfile ~= nil) then
       		afterProfile()
 			end
@@ -246,6 +252,7 @@ local afterCreateTrip
 --- requestToken reception
 function openNewTripWindow(next)
 
+   analytics.event("Tripit", "create") 
 	afterCreateTrip = next
 
 	local createTripUrl = "https://m.tripit.com/trip/create"
@@ -264,6 +271,7 @@ function createTripListener( event )
 	if string.lower(event.url) == "https://m.tripit.com/"
 	or string.lower(event.url) == "https://m.tripit.com/home"
 	then
+   	analytics.event("Tripit", "creationCancelled") 
 		webView:removeSelf()
 		webView = nil;
 	end
@@ -274,6 +282,7 @@ function createTripListener( event )
       	afterCreateTrip()
       end
 		
+   	analytics.event("Tripit", "creationComplete") 
 		webView:removeSelf()
 		webView = nil;
 	end

@@ -34,10 +34,12 @@ function init(version, trackingId, profileId, appName, appVersion)
 	params.appVersion 	= appVersion 
 end
 
+----------------------------------------------------------------------------------------------------
+
 function pageview(page)
 
 	local data = ""
-	data = data .. "v=" 	.. params.version
+	data = data .. "v=" 		.. params.version
 	data = data .. "&tid=" 	.. params.trackingId
 	data = data .. "&cid=" 	.. params.profileId
 	data = data .. "&t=" 	.. "appview"
@@ -47,3 +49,20 @@ function pageview(page)
 	
 	utils.post(ANALYTICS_URL, data)
 end
+
+----------------------------------------------------------------------------------------------------
+
+function event(category, action)
+
+	local data = ""
+	data = data .. "v=" 		.. params.version
+	data = data .. "&tid=" 	.. params.trackingId
+	data = data .. "&cid=" 	.. params.profileId
+	data = data .. "&t=" 	.. "event"
+	data = data .. "&an=" 	.. params.appName
+	data = data .. "&ec=" 	.. category
+	data = data .. "&ea=" 	.. action
+	
+	utils.post(ANALYTICS_URL, data)
+end
+

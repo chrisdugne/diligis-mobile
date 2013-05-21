@@ -9,6 +9,11 @@ module(..., package.seeall)
 -----------------------------------------------------------------------------------------
 
 function openAppHome()
+	
+	--- analytics
+	analytics.pageview("AppHome")
+	--- 
+	
 	storyboard.gotoScene( "views.AppHome" )
 end
 
@@ -30,6 +35,10 @@ end
 
 function displayProfile(linkedinUID, back)
 	
+	--- analytics
+	analytics.pageview("Profile")
+	--- 
+
 	local options = {
 		params = {
 			linkedinUID = linkedinUID,
@@ -48,6 +57,11 @@ function openStream()
 end
 
 function displayStream()
+
+	--- analytics
+	analytics.pageview("Stream")
+	--- 
+	
 	storyboard.gotoScene( "views.Stream" )
 end
 
@@ -59,6 +73,11 @@ function openTrips()
 end
 
 function displayTrips()
+
+	--- analytics
+	analytics.pageview("Trips")
+	--- 
+	
 	storyboard.gotoScene( "views.Trips" )
 end
 
@@ -66,6 +85,10 @@ end
 --- TripDiligis + TripMessages
 
 function openTripDiligis(back)
+	
+	--- analytics
+	analytics.pageview("TripDiligis")
+	--- 
 	
 	local options = {
 		params = {
@@ -78,6 +101,10 @@ end
 
 function openTripMessages(back)
 
+	--- analytics
+	analytics.pageview("TripMessages")
+	--- 
+	
 	local options = {
 		params = {
 			back = backOrLastBack(back)
@@ -90,6 +117,10 @@ end
 ---------------------------------------------
 
 function openWriteMessage(event, requireDefaultText, back)
+	
+	--- analytics
+	analytics.pageview("WriteMessage")
+	--- 
 	
 	local options = {
 		params = {

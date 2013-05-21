@@ -35,12 +35,11 @@ widget 			= require "widget"
 storyboard 		= require "storyboard"
 
 ---- Additional libs
---ui 				= require "libs.ui"
+analytics 		= require("libs.google.Analytics")
 xml 				= require "libs.Xml"
 utils 			= require "libs.Utils"
 linkedIn 		= require "libs.social.LinkedIn"
 tripit 			= require "libs.social.Tripit"
-analytics 		= require("libs.google.Analytics")
 
 ---- Server access Managers
 accountManager = require "managers.AccountManager"

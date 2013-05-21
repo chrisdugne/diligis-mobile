@@ -77,7 +77,10 @@ function scene:drawProfile(linkedinUID)
    	local logoutButton = widget.newButton{
    		defaultFile	= "images/buttons/logout.png", 
    		overFile		= "images/buttons/logout.png", 
-   		onRelease	= function() accountManager.logout() end, 
+   		onRelease	= function() 
+   			accountManager.logout()
+				analytics.event("Navigation", "logout")  
+   		end, 
    	}
    
    	logoutButton.x = display.contentWidth * 0.5

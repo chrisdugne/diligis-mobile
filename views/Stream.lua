@@ -135,14 +135,17 @@ function showEvent(event)
 	
 	if(event.content.type == eventManager.ANNOUNCEMENT) then
 		router.displayProfile(event.sender.linkedinUID, router.openStream)
+      analytics.event("Navigation", "streamToAnnouncement") 
 		
 	elseif (event.content.type == eventManager.DILIGIS) then
 		selectedTrip = getTrip(event)
 		router.openTripDiligis(router.openStream)
+      analytics.event("Navigation", "streamToDiligis") 
 		
 	elseif (event.content.type == eventManager.MESSAGE) then
 		selectedTrip = getTrip(event)
 		router.openTripMessages(router.openStream)
+      analytics.event("Navigation", "streamToMessage") 
 		
 	end
 	

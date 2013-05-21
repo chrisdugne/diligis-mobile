@@ -217,6 +217,8 @@ end
 local peopleProfileReceived
 function getPeopleProfile(id, next)
 	
+   analytics.event("LinkedIn", "getPeopleProfile") 
+   	
 	if(data.people[id] ~= nil) then
 		next()
 	else

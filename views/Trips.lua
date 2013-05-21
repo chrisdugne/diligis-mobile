@@ -49,6 +49,7 @@ end
 
 function syncWithTripit()
 	 tripit.authorise(accountManager.getTripitProfileAndTrips, cancelTripit)
+    analytics.event("Trip", "sync") 
 end
 
 function afterCreateTrip()
@@ -57,9 +58,11 @@ end
 
 function createTrip()
 	tripit.authorise(afterCreateTrip, cancelTripit)
+   analytics.event("Trip", "create") 
 end
 
 function cancelTripit()
+   analytics.event("Trip", "cancelCreation") 
 	print('cancel tripit')
 end
 

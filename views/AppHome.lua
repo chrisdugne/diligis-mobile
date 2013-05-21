@@ -23,10 +23,6 @@ local loadingSpinner
 
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
-
-	--- analytics
-	analytics.pageview("AppHome")
-	--- 
 	
 	local view = self.view
 	
@@ -81,6 +77,11 @@ end
 ------------------------------------------
 
 function signIn()
+
+	--- analytics
+	analytics.event("Navigation", "signIn") 
+	--- 
+	
 	loadingSpinner:start()
 	transition.to( loadingSpinner, { alpha = 1.0 } )
 	transition.to( signInButton, 	 { alpha = 0 } )

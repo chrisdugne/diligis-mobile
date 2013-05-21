@@ -135,6 +135,7 @@ end
 
 function scene:openWriter()
 	if(#events > 0) then
+      analytics.event("Message", "startAnswer") 
 		router.openWriteMessage(events[#events], false, router.openTripMessages)
 	end
 end

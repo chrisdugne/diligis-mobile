@@ -162,9 +162,8 @@ function scene:onRowRender( event )
 end
 
 function scene:openWriter(diligis)
-	print("openWriter from tripdiligis")
-	print(diligis)
-	router.openWriteMessage(diligis, true)
+   analytics.event("Message", "startTalking") 
+   router.openWriteMessage(diligis, true)
 end
 
 -----------------------------------------------------------------------------------------

@@ -187,6 +187,10 @@ function addCustomButton(image, action, showMenuCustomAction, isShowMenuButton)
 		action()
 		if not isShowMenuButton then hideMenu() end 
 		if isShowMenuButton and showMenuCustomAction then showMenuCustomAction() end 
+
+   	--- analytics
+		if isShowMenuButton then analytics.event("Navigation", "showMenu") end 
+   	--- 
 	end
 	
 	local newButton = widget.newButton{
