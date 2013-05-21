@@ -165,4 +165,5 @@ end
 function logout()
 	linkedIn.deauthorise()
 	tripit.logout()
+	router.openAppHome()
 end

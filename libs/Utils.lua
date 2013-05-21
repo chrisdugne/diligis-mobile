@@ -80,11 +80,11 @@ end
 -----------------------------------------------------------------------------------------
 
 function joinTables(t1, t2)
-	
+
 	local result = {}
 	if(t1 == nil) then t1 = {} end
 	if(t2 == nil) then t2 = {} end
-	
+
 	for k,v in pairs(t1) do
 		table.insert(result, v) 
 	end 
@@ -147,14 +147,27 @@ function post(url, data, next, type)
 	local headers = {}
 
 	if(type == nil) then
-	   headers["Content-Type"] = "application/x-www-form-urlencoded"
-   elseif(type == "json") then
-   	headers["Content-Type"] = "application/json"
+		headers["Content-Type"] = "application/x-www-form-urlencoded"
+	elseif(type == "json") then
+		headers["Content-Type"] = "application/json"
 	end
-   
-   local params = {}
-   params.headers = headers
-   params.body = data
-   
-   network.request( url, "POST", next, params)
+
+	local params = {}
+	params.headers = headers
+	params.body = data
+
+	network.request( url, "POST", next, params)
+end
+
+
+--------------------------------------------------------
+
+function parseDate(str)
+	_,_,y,m,d=string.find(str, "(%d+)-(%d+)-(%d+)")
+	return tonumber(y),tonumber(m),tonumber(d)
+end
+
+function parseDateTime(str)
+	local Y,M,D = parseDate(str)
+	return os.time({year=Y, month=M, day=D})
 end

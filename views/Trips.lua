@@ -148,9 +148,21 @@ function scene:onRowRender( event )
 	imagesManager.drawImage( 
 		row, 
 		tripRendered.imageUrl, 
-		10, 15, 
+		10, 5, 
 		IMAGE_TOP_LEFT, 0.3
 	)
+
+	local perlImage
+	if(os.time() - utils.parseDateTime(tripRendered.startDate) > 0) then
+		perlImage = "images/icons/green.mini.png"
+	else
+		perlImage = "images/icons/blue.mini.png"
+	end
+	
+	local perl = display.newImage( perlImage, false )
+	perl.x = 27
+	perl.y = row.contentHeight - 20
+	row:insert(perl)
 
 	if(tripRendered.events ~= nil and #tripRendered.events > 0) then
 	

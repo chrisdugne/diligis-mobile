@@ -20,7 +20,7 @@ local profile
 function scene:createScene( event )
 	profile = display.newGroup()
 end
-	
+
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene(linkedinUID, back)
@@ -28,7 +28,7 @@ function scene:refreshScene(linkedinUID, back)
 	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
 	self:buildProfile(linkedinUID);
 end
-	
+
 -----------------------------------------------------------------------------------------
 
 function scene:buildProfile(linkedinUID)
@@ -40,16 +40,16 @@ function scene:drawProfile(linkedinUID)
 	----------------------
 
 	utils.emptyGroup(profile)
-	
+
 	----------------------
 
 	imagesManager.drawImage(
-		profile, 
-		linkedIn.data.people[linkedinUID].pictureUrl, 
-		display.contentCenterX, 100, 
-		IMAGE_CENTER, 1
+   	profile, 
+   	linkedIn.data.people[linkedinUID].pictureUrl, 
+   	display.contentCenterX, 100, 
+   	IMAGE_CENTER, 1
 	)
-	
+
 	----------------------
 
 	local name = linkedIn.data.people[linkedinUID].firstName .. " " .. linkedIn.data.people[linkedinUID].lastName
@@ -57,7 +57,7 @@ function scene:drawProfile(linkedinUID)
 	nameDisplay:setTextColor( 0 )
 	nameDisplay.x = display.contentWidth * 0.5
 	nameDisplay.y = 200
-	
+
 	profile:insert( nameDisplay )
 
 	----------------------
@@ -66,12 +66,42 @@ function scene:drawProfile(linkedinUID)
 	local titleDisplay = display.newText( title, 0, 0, native.systemFont, 16 )
 	titleDisplay:setTextColor( 0 )
 	titleDisplay.x = display.contentWidth * 0.5
-	titleDisplay.y = 300
+	titleDisplay.y = 260
 
 	profile:insert( titleDisplay )
 
 	----------------------
-	
+	--- linkedin logout
+
+	local logoutButton = widget.newButton{
+		defaultFile	= "images/buttons/logout.png", 
+		overFile		= "images/buttons/logout.png", 
+		onRelease	= function() accountManager.logout() end, 
+	}
+
+	logoutButton.x = display.contentWidth * 0.5
+	logoutButton.y = 450
+
+	profile:insert( logoutButton )
+
+	--	--------------------------------
+	--	-- tripit logout
+	--
+	--	local tripitLogoutButton = widget.newButton{
+	--		defaultFile	= "images/buttons/home.png", 
+	--		overFile		= "images/buttons/home.png", 
+	--		onRelease	= function() tripit.logout() hideMenu() if (showMenuCustomAction) then showMenuCustomAction() end end, 
+	--   }
+	--   
+	--   tripitLogoutButton.x = 220
+	--   tripitLogoutButton.y = titleBar.y
+	--	
+	--		profile:insert( tripitLogoutButton )
+	--	
+
+
+	----------------------
+
 	self.view:insert( profile )
 
 	----------------------
@@ -83,11 +113,11 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	
+
 	if event.params then
-   	self:refreshScene(event.params.linkedinUID, event.params.back);
+		self:refreshScene(event.params.linkedinUID, event.params.back);
 	end
-	
+
 	profile.x = -display.contentWidth * 1.5
 	transition.to( profile,  { x = 0 , time = 400, transition = easing.outExpo } )
 end
