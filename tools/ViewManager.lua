@@ -136,7 +136,7 @@ function drawMenu(view)
 
 	--- stream button
 
-	local openStreamAction = function() return router.openStream(true) end
+	local openStreamAction = function() return router.openStream() end
 	
 	local streamText = display.newText( "Stream", 160, 130, native.systemFont, 20 )
 	streamText:setReferencePoint( display.CenterReferencePoint )

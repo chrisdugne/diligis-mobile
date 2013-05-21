@@ -29,7 +29,7 @@ end
 function getStreamListener( event )
 	stream = json.decode(event.response);
 	native.setActivityIndicator( false )
-	router.openStream(false);
+	router.displayStream();
 end
 
 -----------------------------------------------------------------------------------------

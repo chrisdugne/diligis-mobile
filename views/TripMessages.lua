@@ -25,8 +25,6 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene(back)
-	print("tripmessages")
-	print(back)
 	viewManager.setupView(self.view);
 	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
 	viewManager.addCustomButton("images/icons/messages.icon.png", self.openWriter);
@@ -60,6 +58,7 @@ function scene:buildMessages()
 		for i in pairs(selectedTrip.events) do
 			if(selectedTrip.events[i].content.type == eventManager.MESSAGE) then
 				table.insert(events, selectedTrip.events[i])
+				accountManager.readEvent(selectedTrip.events[i])
    		end
 		end
 	end

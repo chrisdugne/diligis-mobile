@@ -126,6 +126,15 @@ function receivedTrips( event )
 end
 
 ------------------------------------------
+
+function readEvent(event)
+	utils.postWithJSON({
+		event = event;
+	},
+	SERVER_URL .. "/readEvent")
+end
+
+------------------------------------------
 --- LinkedIn
 -- 
 

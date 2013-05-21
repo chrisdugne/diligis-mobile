@@ -44,12 +44,11 @@ end
 
 function openStream()
 	lastBack = openStream
+	eventManager.getStream()
+end
 
-	if(fromMenu) then 
-		eventManager.getStream()
-	else
-   	storyboard.gotoScene( "views.Stream" )
-	end
+function displayStream()
+	storyboard.gotoScene( "views.Stream" )
 end
 
 ---------------------------------------------
