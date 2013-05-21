@@ -124,7 +124,7 @@ function sendMessage()
 	-- BUG with copy paste we may go over 200 :s
 	if(#textBox.text < 201) then
 		eventManager.sendMessage(textBox.text, selectedEvent.content.uid, selectedTrip.tripitId)
-   	back()
+   	effectBack()
 	end
 	
 end

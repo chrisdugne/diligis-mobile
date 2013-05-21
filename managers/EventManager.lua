@@ -43,10 +43,5 @@ function sendMessage(text, contentUID, tripFromId)
 			tripFromId 	= tripFromId
 		}
 	},
-	SERVER_URL .. "/sendMessage", 
-	messageSent)
-end
-
-function messageSent( event )
-	accountManager.refreshTripsFromServer()
+	SERVER_URL .. "/sendMessage")
 end

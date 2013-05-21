@@ -122,7 +122,7 @@ end
 function receivedTrips( event )
 	user.trips = json.decode(event.response);
 	native.setActivityIndicator( false )
-	return router.openTrips() 
+	return router.displayTrips() 
 end
 
 ------------------------------------------

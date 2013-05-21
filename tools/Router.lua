@@ -55,6 +55,10 @@ end
 
 function openTrips()
 	lastBack = openTrips
+	accountManager.refreshTripsFromServer()
+end
+
+function displayTrips()
 	storyboard.gotoScene( "views.Trips" )
 end
 
@@ -86,10 +90,6 @@ end
 ---------------------------------------------
 
 function openWriteMessage(event, requireDefaultText, back)
-	
-	print("openWriteMessage")
-	print(back)
-	print(back or lastBack)
 	
 	local options = {
 		params = {

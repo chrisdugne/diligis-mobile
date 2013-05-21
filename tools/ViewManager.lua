@@ -32,8 +32,8 @@ function drawHeader(view, showMenuCustomAction)
 	--- header background
 	-- The gradient used by the title bar
 	local titleGradient = graphics.newGradient( 
-	{ 23, 55, 94, 110 }, 
-	{ 23, 55, 94, 255 }, "down" )
+	{ 23, 23, 23, 6 }, 
+	{ 45, 45, 45, 144 }, "down" )
 
 	-- Create toolbar to go at the top of the screen
 	local titleBar = display.newRect( 0, 0, display.contentWidth, 32 )
@@ -43,24 +43,16 @@ function drawHeader(view, showMenuCustomAction)
 	header:insert( titleBar )
 	header.titleBar = titleBar
 
-	-- create embossed text to go on toolbar
-	local titleText = display.newText( "Diligis", 0, 0, native.systemFont, 20 )
-	titleText:setReferencePoint( display.CenterReferencePoint )
-	titleText:setTextColor( 255 )
-	titleText.x = 160
-	titleText.y = titleBar.y
-
-	header:insert( titleText )
-	header.titleText = titleText
-
 	--- home button
 	addHomeButton(showMenuCustomAction)
 	
-	--
 	--	--- top logo
---	local logo = display.newImage(view, "images/logos/top.logo.png" )
---	logo.x = display.contentWidth/2
---	logo.y = titleBar.y
+	local logo = display.newImage(view, "images/logos/d_logo_small.png" )
+	logo.x = 2*display.contentWidth/3
+	logo.y = titleBar.y + 3
+	
+	header:insert( logo )
+	header.profilelogoImage = logo
 
 	-- linkedin picture
 	
@@ -210,7 +202,7 @@ function addCustomButton(image, action, showMenuCustomAction, isShowMenuButton)
    	transition.to( 
    		header.buttons[i], { 
       		x 				= header.buttons[i].x + 40*i, 
-      		time 			= 400, 
+      		time 			= 40, 
       		transition 	= easing.outExpo 
    		}
    	)

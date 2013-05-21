@@ -73,16 +73,18 @@ function scene:drawProfile(linkedinUID)
 	----------------------
 	--- linkedin logout
 
-	local logoutButton = widget.newButton{
-		defaultFile	= "images/buttons/logout.png", 
-		overFile		= "images/buttons/logout.png", 
-		onRelease	= function() accountManager.logout() end, 
-	}
-
-	logoutButton.x = display.contentWidth * 0.5
-	logoutButton.y = 450
-
-	profile:insert( logoutButton )
+	if(accountManager.user.linkedinUID == linkedinUID) then
+   	local logoutButton = widget.newButton{
+   		defaultFile	= "images/buttons/logout.png", 
+   		overFile		= "images/buttons/logout.png", 
+   		onRelease	= function() accountManager.logout() end, 
+   	}
+   
+   	logoutButton.x = display.contentWidth * 0.5
+   	logoutButton.y = 450
+   
+   	profile:insert( logoutButton )
+   end
 
 	--	--------------------------------
 	--	-- tripit logout
