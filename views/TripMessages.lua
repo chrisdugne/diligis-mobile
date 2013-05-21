@@ -110,12 +110,20 @@ function scene:onRowRender( event )
 
 	---------
 		
-	local picture = imagesManager.drawImage( 
+	imagesManager.drawImage(
 		row, 
 		linkedIn.data.people[message.sender.linkedinUID].pictureUrl, 
 		5, 5,	
-		IMAGE_TOP_LEFT, 0.4
+		IMAGE_TOP_LEFT, 0.4,
+		false,
+		function(picture)
+			self:rowRenderContent(row, picture, message)
+		end
 	)
+
+end
+
+function scene:rowRenderContent( row, picture, message )
 	
 	local openProfile = function() router.displayProfile(message.sender.linkedinUID, router.openTripMessages) end
 	picture:addEventListener("tap", openProfile)

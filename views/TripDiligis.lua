@@ -105,17 +105,24 @@ end
 function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
-	local diligis = events[row.index];
+	local diligis = events[row.index]
 
 	---------
 	
-	local picture = imagesManager.drawImage( 
+	imagesManager.drawImage(
 		row, 
 		linkedIn.data.people[diligis.sender.linkedinUID].pictureUrl, 
 		30, row.height * 0.5,
-		IMAGE_CENTER, 0.6
+		IMAGE_CENTER, 0.6,
+		false,
+		function(picture)
+			self:rowRenderContent(row, picture, diligis)
+		end
 	)
 	
+end
+	
+function scene:rowRenderContent( row, picture, diligis )
 	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, router.openTripDiligis) end
 	picture:addEventListener("tap", openProfile)
 

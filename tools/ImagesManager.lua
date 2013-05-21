@@ -8,30 +8,25 @@ local images = {}
 
 -----------------------------------------------------------------------------------------
 
---function fetchImage( url, next, fileName )
---	if not fileName then 
---		fileName = utils.imageName(url)
---	end
---
---	local imageReceived = function(event) return storeImage(fileName, event.target, next)  end
---	display.loadRemoteImage( url, "GET", imageReceived, fileName, system.TemporaryDirectory )
---end
---
---function storeImage( name, image, next)
---	image.alpha = 0
---	images[name] = image
---	next();
---end
+function drawImage( group, url, x, y, positionFrom, scale, smooth, next )
 
-------------------------------------------------------------
-
-function drawImage( group, url, x, y, positionFrom, scale, smooth )
-
-	local name 	= utils.imageName(url)
-	local image = display.newImage( group, name, system.TemporaryDirectory)
+	local fileName = utils.imageName(url)
+	local image = display.newImage( group, fileName, system.TemporaryDirectory)
 	
-	image.xScale = scale
-	image.yScale = scale
+	if not image then
+		local imageReceived = function(event) return placeImage(event.target, fileName, group, x, y, positionFrom, scale, smooth, next)  end
+		display.loadRemoteImage( url, "GET", imageReceived, fileName, system.TemporaryDirectory )
+	else
+		placeImage(image, fileName, group, x, y, positionFrom, scale, smooth, next)
+	end
+	
+end	
+
+-----------------------------------------------------------------------------------------
+
+function placeImage(image, fileName, group, x, y, positionFrom, scale, smooth, next)
+	group:insert(image)
+	image:scale (scale, scale)
 
 	if(positionFrom == IMAGE_TOP_LEFT) then
 		image.x = x + image.width*scale/2 
@@ -47,8 +42,11 @@ function drawImage( group, url, x, y, positionFrom, scale, smooth )
 		image.alpha = 1
 	end
 	
-	return image
+	images[fileName] = image
+	next(image)
 end
+
+-----------------------------------------------------------------------------------------
 
 function hideImage( image )
 	transition.to( image, { alpha = 0, time = 400, transition = easing.outQuad } )

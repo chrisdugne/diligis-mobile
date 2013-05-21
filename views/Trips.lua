@@ -148,12 +148,19 @@ function scene:onRowRender( event )
 	arrow.y = row.contentHeight * 0.5
 	row:insert(arrow)
 
-	imagesManager.drawImage( 
+	imagesManager.drawImage(
 		row, 
 		tripRendered.imageUrl, 
 		10, 5, 
-		IMAGE_TOP_LEFT, 0.3
+		IMAGE_TOP_LEFT, 0.3,
+		false,
+		function(picture)
+			self:rowRenderContent(row, tripRendered)
+		end
 	)
+end
+
+function scene:rowRenderContent (row, tripRendered)
 
 	local perlImage
 	if(os.time() - utils.parseDateTime(tripRendered.startDate) > 0) then
@@ -223,7 +230,17 @@ function scene:onRowTouch( event )
 		details.address.text 			= selectedTrip.address
 		details.startDate.text 			= "From " .. selectedTrip.startDate
 		details.endDate.text 			= "To "   .. selectedTrip.endDate
-		details.tripSelectedImage 		= imagesManager.drawImage(details, selectedTrip.imageUrl, display.contentCenterX, 100, IMAGE_CENTER, 1)
+		
+      imagesManager.drawImage(
+      	details, 
+      	selectedTrip.imageUrl,
+      	display.contentCenterX, 100,
+      	IMAGE_CENTER, 1,
+      	false,
+      	function(image)
+      		details.tripSelectedImage = image
+      	end
+      )
 		
 		local nbMessages 	= 0
 		local nbDiligis 	= 0

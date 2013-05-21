@@ -47,9 +47,13 @@ function scene:drawProfile(linkedinUID)
    	profile, 
    	linkedIn.data.people[linkedinUID].pictureUrl, 
    	display.contentCenterX, 100, 
-   	IMAGE_CENTER, 1
+   	IMAGE_CENTER, 1,
+   	false, 
+   	function() self:drawTextsAndButtons(linkedinUID) end
 	)
+end
 
+function scene:drawTextsAndButtons(linkedinUID)
 	----------------------
 
 	local name = linkedIn.data.people[linkedinUID].firstName .. " " .. linkedIn.data.people[linkedinUID].lastName

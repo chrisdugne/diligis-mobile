@@ -56,20 +56,22 @@ function drawHeader(view, showMenuCustomAction)
 
 	-- linkedin picture
 	
-	local profileImage =	imagesManager.drawImage(
+	imagesManager.drawImage(
 		header, 
 		linkedIn.data.profile.pictureUrl, 
 		display.contentWidth - 40, 0, 
-		IMAGE_TOP_LEFT, 0.4
+		IMAGE_TOP_LEFT, 0.4,
+		false,
+		function(image)
+			local openMyProfile = function() hideMenu() router.displayProfile(accountManager.user.linkedinUID) end
+      	image:addEventListener("tap", openMyProfile)
+      	header.image = image
+      	
+      	showHeader()
+		end
 	)
 	
-	local openMyProfile = function() hideMenu() router.displayProfile(accountManager.user.linkedinUID) end
-	profileImage:addEventListener("tap", openMyProfile)
 	
-	header:insert( profileImage )
-	header.profileImage = profileImage
-	
-	showHeader()
 end
 
 ---------------------------------------------

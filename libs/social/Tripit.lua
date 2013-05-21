@@ -167,7 +167,7 @@ function tripitProfileListener( event )
 		local response = xml.parseXML(event.response).Response
 
 		if(response.Error ~= nil) then
-			native.showAlert("Connection impossible", response.Error.description.value)
+			native.showAlert("Connection failed : go check your emails !", response.Error.description.value)
 			callBackCancel();
 			native.setActivityIndicator( false )
 		else
