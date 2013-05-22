@@ -12,7 +12,8 @@ local back
 
 ----------------------
 
-function effectBack() 
+function effectBack()
+ 	native.setKeyboardFocus( nil ) 
 	transition.to( textBox, { y = - display.contentHeight, time = 400, transition = easing.inExpo, onComplete = back } )
 end
 
@@ -47,28 +48,28 @@ function scene:buildWriter(event, requireDefaultText)
 	utils.tprint(selectedEvent)
 	
 	local backButton = widget.newButton	{
-		width = display.contentWidth/3,
-		height = 46,
+		width = display.contentWidth/6,
+		height = 23,
 		label = "Back", 
-		labelYOffset = - 1,
+		labelYOffset = 2,
 		onRelease = effectBack
 	}
 	
 	backButton.x = display.contentCenterX - 70
-	backButton.y = display.contentHeight - backButton.contentHeight
+	backButton.y = 40 + backButton.contentHeight
 	
 	self.view:insert( backButton )
 
 	local sendButton = widget.newButton	{
-		width = display.contentWidth/3,
-		height = 46,
+		width = display.contentWidth/6,
+		height = 23,
 		label = "Send", 
-		labelYOffset = - 1,
+		labelYOffset = 2,
 		onRelease = sendMessage
 	}
 	
 	sendButton.x = display.contentCenterX + 70
-	sendButton.y = display.contentHeight - sendButton.contentHeight
+	sendButton.y = 40 + sendButton.contentHeight
 	
 	self.view:insert( sendButton )
 
@@ -94,12 +95,12 @@ function scene:buildWriter(event, requireDefaultText)
 
 	----------------------
 
-	transition.to( textBox, { y = 60 + textBox.contentHeight/2, time = 400, transition = easing.outExpo } )
+	transition.to( textBox, { y = 140 + textBox.contentHeight/2, time = 400, transition = easing.outExpo } )
    native.setKeyboardFocus( textBox )
 	
 	----------------------
 
-	charLeftText = display.newText( "(" .. 200-#textBox.text .. ")", display.contentWidth - 60, 300, native.systemFontBold, 14 )
+	charLeftText = display.newText( "(" .. 200-#textBox.text .. ")", display.contentWidth - 60, 100, native.systemFontBold, 14 )
 	charLeftText:setTextColor( 0 )
 	
 	self.view:insert( charLeftText )
