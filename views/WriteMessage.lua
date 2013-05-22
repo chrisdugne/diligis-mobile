@@ -83,12 +83,14 @@ function scene:buildWriter(event, requireDefaultText)
 --	end
 
 	----------------------
-
-	if(requireDefaultText) then
-   	textBox.text = "Hello " .. selectedEvent.sender.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
-   else
-		textBox.text = ""   
-   end
+-- BUG IPAD : defaultText invisible ? 
+--	if(requireDefaultText) then
+--   	textBox.text = "Hello " .. selectedEvent.sender.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
+--   else
+--		textBox.text = ""   
+--   end
+	
+	textBox.text = ""   
 
 	----------------------
 
@@ -101,6 +103,13 @@ function scene:buildWriter(event, requireDefaultText)
 	charLeftText:setTextColor( 0 )
 	
 	self.view:insert( charLeftText )
+	
+	----------------------
+
+	local writingToText = display.newText( "to " .. selectedEvent.sender.name, 40, 300, native.systemFontBold, 14 )
+	writingToText:setTextColor( 0 )
+	
+	self.view:insert( writingToText )
 end
 
 ----------------------
