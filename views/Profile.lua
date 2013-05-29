@@ -57,7 +57,7 @@ function scene:drawTextsAndButtons(linkedinUID)
 	----------------------
 
 	local name = linkedIn.data.people[linkedinUID].firstName .. " " .. linkedIn.data.people[linkedinUID].lastName
-	local nameDisplay = display.newText( name, 0, 0, native.systemFontBold, 28 )
+	local nameDisplay = display.newText( name, 0, 0, native.systemFontBold, 14 )
 	nameDisplay:setTextColor( 0 )
 	nameDisplay.x = display.contentWidth * 0.5
 	nameDisplay.y = 200
@@ -66,13 +66,23 @@ function scene:drawTextsAndButtons(linkedinUID)
 
 	----------------------
 
-	local title = linkedIn.data.people[linkedinUID].headline .. " (" .. linkedIn.data.people[linkedinUID].industry .. ")"
-	local titleDisplay = display.newText( title, 0, 0, native.systemFont, 16 )
+	local title = linkedIn.data.people[linkedinUID].headline
+	local titleDisplay = display.newText( title, 0, 0, native.systemFont, 12 )
 	titleDisplay:setTextColor( 0 )
 	titleDisplay.x = display.contentWidth * 0.5
 	titleDisplay.y = 260
 
 	profile:insert( titleDisplay )
+	
+	----------------------
+
+	local industry = linkedIn.data.people[linkedinUID].industry
+	local industryDisplay = display.newText( "(" .. linkedIn.data.people[linkedinUID].industry .. ")", 0, 0, native.systemFont, 12 )
+	industryDisplay:setTextColor( 0 )
+	industryDisplay.x = display.contentWidth * 0.5
+	industryDisplay.y = 280
+
+	profile:insert( industryDisplay )
 
 	----------------------
 	--- linkedin logout
