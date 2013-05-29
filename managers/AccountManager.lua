@@ -144,18 +144,13 @@ function linkedInConnect()
 end
 
 function linkedInCancel()
-	--- analytics
-	analytics.event("Navigation", "linkedInCancel") 
-	--- 
-
+	analytics.event("LinkedIn", "linkedInCancel") 
 	router.openAppHome()
 end
 
 function linkedInConnected()
 
-	--- analytics
-	analytics.event("Navigation", "linkedInConnected") 
-	--- 
+	analytics.event("LinkedIn", "linkedInConnected") 
 
 	user =	{
 		linkedinId 		= linkedIn.data.profile.id,
