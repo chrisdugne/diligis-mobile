@@ -172,9 +172,10 @@ function profileListener( event )
 
 	if ( not event.isError ) then
 		data.profile = json.decode(event.response);
+   	callBackAuthorisationDone();
+	else
+		deauthorise()
 	end
-
-	callBackAuthorisationDone();
 
 end
 
