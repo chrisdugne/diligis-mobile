@@ -143,7 +143,14 @@ function accessTokenListener( event )
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
 
 		getProfile();
-		--deauthorise()
+	else
+		local details = ""
+		if(event.errorMessage) then 
+			details = event.errorMessage
+		end
+		
+		native.showAlert( "Linkedin connection problem..", "Please try another account. Details : " .. details, { "OK" } )
+		deauthorise()
 	end
 
 end
@@ -156,6 +163,7 @@ end
 --- profile request
 function getProfile()
 
+	native.showAlert( "Linkedin", "Fetching your profile", { "OK" } )
 	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,headline,industry,email-address)";
 
 	local customParams = 
