@@ -163,7 +163,6 @@ end
 --- profile request
 function getProfile()
 
-	native.showAlert( "Linkedin", "Fetching your profile", { "OK" } )
 	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,headline,industry,email-address)";
 
 	local customParams = 
@@ -178,11 +177,14 @@ end
 --- profile reception
 function profileListener( event )
 
-	if ( not event.isError ) then
-		data.profile = json.decode(event.response);
-   	callBackAuthorisationDone();
-	else
+	local response = json.decode(event.response)
+
+	if ( response.errorCode == 0 ) then
+		native.showAlert( "Linkedin Error", response.message, { "OK" } )
 		deauthorise()
+	else
+		data.profile = response
+   	callBackAuthorisationDone();
 	end
 
 end
