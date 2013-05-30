@@ -36,7 +36,7 @@ function drawHeader(view, showMenuCustomAction)
 	{ 45, 45, 45, 144 }, "down" )
 
 	-- Create toolbar to go at the top of the screen
-	local titleBar = display.newRect( 0, 0, display.contentWidth, 32 )
+	local titleBar = display.newRect( 0, 0, display.contentWidth, HEADER_HEIGHT )
 	titleBar:setFillColor( titleGradient )
 	titleBar.y = display.screenOriginY + titleBar.contentHeight * 0.5
 	titleBar.y = display.screenOriginY + titleBar.contentHeight * 0.5
@@ -48,7 +48,7 @@ function drawHeader(view, showMenuCustomAction)
 	
 	--	--- top logo
 	local logo = display.newImage(view, "images/logos/d_logo_small.png" )
-	logo.x = 2*display.contentWidth/3
+	logo.x = 180
 	logo.y = titleBar.y + 3
 	
 	header:insert( logo )
@@ -59,7 +59,7 @@ function drawHeader(view, showMenuCustomAction)
 	imagesManager.drawImage(
 		header, 
 		linkedIn.data.profile.pictureUrl, 
-		display.contentWidth - 40, 0, 
+		display.contentWidth - 70, 0, 
 		IMAGE_TOP_LEFT, 0.4,
 		false,
 		function(image)
@@ -70,6 +70,20 @@ function drawHeader(view, showMenuCustomAction)
       	showHeader()
 		end
 	)
+	
+	local logoutButton = widget.newButton{
+		defaultFile	= "images/buttons/logout.png", 
+		overFile		= "images/buttons/logout.png", 
+		onRelease	= function() 
+			accountManager.logout()
+			analytics.event("Navigation", "logout")  
+		end, 
+	}
+
+	logoutButton.x = display.contentWidth -16
+	logoutButton.y = 16
+
+	header:insert( logoutButton )
 	
 	
 end

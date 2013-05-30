@@ -11,6 +11,7 @@ local tripit 		= require("libs.social.Tripit")
 
 local linkedInImage
 local signInButton
+local cancelButton
 local loadingSpinner
 
 -----------------------------------------------------------------------------------------
@@ -55,6 +56,22 @@ function scene:createScene( event )
    
    signInButton.x = display.contentWidth/2
    signInButton.y =  3*display.contentHeight/4+20
+	
+	--- cancel button
+	local cancelAction = function() analytics.event("Navigation", "appHomeCancel")  accountManager.logout() end
+	cancelButton = widget.newButton	{
+		width = 80,
+		height = 40,
+		label = "Cancel", 
+		labelYOffset = -2,
+		onRelease = cancelAction
+	}
+	
+   cancelButton.x = display.contentWidth/2
+   cancelButton.y =  3*display.contentHeight/4 - 100
+	
+	cancelButton.alpha = 0
+	view:insert( cancelButton )
    
 	-- Create a spinner widget
 	loadingSpinner = widget.newSpinner
@@ -76,6 +93,7 @@ end
 
 ------------------------------------------
 
+local enterSceneBeforeTimerComplete
 function signIn()
 
 	--- analytics
@@ -83,9 +101,19 @@ function signIn()
 	--- 
 	
 	loadingSpinner:start()
-	transition.to( loadingSpinner, { alpha = 1.0 } )
+	transition.to( loadingSpinner, { alpha = 1 } )
 	transition.to( signInButton, 	 { alpha = 0 } )
+	transition.to( cancelButton, 	 { alpha = 0 } )
 	accountManager.linkedInConnect()
+	
+	enterSceneBeforeTimerComplete = false
+	timer.performWithDelay( 3000, toLongLinkedin )
+end
+
+function toLongLinkedin( event )
+	if(not enterSceneBeforeTimerComplete) then
+		transition.to( cancelButton, { alpha = 1 } )
+	end		
 end
 
 ------------------------------------------
@@ -93,8 +121,9 @@ end
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	loadingSpinner.alpha = 0
-	transition.to( signInButton, { alpha = 1.0 } )
-	
+	cancelButton.alpha = 0
+	transition.to( signInButton, { alpha = 1 } )
+	enterSceneBeforeTimerComplete = true
 	viewManager.removeHeader()
 end
 

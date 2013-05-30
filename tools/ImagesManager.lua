@@ -11,6 +11,7 @@ local images = {}
 function drawImage( group, url, x, y, positionFrom, scale, smooth, next )
 
 	local fileName = utils.imageName(url)
+	print(fileName)
 	local image = display.newImage( group, fileName, system.TemporaryDirectory)
 	
 	if not image then

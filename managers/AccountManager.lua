@@ -19,7 +19,6 @@ end
 
 function getAccountListener( event )
 	user = json.decode(event.response);
-	utils.tprint(user)
 	eventManager.getStream();
 end
 

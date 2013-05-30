@@ -83,9 +83,9 @@ function requestTokenListener( event )
 
 		native.setActivityIndicator( false )
 		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight)
+		webView:addEventListener( "urlRequest", webviewListener )
 		webView:request( authenticateUrl )
 
-		webView:addEventListener( "urlRequest", webviewListener )
 	end
 end
 
@@ -258,9 +258,9 @@ function openNewTripWindow(next)
 	local createTripUrl = "https://m.tripit.com/trip/create"
 
 	webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight)
+	webView:addEventListener( "urlRequest", createTripListener )
 	webView:request( createTripUrl )
 
-	webView:addEventListener( "urlRequest", createTripListener )
 end
 
 -----------------------------------------------------

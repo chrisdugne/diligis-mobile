@@ -87,10 +87,8 @@ function requestTokenListener( event )
 		local authenticateUrl = "https://www.linkedin.com/uas/oauth/authenticate?oauth_token=" .. data.requestToken
 
 		webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight )
-		webView:request( authenticateUrl )
-
 		webView:addEventListener( "urlRequest", webviewListener )
-
+		webView:request( authenticateUrl )
 	end
 end
 
@@ -163,27 +161,41 @@ end
 --- profile request
 function getProfile()
 
-	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,headline,industry,email-address)";
+--	local profileUrl = "http://api.linkedin.com/v1/people/~"
+	local profileUrl = "http://api.linkedin.com/v1/people/~:(id,first-name,last-name,picture-url,headline,industry,email-address,public-profile-url)"
 
 	local customParams = 
 	{
 		format = "json"
 	}
-
+	
 	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", profileListener)
-
 end
 
 --- profile reception
 function profileListener( event )
 
 	local response = json.decode(event.response)
-
-	if ( response.errorCode == 0 ) then
+	utils.tprint(response)
+	
+	if ( response.errorCode ) then
 		native.showAlert( "Linkedin Error", response.message, { "OK" } )
 		deauthorise()
 	else
 		data.profile = response
+
+		if( not data.profile.emailAddress) then
+			data.profile.emailAddress = ""
+		end
+
+		if( not data.profile.firstName) then
+			data.profile.firstName = ""
+		end
+
+		if( not data.profile.lastName) then
+			data.profile.lastName = ""
+		end
+		
    	callBackAuthorisationDone();
 	end
 
@@ -235,7 +247,7 @@ function getPeopleProfile(id, next)
 	else
    	peopleProfileReceived = next;
    	
-   	local profileUrl = "http://api.linkedin.com/v1/people/id=".. id ..":(id,first-name,last-name,picture-url,headline,industry,email-address)";
+   	local profileUrl = "http://api.linkedin.com/v1/people/id=".. id ..":(id,first-name,last-name,picture-url,headline,industry,email-address,site-standard-profile-request)";
    	local customParams = {
    		format = "json"
    	}

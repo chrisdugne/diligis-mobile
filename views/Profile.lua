@@ -7,6 +7,8 @@
 
 local scene = storyboard.newScene()
 local profile
+local webView
+local back
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -23,10 +25,20 @@ end
 
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene(linkedinUID, back)
-	viewManager.setupView(self.view);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
+function scene:refreshScene(linkedinUID, fromView)
+	back = fromView
+	viewManager.setupView(self.view, backToDiligis);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", backToDiligis);
 	self:buildProfile(linkedinUID);
+
+end
+
+-----------------------------------------------------
+
+function backToDiligis()
+	webView:removeSelf()
+	webView = nil;
+	back()
 end
 
 -----------------------------------------------------------------------------------------
@@ -43,14 +55,17 @@ function scene:drawProfile(linkedinUID)
 
 	----------------------
 
-	imagesManager.drawImage(
-   	profile, 
-   	linkedIn.data.people[linkedinUID].pictureUrl, 
-   	display.contentCenterX, 100, 
-   	IMAGE_CENTER, 1,
-   	false, 
-   	function() self:drawTextsAndButtons(linkedinUID) end
-	)
+	webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT , display.contentWidth, display.contentHeight - HEADER_HEIGHT )
+	webView:request( linkedIn.data.people[linkedinUID].siteStandardProfileRequest.url )
+
+--	imagesManager.drawImage(
+--   	profile, 
+--   	linkedIn.data.people[linkedinUID].pictureUrl, 
+--   	display.contentCenterX, 100, 
+--   	IMAGE_CENTER, 1,
+--   	false, 
+--   	function() self:drawTextsAndButtons(linkedinUID) end
+--	)
 end
 
 function scene:drawTextsAndButtons(linkedinUID)
