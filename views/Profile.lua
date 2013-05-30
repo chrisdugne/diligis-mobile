@@ -36,8 +36,10 @@ end
 -----------------------------------------------------
 
 function backToDiligis()
-	webView:removeSelf()
-	webView = nil;
+	if(webView) then
+		webView:removeSelf()
+		webView = nil;
+	end
 	back()
 end
 
@@ -55,68 +57,76 @@ function scene:drawProfile(linkedinUID)
 
 	----------------------
 
-	webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT , display.contentWidth, display.contentHeight - HEADER_HEIGHT )
-	webView:request( linkedIn.data.people[linkedinUID].siteStandardProfileRequest.url )
+	if(linkedIn.data.people[linkedinUID].siteStandardProfileRequest) then
+		webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT , display.contentWidth, display.contentHeight - HEADER_HEIGHT )
+		webView:request( linkedIn.data.people[linkedinUID].siteStandardProfileRequest.url )
+	else
+   	imagesManager.drawImage(
+      	profile, 
+      	linkedIn.data.people[linkedinUID].pictureUrl, 
+      	display.contentCenterX, 100, 
+      	IMAGE_CENTER, 1,
+      	false, 
+      	function() self:drawTextsAndButtons(linkedinUID) end
+   	)
+	end
 
---	imagesManager.drawImage(
---   	profile, 
---   	linkedIn.data.people[linkedinUID].pictureUrl, 
---   	display.contentCenterX, 100, 
---   	IMAGE_CENTER, 1,
---   	false, 
---   	function() self:drawTextsAndButtons(linkedinUID) end
---	)
 end
 
 function scene:drawTextsAndButtons(linkedinUID)
-	----------------------
 
-	local name = linkedIn.data.people[linkedinUID].firstName .. " " .. linkedIn.data.people[linkedinUID].lastName
-	local nameDisplay = display.newText( name, 0, 0, native.systemFontBold, 14 )
-	nameDisplay:setTextColor( 0 )
-	nameDisplay.x = display.contentWidth * 0.5
-	nameDisplay.y = 200
+	local privateText = "This person has asked LinkedIn not to tell any information."
+	local privateDisplay = display.newText( privateText, display.contentWidth * 0.5 - 80, 200, 200, 200, native.systemFontBold, 14 )
+	privateDisplay:setTextColor( 0 )
 
-	profile:insert( nameDisplay )
+	profile:insert( privateDisplay )
 
-	----------------------
-
-	local title = linkedIn.data.people[linkedinUID].headline
-	local titleDisplay = display.newText( title, 0, 0, native.systemFont, 12 )
-	titleDisplay:setTextColor( 0 )
-	titleDisplay.x = display.contentWidth * 0.5
-	titleDisplay.y = 260
-
-	profile:insert( titleDisplay )
-	
-	----------------------
-
-	local industry = linkedIn.data.people[linkedinUID].industry
-	local industryDisplay = display.newText( "(" .. linkedIn.data.people[linkedinUID].industry .. ")", 0, 0, native.systemFont, 12 )
-	industryDisplay:setTextColor( 0 )
-	industryDisplay.x = display.contentWidth * 0.5
-	industryDisplay.y = 280
-
-	profile:insert( industryDisplay )
-
-	----------------------
-	--- linkedin logout
-
-	if(accountManager.user.linkedinUID == linkedinUID) then
-   	local logoutButton = widget.newButton{
-   		defaultFile	= "images/buttons/logout.png", 
-   		overFile		= "images/buttons/logout.png", 
-   		onRelease	= function() 
-   			accountManager.logout()
-				analytics.event("Navigation", "logout")  
-   		end, 
-   	}
-   
-   	logoutButton.x = display.contentWidth * 0.5
-   	logoutButton.y = 450
-   
-   	profile:insert( logoutButton )
-   end
+--	local name = linkedIn.data.people[linkedinUID].firstName .. " " .. linkedIn.data.people[linkedinUID].lastName
+--	local nameDisplay = display.newText( name, 0, 0, native.systemFontBold, 14 )
+--	nameDisplay:setTextColor( 0 )
+--	nameDisplay.x = display.contentWidth * 0.5
+--	nameDisplay.y = 200
+--
+--	profile:insert( nameDisplay )
+--
+--	----------------------
+--
+--	local title = linkedIn.data.people[linkedinUID].headline
+--	local titleDisplay = display.newText( title, 0, 0, native.systemFont, 12 )
+--	titleDisplay:setTextColor( 0 )
+--	titleDisplay.x = display.contentWidth * 0.5
+--	titleDisplay.y = 260
+--
+--	profile:insert( titleDisplay )
+--	
+--	----------------------
+--
+--	local industry = linkedIn.data.people[linkedinUID].industry
+--	local industryDisplay = display.newText( "(" .. linkedIn.data.people[linkedinUID].industry .. ")", 0, 0, native.systemFont, 12 )
+--	industryDisplay:setTextColor( 0 )
+--	industryDisplay.x = display.contentWidth * 0.5
+--	industryDisplay.y = 280
+--
+--	profile:insert( industryDisplay )
+--
+--	----------------------
+--	--- linkedin logout
+--
+--	if(accountManager.user.linkedinUID == linkedinUID) then
+--   	local logoutButton = widget.newButton{
+--   		defaultFile	= "images/buttons/logout.png", 
+--   		overFile		= "images/buttons/logout.png", 
+--   		onRelease	= function() 
+--   			accountManager.logout()
+--				analytics.event("Navigation", "logout")  
+--   		end, 
+--   	}
+--   
+--   	logoutButton.x = display.contentWidth * 0.5
+--   	logoutButton.y = 450
+--   
+--   	profile:insert( logoutButton )
+--   end
 
 	--	--------------------------------
 	--	-- tripit logout

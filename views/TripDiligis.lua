@@ -106,6 +106,7 @@ function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
 	local diligis = events[row.index]
+	local me = self
 
 	---------
 	
@@ -115,14 +116,19 @@ function scene:onRowRender( event )
 		30, row.height * 0.5,
 		IMAGE_CENTER, 0.6,
 		false,
-		function(picture)
-			self:rowRenderContent(row, picture, diligis)
-		end
+		function(picture) return me:rowRenderContent(row, picture, diligis) end
 	)
 	
 end
+
+function scene:receivedPicture(picture)
+	self:rowRenderContent(row, picture, diligis)
+end
 	
 function scene:rowRenderContent( row, picture, diligis )
+
+	print("------------> 2")
+	
 	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, router.openTripDiligis) end
 	picture:addEventListener("tap", openProfile)
 

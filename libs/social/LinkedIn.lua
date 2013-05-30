@@ -249,7 +249,8 @@ function getPeopleProfile(id, next)
    	
    	local profileUrl = "http://api.linkedin.com/v1/people/id=".. id ..":(id,first-name,last-name,picture-url,headline,industry,email-address,site-standard-profile-request)";
    	local customParams = {
-   		format = "json"
+   		format = "json",
+   		linkedinUID = id
    	}
    
    	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", peopleProfileListener)
@@ -259,9 +260,17 @@ end
 
 --- profile reception
 function peopleProfileListener( event )
-
+	
 	if ( not event.isError ) then
+   	
 		local profile = json.decode(event.response)
+		
+		if(profile.id == "private") then
+      	local params = utils.getUrlParams(event.url)
+			profile.id = params.linkedinUID
+			profile.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+		end
+		
 		data.people[profile.id] = profile
 	end
 
