@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- TripMessages.lua
+-- Messages.lua
 --
 
 -----------------------------------------------------------------------------------------
@@ -24,16 +24,21 @@ end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene(back)
+function scene:refreshScene()
 	viewManager.setupView(self.view);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
---	viewManager.addCustomButton("images/icons/messages.icon.png", self.openWriter);
 	self:buildMessages();
 end
 	
 -----------------------------------------------------------------------------------------
 
 function scene:buildMessages()
+
+ 	if( #accountManager.user.messages == 0) then
+ 		self:showNoMessages();
+ 		return
+ 	end	
+
+	----------------------
 
 	native.setActivityIndicator( true )
 	
@@ -52,47 +57,57 @@ function scene:buildMessages()
 
 	----------------------
 	
-	events = {}
-
-	if(selectedTrip ~= nil and #selectedTrip.events > 0 ) then
-		for i in pairs(selectedTrip.events) do
-			if(selectedTrip.events[i].content.type == eventManager.MESSAGE) then
-				table.insert(events, selectedTrip.events[i])
-				accountManager.readEvent(selectedTrip.events[i])
-   		end
-		end
-	end
-	
-	--- json to table for the event.sender
-	for i in pairs(events) do
-		if type(events[i].sender) ~= "table" then events[i].sender = json.decode(events[i].sender) end
-		if type(events[i].recepient) ~= "table" then events[i].recepient = json.decode(events[i].recepient) end
-	end
-	
-	--- get all linkedin profiles
 	local ids = {}
-	for i in pairs(events) do
-		table.insert(ids, events[i].sender.linkedinUID)
+
+	----------------------
+
+	for i in pairs(accountManager.user.messages) do
+		accountManager.readEvent(accountManager.user.messages[i])
+
+		--- json to table for the event.sender
+		if type(accountManager.user.messages[i].sender) 	~= "table" then accountManager.user.messages[i].sender 	 = json.decode(accountManager.user.messages[i].sender) 		end
+		if type(accountManager.user.messages[i].recepient) ~= "table" then accountManager.user.messages[i].recepient = json.decode(accountManager.user.messages[i].recepient) 	end
+
+	--- get all linkedin profiles
+		table.insert(ids, accountManager.user.messages[i].sender.linkedinUID)
+		table.insert(ids, accountManager.user.messages[i].recepient.linkedinUID)
 	end
+	
+	----------------------
 
 	linkedIn.getProfiles(ids, function(event) return self:drawList() end) 
 
 end
 
 function scene:drawList()
-	for i in pairs(events) do
-		self:createRow() 
+	for i in pairs(accountManager.user.messages) do
+		self:createRow(accountManager.user.messages[i]) 
 	end
 	
 	native.setActivityIndicator( false )
 end
 
+function scene:showNoMessages()
+	
+	local noMessageText = display.newText( "No Message", 0, 0, native.systemFontBold, 28 )
+	noMessageText:setTextColor( 0 )
+	noMessageText.x = display.contentWidth/2
+	noMessageText.y = display.contentCenterY
+	
+	self.view:insert( noMessageText )
+end
+
 -----------------------------------------------------------------------------------------
 --- List tools : row creation + touch events
-function scene:createRow()
+function scene:createRow(message)
+	
+	print("-------->")
+	print(message.content.text)
+	print(#message.content.text)
+
 	list:insertRow
 	{
-		rowHeight = 164,
+		rowHeight = 150,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -107,8 +122,8 @@ end
 function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
-	local message = events[row.index];
-
+	local message = accountManager.user.messages[row.index];
+	
 	---------
 		
 	imagesManager.drawImage(
@@ -166,7 +181,7 @@ function scene:rowRenderText( row, picture, message )
    	picture:addEventListener("tap", openProfile)
 	end
 	
-	local text = display.newText( message.content.text, 50, 50, 205, 100, native.systemFont, 14 )
+	local text = display.newText( message.content.text, 50, 50, 205, 100, native.systemFont, 11 )
 	text:setTextColor( 0 )
 	row:insert(text)
 	
@@ -177,30 +192,27 @@ function scene:rowRenderText( row, picture, message )
    		fontSize = 10,
    		label = "Answer", 
    		labelYOffset = 2,
-   		onRelease = function() self.openWriter(message) end
+   		onRelease = function() self:openWriter(message) end
    	}
    	
-   	answerButton.x = display.contentWidth - answerButton.width - 10
-   	answerButton.y = text.y + text.contentHeight/2 - 10
+   	answerButton.x = row.contentWidth - answerButton.width - 10
+   	answerButton.y = row.contentHeight - 30
    	
    	row:insert( answerButton ) 
 	end
 end
 
 
-function scene:openWriter()
-	if(#events > 0) then
-      analytics.event("Message", "startAnswer") 
-      
-		router.openWriteMessage(events[#events], true, router.openTripMessages)
-	end
+function scene:openWriter(message)
+   analytics.event("Message", "startAnswer") 
+	router.openWriteMessage(message, true, router.openMessages)
 end
 
 -----------------------------------------------------------------------------------------
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene(event.params.back);
+	self:refreshScene();
 end
 
 -- Called when scene is about to move offscreen:

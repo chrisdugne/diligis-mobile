@@ -95,6 +95,7 @@ function scene:onRowRender( event )
 	local row = event.row
 	local eventRendered = eventManager.stream[row.index];
 	if type(eventRendered.sender) ~= "table" then eventRendered.sender = json.decode(eventRendered.sender) end
+	if eventRendered.recepient and type(eventRendered.recepient) ~= "table" then eventRendered.recepient = json.decode(eventRendered.recepient) end
 
 	local image
 	if(eventRendered.content.type == eventManager.ANNOUNCEMENT) then
@@ -133,9 +134,16 @@ end
 
 function showEvent(event)
 	
+	print("-----")
+	utils.tprint(event)
 	if(event.content.type == eventManager.ANNOUNCEMENT) then
-		router.displayProfile(event.sender.linkedinUID, router.openStream)
-      analytics.event("Navigation", "streamToAnnouncement") 
+		if(event.sender.tripId) then
+         analytics.event("Navigation", "streamToTrip") 
+   		router.openPeopleTrip(event, router.openStream)
+		else
+         analytics.event("Navigation", "streamToProfile") 
+   		router.displayProfile(event.sender.linkedinUID, router.openStream)
+		end
 		
 	elseif (event.content.type == eventManager.DILIGIS) then
 		selectedTrip = getTrip(event)
@@ -144,7 +152,7 @@ function showEvent(event)
 		
 	elseif (event.content.type == eventManager.MESSAGE) then
 		selectedTrip = getTrip(event)
-		router.openTripMessages(router.openStream)
+		router.openMessages()
       analytics.event("Navigation", "streamToMessage") 
 		
 	end

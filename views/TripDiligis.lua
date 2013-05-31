@@ -69,6 +69,7 @@ function scene:buildDiligis()
 	local ids = {}
 	for i in pairs(events) do
 		if type(events[i].sender) ~= "table" then events[i].sender = json.decode(events[i].sender) end
+		if events[i].recepient and type(events[i].recepient) ~= "table" then events[i].recepient = json.decode(events[i].recepient) end
 		table.insert(ids, events[i].sender.linkedinUID)
 	end
 
@@ -127,8 +128,6 @@ end
 	
 function scene:rowRenderContent( row, picture, diligis )
 
-	print("------------> 2")
-	
 	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, router.openTripDiligis) end
 	picture:addEventListener("tap", openProfile)
 

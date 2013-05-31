@@ -108,7 +108,8 @@ function scene:buildTripView()
 	----------------------
 	-- insert rows into list (tableView widget)
 	-- 
- 	if(accountManager.user.trips == nil or table.getn(accountManager.user.trips) == 0) then
+	
+ 	if( #accountManager.user.trips == 0) then
  		showNoTrips();
  	else
 		for i in pairs(accountManager.user.trips) do
@@ -255,8 +256,23 @@ function scene:onRowTouch( event )
    		end
    	end
    	
-		details.diligisCount.text 	= nbDiligis
-		details.messagesCount.text = nbMessages
+   	if(nbDiligis > 0) then
+   		details.diligisCount.text 	= nbDiligis
+   		details.diligisCount.alpha = 1
+   		details.diligisIcon.alpha 	= 1
+   	else
+   		details.diligisCount.alpha = 0
+   		details.diligisIcon.alpha 	= 0
+   	end
+   	
+   	if(nbMessages > 0) then
+   		details.messagesCount.text  = nbMessages
+   		details.messagesCount.alpha = 1
+   		details.messagesIcon.alpha  = 1
+   	else
+   		details.messagesCount.alpha = 0
+   		details.messagesIcon.alpha  = 0
+   	end
    	
 		showDetails()
 	end
@@ -272,7 +288,7 @@ function scene:buildDetails()
 	
 	----------------------
 
-	local address = display.newText( "", 0, 0, native.systemFontBold, 28 )
+	local address = display.newText( "", 0, 0, native.systemFontBold, 16 )
 	address:setTextColor( 0 )
 	address.x = display.contentWidth * 0.5
 	address.y = 200
@@ -282,7 +298,7 @@ function scene:buildDetails()
 
 	----------------------
 
-	local startDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	local startDate = display.newText( "", 0, 0, native.systemFontBold, 13 )
 	startDate:setTextColor( 0 )
 	startDate.x = display.contentWidth * 0.5
 	startDate.y = 250
@@ -292,7 +308,7 @@ function scene:buildDetails()
 	 
 	----------------------
 
-	local endDate = display.newText( "", 0, 0, native.systemFontBold, 16 )
+	local endDate = display.newText( "", 0, 0, native.systemFontBold, 13 )
 	endDate:setTextColor( 0 )
 	endDate.x = display.contentWidth * 0.5
 	endDate.y = 290

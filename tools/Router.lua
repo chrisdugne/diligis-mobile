@@ -51,6 +51,25 @@ end
 
 ---------------------------------------------
 
+function openPeopleTrip(announcement, back)
+
+	--- analytics
+	analytics.pageview("PeopleTrip")
+	--- 
+
+	local options = {
+		params = {
+			announcement 	= announcement,
+			back 				= back
+		}
+	}
+	
+	storyboard.gotoScene( "views.PeopleTrip", options )
+end
+
+
+---------------------------------------------
+
 function openStream()
 	lastBack = openStream
 	eventManager.getStream()
@@ -116,7 +135,7 @@ end
 
 ---------------------------------------------
 
-function openWriteMessage(event, requireDefaultText, back)
+function openWriteMessage(event, answer, back)
 	
 	--- analytics
 	analytics.pageview("WriteMessage")
@@ -124,13 +143,24 @@ function openWriteMessage(event, requireDefaultText, back)
 	
 	local options = {
 		params = {
-			event = event,
-			requireDefaultText = requireDefaultText,
-			back = back or lastBack
+			event 	= event,
+			answer 	= answer,
+			back 		= back or lastBack
 		}
 	}
 
 	storyboard.gotoScene( "views.WriteMessage", options )
+end
+
+
+function openMessages()
+	
+	--- analytics
+	analytics.pageview("Messages")
+	--- 
+	
+	lastBack = openMessages
+	storyboard.gotoScene( "views.Messages" )
 end
 
 ---------------------------------------------

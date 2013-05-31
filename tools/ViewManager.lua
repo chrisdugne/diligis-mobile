@@ -156,6 +156,29 @@ function drawMenu(view)
 	menu:insert( tripsButton )
 	menu.tripsButton = tripsButton;
 	
+
+	--- messages button
+
+	local openMessagesAction = function() return router.openMessages() end
+
+	local messagesText = display.newText( "Messages", 160, 330, native.systemFont, 20 )
+	messagesText:setReferencePoint( display.CenterReferencePoint )
+	messagesText:setTextColor( 000 )
+	messagesText:addEventListener("tap", openMessagesAction)
+	menu:insert( messagesText )
+
+	local messagesButton = widget.newButton{
+		defaultFile	= "images/buttons/messages.medium.png", 
+		overFile		= "images/buttons/messages.medium.png", 
+		onRelease	= openMessagesAction
+   }
+   
+   messagesButton.x = 90
+   messagesButton.y = 340
+   
+	menu:insert( messagesButton )
+	menu.messagesButton = messagesButton;
+
 end
 
 ---------------------------------------------

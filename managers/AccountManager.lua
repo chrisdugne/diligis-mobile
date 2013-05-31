@@ -7,8 +7,7 @@ module(..., package.seeall)
 user = {}
 
 -----------------------------------------------------------------------------------------
---
---
+
 function getAccount()
 	utils.postWithJSON({
 		user = user;
@@ -19,6 +18,8 @@ end
 
 function getAccountListener( event )
 	user = json.decode(event.response);
+	removeDummyTripAndGetMessages()
+	
 	eventManager.getStream();
 end
 
@@ -120,8 +121,34 @@ end
 
 function receivedTrips( event )
 	user.trips = json.decode(event.response);
+	removeDummyTripAndGetMessages()
+	
 	native.setActivityIndicator( false )
 	return router.displayTrips() 
+end
+
+------------------------------------------
+
+function removeDummyTripAndGetMessages()
+
+	user.messages = {}
+	
+	if(user.trips) then
+		for i in pairs(user.trips) do
+   		
+      	if(user.trips[i].events) then
+      		for m in pairs(user.trips[i].events) do
+      			if(user.trips[i].events[m].content.type == eventManager.MESSAGE) then
+               	table.insert(user.messages, user.trips[i].events[m])
+      			end
+      		end
+   		end
+
+			if(user.trips[i].tripitId == user.uid) then
+      		table.remove(user.trips, i) -- user dummy trip
+			end
+		end
+	end
 end
 
 ------------------------------------------

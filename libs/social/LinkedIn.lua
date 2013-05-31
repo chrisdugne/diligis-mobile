@@ -176,7 +176,6 @@ end
 function profileListener( event )
 
 	local response = json.decode(event.response)
-	utils.tprint(response)
 	
 	if ( response.errorCode ) then
 		native.showAlert( "Linkedin Error", response.message, { "OK" } )

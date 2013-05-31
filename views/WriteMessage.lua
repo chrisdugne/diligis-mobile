@@ -33,15 +33,16 @@ end
 -----------------------------------------------------------------------------------------
 
 --- here 'event' is a Diligis Event + content + sender
-function scene:refreshScene(event, requireDefaultText, fromView)
+function scene:refreshScene(event, answer, fromView)
 	back = fromView
+	isAnswer = answer
 	viewManager.setupView(self.view, effectBack);
-	self:buildWriter(event, requireDefaultText);
+	self:buildWriter(event);
 end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:buildWriter(event, requireDefaultText)
+function scene:buildWriter(event)
 	
 	selectedEvent = event
 	print("buildWriter")
@@ -84,13 +85,7 @@ function scene:buildWriter(event, requireDefaultText)
 --	end
 
 	----------------------
--- BUG IPAD : defaultText invisible ? 
---	if(requireDefaultText) then
---   	textBox.text = "Hello " .. selectedEvent.sender.name .. " !\n Perhaps we could meet each other during this trip ?\n\t" .. accountManager.user.name
---   else
---		textBox.text = ""   
---   end
-	
+
 	textBox.text = ""   
 
 	----------------------
@@ -135,8 +130,22 @@ function sendMessage()
    
 	-- BUG with copy paste we may go over 200 :s
 	if(#textBox.text < 201) then
-		eventManager.sendMessage(textBox.text, selectedEvent.content.uid, selectedTrip.tripitId)
-		back = router.openTrips
+	
+		if(isAnswer) then 
+
+			local tripId
+			if(selectedEvent.recepient) then
+				tripId = selectedEvent.recepient.tripId
+   		else
+   			tripId = selectedTrip.tripitId
+   		end
+
+			eventManager.sendAnswer(textBox.text, selectedEvent.content.uid, tripId)
+   		
+   	else
+   		eventManager.sendMessage(textBox.text, accountManager.user.linkedinUID, selectedEvent.sender.tripId)
+		end
+		
    	effectBack()
 	end
 	
@@ -146,7 +155,7 @@ end
 
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene(event.params.event, event.params.requireDefaultText, event.params.back);
+	self:refreshScene(event.params.event, event.params.answer, event.params.back);
 end
 
 -- Called when scene is about to move offscreen:
