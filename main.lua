@@ -5,13 +5,13 @@
 -----------------------------------------------------------------------------------------
 
 APP_NAME 	= "Diligis"
-APP_VERSION = "1.8"
+APP_VERSION = "2.0"
 
 -----------------------------------------------------------------------------------------
 
 --SERVER_URL 		= "http://192.168.0.8:9000" 
---SERVER_URL 		= "http://localhost:9000" 
-SERVER_URL 		= "http://diligis.herokuapp.com/" 
+SERVER_URL 		= "http://localhost:9000" 
+--SERVER_URL 		= "http://diligis.herokuapp.com/" 
 
 -----------------------------------------------------------------------------------------
 
@@ -69,6 +69,16 @@ selectedEvent 		= nil
 
 display.setStatusBar( display.HiddenStatusBar ) 
 analytics.init(ANALYTICS_VERSION, ANALYTICS_TRACKING_ID, ANALYTICS_PROFILE_ID, APP_NAME, APP_VERSION)
+
+localData = utils.loadTable("localData.json")
+print("--- local data : ")
+utils.tprint(localData)
+	
+if(not localData) then
+	localData = {user = {}}
+   utils.saveTable(localData, "localData.json")
+end
+
 router.openAppHome()
 
 ------------------------------------------

@@ -8,6 +8,27 @@ user = {}
 
 -----------------------------------------------------------------------------------------
 
+function newUser()
+	localData.user.name 			= localData.user.firstName .. " " .. localData.user.lastName
+	localData.user.linkedinId 	= "none"
+	localData.user.industry 	= "none"
+
+	utils.postWithJSON({
+		user = localData.user;
+	},
+	SERVER_URL .. "/newUser", 
+	newUserListener)
+end
+
+function newUserListener( event )
+	user = json.decode(event.response);
+	localData.user.uid = user.uid
+   utils.saveTable(localData, "localData.json")  
+	eventManager.getStream();
+end
+
+-----------------------------------------------------------------------------------------
+
 function getAccount()
 	utils.postWithJSON({
 		user = user;
