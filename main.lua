@@ -48,6 +48,7 @@ linkedIn 		= require "libs.social.LinkedIn"
 ---- Server access Managers
 accountManager = require "managers.AccountManager"
 eventManager 	= require "managers.EventManager"
+tripManager 	= require "managers.TripManager"
 
 ---- App Tools
 router 			= require "tools.Router"

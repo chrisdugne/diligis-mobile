@@ -66,7 +66,7 @@ end
 
 function createTrip()
    analytics.event("Trip", "create")
-    
+   tripManager.openNewJourneyWindow()
 end
 
 -----------------------------------------------------------------------------------------
