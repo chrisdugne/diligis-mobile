@@ -128,7 +128,7 @@ end
 	
 function scene:rowRenderContent( row, picture, diligis )
 
-	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, router.openTripDiligis) end
+	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, diligis.sender.uid, router.openTripDiligis) end
 	picture:addEventListener("tap", openProfile)
 
 	---------

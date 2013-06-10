@@ -143,7 +143,7 @@ function sendMessage()
 			eventManager.sendAnswer(textBox.text, selectedEvent.content.uid, tripId)
    		
    	else
-   		eventManager.sendMessage(textBox.text, accountManager.user.linkedinUID, selectedEvent.sender.tripId)
+   		eventManager.sendMessage(textBox.text, accountManager.user.email, selectedEvent.sender.tripId)
 		end
 		
    	effectBack()

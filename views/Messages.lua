@@ -141,7 +141,7 @@ end
 
 function scene:rowRenderContent( row, picture, message )
 	
-	local openProfile = function() router.displayProfile(message.sender.linkedinUID, router.openTripMessages) end
+	local openProfile = function() router.displayProfile(message.sender.linkedinUID, message.sender.uid, router.openTripMessages) end
 	picture:addEventListener("tap", openProfile)
 
 	---------
@@ -177,7 +177,7 @@ end
 function scene:rowRenderText( row, picture, message )
 
 	if(picture) then
-   	local openProfile = function() router.displayProfile(message.recepient.linkedinUID, router.openTripMessages) end
+   	local openProfile = function() router.displayProfile(message.recepient.linkedinUID, message.recepient.uid, router.openTripMessages) end
    	picture:addEventListener("tap", openProfile)
 	end
 	

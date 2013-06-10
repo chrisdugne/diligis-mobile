@@ -33,7 +33,7 @@ end
 
 ---------------------------------------------
 
-function displayProfile(linkedinUID, back)
+function displayProfile(linkedinUID, userUID, back)
 	
 	--- analytics
 	analytics.pageview("Profile")
@@ -42,7 +42,8 @@ function displayProfile(linkedinUID, back)
 	local options = {
 		params = {
 			linkedinUID = linkedinUID,
-			back = back or lastBack
+			userUID 		= userUID,
+			back 			= back or lastBack
 		}
 	}
 	

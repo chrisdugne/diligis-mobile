@@ -44,7 +44,6 @@ analytics 		= require("libs.google.Analytics")
 xml 				= require "libs.Xml"
 utils 			= require "libs.Utils"
 linkedIn 		= require "libs.social.LinkedIn"
-tripit 			= require "libs.social.Tripit"
 
 ---- Server access Managers
 accountManager = require "managers.AccountManager"
@@ -70,14 +69,21 @@ selectedEvent 		= nil
 display.setStatusBar( display.HiddenStatusBar ) 
 analytics.init(ANALYTICS_VERSION, ANALYTICS_TRACKING_ID, ANALYTICS_PROFILE_ID, APP_NAME, APP_VERSION)
 
+-----------------------------------------------------------------------------------------
+
 localData = utils.loadTable("localData.json")
-print("--- local data : ")
-utils.tprint(localData)
+
+------------------------------------------
 	
 if(not localData) then
 	localData = {user = {}}
    utils.saveTable(localData, "localData.json")
 end
+
+accountManager.user = localData.user
+accountManager.user.isConnected = false
+
+------------------------------------------
 
 router.openAppHome()
 

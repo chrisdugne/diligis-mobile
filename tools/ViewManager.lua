@@ -55,15 +55,19 @@ function drawHeader(view, showMenuCustomAction)
 	header.profilelogoImage = logo
 
 	-- linkedin picture
-	
+	-- linkedIn.data.profile.pictureUrl
 	imagesManager.drawImage(
 		header, 
-		linkedIn.data.profile.pictureUrl, 
+		localData.user.pictureUrl, 
 		display.contentWidth - 70, 0, 
 		IMAGE_TOP_LEFT, 0.4,
 		false,
 		function(image)
-			local openMyProfile = function() hideMenu() router.displayProfile(accountManager.user.linkedinUID) end
+			local openMyProfile = function() 
+				hideMenu() 
+   			if showMenuCustomAction then showMenuCustomAction() end  
+				router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
+			end
       	image:addEventListener("tap", openMyProfile)
       	header.image = image
       	
@@ -75,6 +79,8 @@ function drawHeader(view, showMenuCustomAction)
 		defaultFile	= "images/buttons/logout.png", 
 		overFile		= "images/buttons/logout.png", 
 		onRelease	= function() 
+			if showMenuCustomAction then showMenuCustomAction() end
+			hideMenu()  
 			accountManager.logout()
 			analytics.event("Navigation", "logout")  
 		end, 

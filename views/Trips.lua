@@ -12,8 +12,8 @@ local tripView, details
 --- Many settings
 local syncwithX 		= display.contentWidth 	* 0.38
 local syncwithY 		= display.contentHeight * 0.93
-local tripitButtonX 	= 50
-local tripitButtonY 	= display.contentHeight * 0.93
+--local tripitButtonX 	= 50
+--local tripitButtonY 	= display.contentHeight * 0.93
 
 -----------------------------------------------------------------------------------------
 -- NOTE: Code outside of listener functions (below) will only be executed once,
@@ -23,11 +23,6 @@ local tripitButtonY 	= display.contentHeight * 0.93
 
 --- Called when the scene's view does not exist:
 function scene:createScene( event )
-	----------------------
-	tripit.init();
-
- 	----------------------
-
 	tripView = display.newGroup()
 	details  = display.newGroup()
 end
@@ -46,24 +41,32 @@ function scene:refreshScene()
 end
 
 -----------------------------------------------------------------------------------------
+--- tripit DEPRECATED v1
+--
+--function syncWithTripit()
+--	 tripit.authorise(accountManager.getTripitProfileAndTrips, cancelTripit)
+--    analytics.event("Trip", "sync") 
+--end
+--
+--function afterCreateTrip()
+--	tripit.openNewTripWindow(accountManager.syncTripsWithTripit)
+--end
+--
+--function createTrip()
+--	tripit.authorise(afterCreateTrip, cancelTripit)
+--   analytics.event("Trip", "create") 
+--end
+--
+--function cancelTripit()
+--   analytics.event("Trip", "cancelCreation") 
+--	print('cancel tripit')
+--end
 
-function syncWithTripit()
-	 tripit.authorise(accountManager.getTripitProfileAndTrips, cancelTripit)
-    analytics.event("Trip", "sync") 
-end
-
-function afterCreateTrip()
-	tripit.openNewTripWindow(accountManager.syncTripsWithTripit)
-end
+-----------------------------------------------------------------------------------------
 
 function createTrip()
-	tripit.authorise(afterCreateTrip, cancelTripit)
-   analytics.event("Trip", "create") 
-end
-
-function cancelTripit()
-   analytics.event("Trip", "cancelCreation") 
-	print('cancel tripit')
+   analytics.event("Trip", "create")
+    
 end
 
 -----------------------------------------------------------------------------------------
@@ -367,7 +370,7 @@ end
 -----------------------------------------------------------------------------------------
 
 function addTripsButtons()
-	viewManager.addCustomButton("images/buttons/refresh.png", syncWithTripit);
+--	viewManager.addCustomButton("images/buttons/refresh.png", syncWithTripit);
 	viewManager.addCustomButton("images/buttons/add.png", createTrip);
 end
 

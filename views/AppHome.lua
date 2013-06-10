@@ -5,7 +5,6 @@
 -----------------------------------------------------------------------------------------
 
 local scene 		= storyboard.newScene()
-local tripit 		= require("libs.social.Tripit")
 
 -----------------------------------------------------------------------------------------
 
@@ -49,11 +48,12 @@ function scene:createScene( event )
 	local logo = display.newImage( "images/logos/d_logo.png" )
 	logo.x = display.contentWidth/2
 	logo.y = display.contentHeight/4
+	view:insert( logo )
 	
 	if(not localData.user.uid) then
 		self:createForm()
 	else
-	
+		self:createUser()
 	end
 	
 	--- sign in text
@@ -110,31 +110,67 @@ function scene:createScene( event )
 	
 end
 
-------------------------------------------
----
---local enterSceneBeforeTimerComplete
---function signIn()
---
---	--- analytics
---	analytics.event("Navigation", "signIn") 
---	--- 
---	
---	loadingSpinner:start()
---	transition.to( loadingSpinner, { alpha = 1 } )
---	transition.to( signInButton, 	 { alpha = 0 } )
---	transition.to( cancelButton, 	 { alpha = 0 } )
---	accountManager.linkedInConnect()
---	
---	enterSceneBeforeTimerComplete = false
---	timer.performWithDelay( 3000, toLongLinkedin )
---end
---
---function toLongLinkedin( event )
---	if(not enterSceneBeforeTimerComplete) then
---		transition.to( cancelButton, { alpha = 1 } )
---	end		
---end
+-------------------------------------------------------------------------------------------------------------
+-- WELCOME FORM
+-------------------------------------------------------------------------------------------------------------
 
+function scene:createUser()
+
+	local view = self.view
+	
+	-------------------------
+	--- Welcome text
+	
+	imagesManager.drawImage(
+		view, 
+		localData.user.pictureUrl, 
+		50, display.contentHeight/2, 
+		IMAGE_CENTER, 0.7,
+		false,
+		function(image)
+      	
+      	local senderName = display.newText( localData.user.name, 0, 0, 270, 50, native.systemFontBold, 14 )
+      	senderName:setTextColor( 0 )
+      	senderName.x = image.x + 180
+      	senderName.y = image.y
+      	view:insert(senderName)
+      
+      	local senderProfile = display.newText( localData.user.headline, 0, 0, 270, 50, native.systemFont, 14 )
+      	senderProfile:setTextColor( 0 )
+      	senderProfile.x = image.x + 180
+      	senderProfile.y = image.y + 30
+      	view:insert(senderProfile)
+      	
+		end
+	)
+
+	-------------------------
+	
+	validateButton = widget.newButton	{
+		width = 80,
+		height = 40,
+		label = "Enter", 
+		labelYOffset = -2,
+		onRelease = enter
+	}
+	
+   validateButton.x = display.contentWidth/2
+   validateButton.y =  5*display.contentHeight/6
+	
+	view:insert( validateButton )
+	
+end
+
+function enter()
+	analytics.event("Navigation", "appHomeEnter")
+   
+   if(accountManager.user.linkedinUID) then
+   	accountManager.linkedInConnect(true)
+   else
+		accountManager.getAccount()
+   end
+   
+end
 
 -------------------------------------------------------------------------------------------------------------
 -- WELCOME FORM
@@ -152,7 +188,8 @@ function scene:createForm()
 	signinText:setReferencePoint( display.CenterReferencePoint )
 	signinText.x = display.contentWidth * 0.5
 	signinText.y = display.contentHeight/2 - 65
-
+	view:insert( signinText )
+	
 	-------------------------
 	
 	emailField = native.newTextField( 
@@ -167,7 +204,6 @@ function scene:createForm()
 	emailField.text = EMAIL_DEFAULT_TEXT
 	emailField:setReferencePoint( display.CenterReferencePoint )
 	emailField:addEventListener( "userInput", emailHandler )
-
 	view:insert( emailField )
 	
 	emailOK = display.newImage( "images/icons/ok.png", false )
@@ -190,7 +226,6 @@ function scene:createForm()
 	firstNameField.text = FIRSTNAME_DEFAULT_TEXT
 	firstNameField:setReferencePoint( display.CenterReferencePoint )
 	firstNameField:addEventListener( "userInput", firstNameHandler )
-
 	view:insert( firstNameField )
 	
 	firstNameOK = display.newImage( "images/icons/ok.png", false )
@@ -213,7 +248,6 @@ function scene:createForm()
 	lastNameField.text = LASTNAME_DEFAULT_TEXT
 	lastNameField:setReferencePoint( display.CenterReferencePoint )
 	lastNameField:addEventListener( "userInput", lastNameHandler )
-
 	view:insert( lastNameField )
 	
 	lastNameOK = display.newImage( "images/icons/ok.png", false )
@@ -236,7 +270,6 @@ function scene:createForm()
 	headlineField.text = HEADER_DEFAULT_TEXT
 	headlineField:setReferencePoint( display.CenterReferencePoint )
 	headlineField:addEventListener( "userInput", headlineHandler )
-
 	view:insert( headlineField )
 	
 	headlineOK = display.newImage( "images/icons/ok.png", false )
@@ -248,9 +281,9 @@ function scene:createForm()
 	-------------------------
 	
 	validateButton = widget.newButton	{
-		width = 50,
-		height = 40,
-		label = "OK", 
+		width 	= 50,
+		height 	= 40,
+		label 	= "OK", 
 		labelYOffset = -2,
 		onRelease = validate
 	}
@@ -319,9 +352,15 @@ function checkValidation()
 end
 
 function validate()
+	emailField:removeSelf()
+	firstNameField:removeSelf()
+	lastNameField:removeSelf()
+	headlineField:removeSelf()
+
 	analytics.event("Navigation", "appHomeValidate")
 	accountManager.newUser()
 end
+
 
 -------------------------------------------------------------------------------------------------------------
 -- SCENE

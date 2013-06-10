@@ -46,13 +46,13 @@ function sendAnswer(text, contentUID, tripFromId)
 	SERVER_URL .. "/sendAnswer")
 end
 
-function sendMessage(text, senderLinkedinUID, tripId)
+function sendMessage(text, senderEmail, tripId)
 	native.setActivityIndicator( true )
 	utils.postWithJSON({
 		message = {
-			text 						= text,
-			senderLinkedinUID 	= senderLinkedinUID,
-			tripId 	= tripId
+			text 				= text,
+			senderEmail 	= senderEmail,
+			tripId 			= tripId
 		}
 	},
 	SERVER_URL .. "/sendMessage")

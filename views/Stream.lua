@@ -6,7 +6,6 @@
 -----------------------------------------------------------------------------------------
 
 local scene = storyboard.newScene()
-local tripit = require("libs.social.Tripit")
 
 --- The elements
 -- 
@@ -142,7 +141,7 @@ function showEvent(event)
    		router.openPeopleTrip(event, router.openStream)
 		else
          analytics.event("Navigation", "streamToProfile") 
-   		router.displayProfile(event.sender.linkedinUID, router.openStream)
+   		router.displayProfile(event.sender.linkedinUID, event.sender.uid, router.openStream)
 		end
 		
 	elseif (event.content.type == eventManager.DILIGIS) then

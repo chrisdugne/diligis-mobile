@@ -118,16 +118,20 @@ end
 
 function tprint (tbl, indent)
 	if not tbl then print("Table nil") return end
-	if not indent then indent = 0 end
-	for k, v in pairs(tbl) do
-		formatting = string.rep("  ", indent) .. k .. ": "
-		if type(v) == "table" then
-			print(formatting)
-			tprint(v, indent+1)
-		else
-			print(formatting .. v)
-		end
-	end
+	if type(tbl) ~= "table" then
+		print(tostring(tbl))
+	else
+   	if not indent then indent = 0 end
+   	for k, v in pairs(tbl) do
+   		formatting = string.rep("  ", indent) .. k .. ": "
+   		if type(v) == "table" then
+   			print(formatting)
+   			tprint(v, indent+1)
+   		else
+   			print(formatting .. tostring(v))
+   		end
+   	end
+   end
 end
 
 -----------------------------------------------------------------------------------------
