@@ -164,11 +164,11 @@ end
 function enter()
 	analytics.event("Navigation", "appHomeEnter")
    
-   if(accountManager.user.linkedinUID) then
-   	accountManager.linkedInConnect(true)
-   else
+--   if(accountManager.user.linkedinUID) then
+--   	accountManager.linkedInConnect(true)
+--   else
 		accountManager.getAccount()
-   end
+--   end
    
 end
 

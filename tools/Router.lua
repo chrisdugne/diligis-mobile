@@ -102,6 +102,32 @@ function displayTrips()
 end
 
 ---------------------------------------------
+
+function openJourneys(back)
+
+	--- analytics
+	analytics.pageview("Journeys")
+	---
+	--  
+	local options = {
+		params = {
+			back = backOrLastBack(back)
+		}
+	}
+	
+	storyboard.gotoScene( "views.Journeys", options )
+end
+
+function displayTrips()
+
+	--- analytics
+	analytics.pageview("Trips")
+	--- 
+	
+	storyboard.gotoScene( "views.Trips" )
+end
+
+---------------------------------------------
 --- TripDiligis + TripMessages
 
 function openTripDiligis(back)

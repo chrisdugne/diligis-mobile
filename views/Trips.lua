@@ -7,13 +7,7 @@
 local scene = storyboard.newScene()
 
 --- The elements
-local tripView, details
-
---- Many settings
-local syncwithX 		= display.contentWidth 	* 0.38
-local syncwithY 		= display.contentHeight * 0.93
---local tripitButtonX 	= 50
---local tripitButtonY 	= display.contentHeight * 0.93
+local tripView
 
 -----------------------------------------------------------------------------------------
 -- NOTE: Code outside of listener functions (below) will only be executed once,
@@ -32,12 +26,11 @@ end
 function scene:refreshScene()
 
 	viewManager.setupView(self.view)
-	addTripsButtons()
+	self:addTripsButtons()
 	
 	self:buildTripView()
-	self:buildDetails()
 
-	showTrips()
+	self:showTrips()
 end
 
 -----------------------------------------------------------------------------------------
@@ -64,9 +57,12 @@ end
 
 -----------------------------------------------------------------------------------------
 
-function createTrip()
-   analytics.event("Trip", "create")
-   tripManager.openNewJourneyWindow()
+function scene:createTrip()
+--   analytics.event("Trip", "create")
+--   tripManager.openNewJourneyWindow()
+
+	tripManager.createTrip()
+	self:refreshScene()
 end
 
 -----------------------------------------------------------------------------------------
@@ -75,7 +71,7 @@ function scene:buildTripView()
 
 	----------------------
 	
-	hideNoTrips()
+	self:hideNoTrips()
 	utils.emptyGroup(tripView)
 
 	----------------------
@@ -111,9 +107,8 @@ function scene:buildTripView()
 	----------------------
 	-- insert rows into list (tableView widget)
 	-- 
-	
  	if( #accountManager.user.trips == 0) then
- 		showNoTrips();
+ 		self:showNoTrips();
  	else
 		for i in pairs(accountManager.user.trips) do
 			self.createRow()
@@ -141,7 +136,7 @@ function scene:onRowRender( event )
 	local row = event.row
 	local tripRendered = accountManager.user.trips[row.index];
 
-	local title = display.newText( tripRendered.displayName, 0, 0, native.systemFontBold, 16 )
+	local title = display.newText( tripRendered.name, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
 	title.y = 22
@@ -165,18 +160,6 @@ function scene:onRowRender( event )
 end
 
 function scene:rowRenderContent (row, tripRendered)
-
-	local perlImage
-	if(os.time() - utils.parseDateTime(tripRendered.startDate) > 0) then
-		perlImage = "images/icons/green.mini.png"
-	else
-		perlImage = "images/icons/blue.mini.png"
-	end
-	
-	local perl = display.newImage( perlImage, false )
-	perl.x = 27
-	perl.y = row.contentHeight - 20
-	row:insert(perl)
 
 	if(tripRendered.events ~= nil and #tripRendered.events > 0) then
 	
@@ -231,172 +214,127 @@ function scene:onRowTouch( event )
 	selectedTrip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
-		details.address.text 			= selectedTrip.address
-		details.startDate.text 			= "From " .. selectedTrip.startDate
-		details.endDate.text 			= "To "   .. selectedTrip.endDate
-		
-      imagesManager.drawImage(
-      	details, 
-      	selectedTrip.imageUrl,
-      	display.contentCenterX, 100,
-      	IMAGE_CENTER, 1,
-      	false,
-      	function(image)
-      		details.tripSelectedImage = image
-      	end
-      )
-		
-		local nbMessages 	= 0
-		local nbDiligis 	= 0
-   	
-   	if(selectedTrip.events ~= nil and #selectedTrip.events > 0) then
-   		for i in pairs(selectedTrip.events) do
-   			if(selectedTrip.events[i].content.type == eventManager.MESSAGE) then
-   				nbMessages = nbMessages + 1
-   			elseif(selectedTrip.events[i].content.type == eventManager.DILIGIS) then
-   				nbDiligis = nbDiligis + 1
-   			end
-   		end
-   	end
-   	
-   	if(nbDiligis > 0) then
-   		details.diligisCount.text 	= nbDiligis
-   		details.diligisCount.alpha = 1
-   		details.diligisIcon.alpha 	= 1
-   	else
-   		details.diligisCount.alpha = 0
-   		details.diligisIcon.alpha 	= 0
-   	end
-   	
-   	if(nbMessages > 0) then
-   		details.messagesCount.text  = nbMessages
-   		details.messagesCount.alpha = 1
-   		details.messagesIcon.alpha  = 1
-   	else
-   		details.messagesCount.alpha = 0
-   		details.messagesIcon.alpha  = 0
-   	end
-   	
-		showDetails()
+		local go = function() router.openJourneys(router.openTrips) end
+      transition.to( tripView,  { x = -display.contentWidth * 1.5 , time = 400, transition = easing.inExpo, onComplete = go } )
 	end
+	
 end
 
 -----------------------------------------------------------------------------------------
 
-function scene:buildDetails()
-
-	----------------------
-
-	utils.emptyGroup(details)
-	
-	----------------------
-
-	local address = display.newText( "", 0, 0, native.systemFontBold, 16 )
-	address:setTextColor( 0 )
-	address.x = display.contentWidth * 0.5
-	address.y = 200
-
-	details:insert( address )
-	details.address = address 
-
-	----------------------
-
-	local startDate = display.newText( "", 0, 0, native.systemFontBold, 13 )
-	startDate:setTextColor( 0 )
-	startDate.x = display.contentWidth * 0.5
-	startDate.y = 250
-
-	details:insert( startDate )
-	details.startDate = startDate
-	 
-	----------------------
-
-	local endDate = display.newText( "", 0, 0, native.systemFontBold, 13 )
-	endDate:setTextColor( 0 )
-	endDate.x = display.contentWidth * 0.5
-	endDate.y = 290
-
-	details:insert( endDate )
-	details.endDate = endDate 
-
-	----------------------
-
-	--- messages icon
-	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-	messagesIcon.x = 100 
-	messagesIcon.y = 360
-	messagesIcon:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
-
-	details:insert( messagesIcon )
-	details.messagesIcon = messagesIcon 
-	
-	local messagesCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
-	messagesCount:setTextColor( 0 )
-	messagesCount.x = messagesIcon.x - 30
-	messagesCount.y = 360
-	messagesCount:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
-
-	details:insert(messagesCount)
-	details.messagesCount = messagesCount 
-
-	--- diligis icon
-	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-	diligisIcon.x = 250 
-	diligisIcon.y = 360
-	diligisIcon:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
-
-	details:insert(diligisIcon)
-	details.diligisIcon = diligisIcon 
-
-	local diligisCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
-	diligisCount:setTextColor( 0 )
-	diligisCount.x = diligisIcon.x - 30
-	diligisCount.y = 360
-	diligisCount:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
-	
-	details:insert(diligisCount)
-	details.diligisCount = diligisCount 
-
-	------------------------------------------------
-	
-	details.x = display.contentWidth + display.contentWidth * 0.5
-	details.y = 0
-	
-	----------------------
-	
-	self.view:insert(details)
-end
+--function scene:buildDetails()
+--
+--	----------------------
+--
+--	utils.emptyGroup(details)
+--	
+--	----------------------
+--
+--	local address = display.newText( "", 0, 0, native.systemFontBold, 16 )
+--	address:setTextColor( 0 )
+--	address.x = display.contentWidth * 0.5
+--	address.y = 200
+--
+--	details:insert( address )
+--	details.address = address 
+--
+--	----------------------
+--
+--	local startDate = display.newText( "", 0, 0, native.systemFontBold, 13 )
+--	startDate:setTextColor( 0 )
+--	startDate.x = display.contentWidth * 0.5
+--	startDate.y = 250
+--
+--	details:insert( startDate )
+--	details.startDate = startDate
+--	 
+--	----------------------
+--
+--	local endDate = display.newText( "", 0, 0, native.systemFontBold, 13 )
+--	endDate:setTextColor( 0 )
+--	endDate.x = display.contentWidth * 0.5
+--	endDate.y = 290
+--
+--	details:insert( endDate )
+--	details.endDate = endDate 
+--
+--	----------------------
+--
+--	--- messages icon
+--	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
+--	messagesIcon.x = 100 
+--	messagesIcon.y = 360
+--	messagesIcon:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
+--
+--	details:insert( messagesIcon )
+--	details.messagesIcon = messagesIcon 
+--	
+--	local messagesCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
+--	messagesCount:setTextColor( 0 )
+--	messagesCount.x = messagesIcon.x - 30
+--	messagesCount.y = 360
+--	messagesCount:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
+--
+--	details:insert(messagesCount)
+--	details.messagesCount = messagesCount 
+--
+--	--- diligis icon
+--	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
+--	diligisIcon.x = 250 
+--	diligisIcon.y = 360
+--	diligisIcon:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
+--
+--	details:insert(diligisIcon)
+--	details.diligisIcon = diligisIcon 
+--
+--	local diligisCount = display.newText( "", 0, 0, native.systemFontBold, 16 )
+--	diligisCount:setTextColor( 0 )
+--	diligisCount.x = diligisIcon.x - 30
+--	diligisCount.y = 360
+--	diligisCount:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
+--	
+--	details:insert(diligisCount)
+--	details.diligisCount = diligisCount 
+--
+--	------------------------------------------------
+--	
+--	details.x = display.contentWidth + display.contentWidth * 0.5
+--	details.y = 0
+--	
+--	----------------------
+--	
+--	self.view:insert(details)
+--end
 
 -----------------------------------------------------------------------------------------
 
-function addTripsButtons()
---	viewManager.addCustomButton("images/buttons/refresh.png", syncWithTripit);
-	viewManager.addCustomButton("images/buttons/add.png", createTrip);
+function scene:addTripsButtons()
+	viewManager.addCustomButton("images/buttons/add.png", function () return self:createTrip() end);
 end
 
 -----------------------------------------------------------------------------------------
 --- states/transitions
 
-function showNoTrips()
+function scene:showNoTrips()
 	transition.to( tripView.noTripText, { alpha = 1.0 } )
 end
 
-function hideNoTrips()
+function scene:hideNoTrips()
 	transition.to( tripView.noTripText, { alpha = 0 } )
 end
 
-function showDetails()
+function scene:showDetails()
 	transition.to( tripView, { x = - display.contentWidth, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = 0, time = 400, transition = easing.outExpo } )
 	viewManager.removeAllButtons()
-	viewManager.addCustomButton("images/buttons/leftArrow.png", showTrips);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", function() self:showTrips() end);
 end
 
-function showTrips()
+function scene:showTrips()
 	transition.to( tripView, { x = 0, time = 400, transition = easing.outExpo } )
 	transition.to( details,  { x = display.contentWidth + display.contentWidth * 0.5, time = 400, transition = easing.outExpo } )
 	viewManager.removeAllButtons()
-	addTripsButtons()
+	self:addTripsButtons()
 end
 
 -----------------------------------------------------------------------------------------

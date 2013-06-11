@@ -4,6 +4,17 @@ module(..., package.seeall)
 
 -----------------------------------------------------------------------------------------
 
+function createTrip()
+	local trip = {
+		name 			= "New trip",
+		imageUrl 	= "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png",
+		journeys 	= {} 
+	}
+	table.insert(accountManager.user.trips, trip)
+end
+
+-----------------------------------------------------------------------------------------
+
 -- 
 -- 
 local afterCreateTrip 
@@ -11,7 +22,7 @@ local afterCreateTrip
 --- requestToken reception
 function openNewJourneyWindow(next)
 
-   analytics.event("Trip", "createJourney") 
+   analytics.event("Trip", "openJourneyWebView") 
 	afterCreateTrip = next
 
 	local url = SERVER_URL .. "/create"
@@ -26,22 +37,19 @@ end
 --
 
 function createTripListener( event )
-
-	if string.lower(event.url) == "https://m.tripit.com/"
-	or string.lower(event.url) == "https://m.tripit.com/home"
-	then
-   	analytics.event("Tripit", "creationCancelled") 
-		webView:removeSelf()
-		webView = nil;
-	end
+	print(event.url)
+	if string.find(string.lower(event.url), "addjourney") then
 	
-	if string.find(string.lower(event.url), "https://m.tripit.com/trip/show/id/") then
-	
-      if(afterCreateTrip ~= nil) then
-      	afterCreateTrip()
-      end
+		local params = utils.getUrlParams(event.url);
+		utils.tprint(params)
+		if(params.type == 0) then
+			print("cancelled")
+      	analytics.event("Trips", "creationCancelled") 
+		else
+			print("adding journey !")
+      	analytics.event("Trips", "addJourney") 
+		end
 		
-   	analytics.event("Tripit", "creationComplete") 
 		webView:removeSelf()
 		webView = nil;
 	end
