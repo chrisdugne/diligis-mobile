@@ -214,7 +214,7 @@ function scene:onRowTouch( event )
 	selectedTrip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
-		local go = function() router.openJourneys(router.openTrips) end
+		local go = function() router.openJourneys(router.displayTrips) end
       transition.to( tripView,  { x = -display.contentWidth * 1.5 , time = 400, transition = easing.inExpo, onComplete = go } )
 	end
 	

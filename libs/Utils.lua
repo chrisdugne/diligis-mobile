@@ -86,11 +86,11 @@ function joinTables(t1, t2)
 	if(t2 == nil) then t2 = {} end
 
 	for k,v in pairs(t1) do
-		table.insert(result, v) 
+		result[k] = v 
 	end 
 
 	for k,v in pairs(t2) do
-		table.insert(result, v) 
+		result[k] = v 
 	end 
 
 	return result

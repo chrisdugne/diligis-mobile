@@ -26,6 +26,7 @@ function scene:refreshScene(back)
 	
 	viewManager.setupView(self.view)
 	viewManager.addCustomButton("images/buttons/add.png", function () return self:createJourney() end);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
 	
 	self:buildJourneys()
 end
@@ -248,8 +249,8 @@ end
 -----------------------------------------------------------------------------------------
 
 --- Called immediately after scene has moved onscreen:
-function scene:enterScene( back )
-	self:refreshScene(back);
+function scene:enterScene( event )
+	self:refreshScene(event.params.back);
 end
 
 --- Called when scene is about to move offscreen:

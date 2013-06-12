@@ -67,22 +67,33 @@ selectedEvent 		= nil
 
 -----------------------------------------------------------------------------------------
 
-display.setStatusBar( display.HiddenStatusBar ) 
-analytics.init(ANALYTICS_VERSION, ANALYTICS_TRACKING_ID, ANALYTICS_PROFILE_ID, APP_NAME, APP_VERSION)
-
------------------------------------------------------------------------------------------
-
 localData = utils.loadTable("localData.json")
-
-------------------------------------------
 	
 if(not localData) then
-	localData = {user = {}}
+	localData = {user = {}, linkedin = {}}
    utils.saveTable(localData, "localData.json")
 end
 
+utils.tprint(localData)
+
+-----------------------------------------------------------------------------------------
+
+display.setStatusBar( display.HiddenStatusBar ) 
+analytics.init(ANALYTICS_VERSION, ANALYTICS_TRACKING_ID, ANALYTICS_PROFILE_ID, APP_NAME, APP_VERSION)
+linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET, localData.linkedin.accessToken, localData.linkedin.accessTokenSecret);
+
+------------------------------------------
+
 accountManager.user = localData.user
 accountManager.user.isConnected = false
+
+------------------------------------------
+
+-- a appliquer dans un workflow de changement de user 
+--if((not accountManager.user.linkedinUID or accountManager.user.linkedinUID == "none") and localData.linkedin.accessToken) then
+--	print("deauthorise")
+--	linkedIn.deauthorise() -- previous user might be connected
+--end
 
 ------------------------------------------
 

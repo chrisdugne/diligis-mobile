@@ -34,19 +34,15 @@ local callBackCancel;
 --- Initiates a new data object.
 -- @param consumerKey The consumer key of your app.
 -- @param consumerSecret The consumer secret of your app.
-function init(consumerKey, consumerSecret)
+function init(consumerKey, consumerSecret, previousAccessToken, previousAccessTokenSecret)
 	
 	data.consumerKey = consumerKey
 	data.consumerSecret = consumerSecret
 
-	data.requestToken = nil
-	data.requestTokenSecret = nil
-
-	data.accessToken = nil
-	data.accessTokenSecret = nil
+	data.accessToken 			= previousAccessToken
+	data.accessTokenSecret 	= previousAccessTokenSecret
 
 	data.profile = nil
-
 end
 
 -----------------------------------------------------------------------------------------
@@ -139,7 +135,7 @@ function accessTokenListener( event )
 
 		data.accessToken = event.response:match('oauth_token=([^&]+)')
 		data.accessTokenSecret = event.response:match('oauth_token_secret=([^&]+)')
-
+		
 		getProfile();
 	else
 		local details = ""
@@ -287,15 +283,28 @@ function deauthorise()
 	local logoutURL = "https://api.linkedin.com/uas/oauth/invalidateToken";
 	local customParams = {}
 	 
+	print("deauthorise")
+	print(data.consumerKey)
+	print(data.accessToken)
+	print(data.consumerSecret)
+	print(data.accessTokenSecret)
+	
 	oAuth.networkRequest(logoutURL, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", logoutListener)
 end
 
 --- logout ok
 function logoutListener( event )
+
+	print("logoutListener")
+	utils.tprint(event)
+	
 	data.accessToken = nil
 	data.accessTokenSecret = nil
 	data.profile = nil
-	callBackCancel()
+	
+	if(callBackCancel) then
+		callBackCancel()
+	end
 end
 
 --

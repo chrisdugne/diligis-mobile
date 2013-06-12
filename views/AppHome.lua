@@ -37,6 +37,12 @@ local validateButton
 -- Called when the scene's view does not exist:
 function scene:createScene( event )
 	
+end
+
+-----------------------------------------------------------------------------------------
+
+function scene:refreshScene()
+
 	local view = self.view
 	
 	--- reset
@@ -164,11 +170,11 @@ end
 function enter()
 	analytics.event("Navigation", "appHomeEnter")
    
---   if(accountManager.user.linkedinUID) then
---   	accountManager.linkedInConnect(true)
---   else
+   if(accountManager.user.linkedinUID) then
+   	accountManager.linkedInConnect(true)
+   else
 		accountManager.getAccount()
---   end
+   end
    
 end
 
@@ -373,7 +379,9 @@ function scene:enterScene( event )
 --	transition.to( signInButton, { alpha = 1 } )
 --	enterSceneBeforeTimerComplete = true
 	viewManager.removeHeader()
+	self:refreshScene();
 end
+
 
 -- Called when scene is about to move offscreen:
 function scene:exitScene( event )

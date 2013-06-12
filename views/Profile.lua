@@ -60,6 +60,9 @@ end
 
 function scene:drawDiligisProfile(user)
 
+	print("drawDiligisProfile")
+	utils.tprint(user)
+
 	----------------------
 
 	utils.emptyGroup(profile)

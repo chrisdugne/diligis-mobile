@@ -23,10 +23,36 @@ function newUser()
 end
 
 function newUserListener( event )
-	user = json.decode(event.response);
-	localData.user.uid = user.uid
-   utils.saveTable(localData, "localData.json")  
+	user = utils.joinTables(user, json.decode(event.response))
+	saveLocalData()
 	eventManager.getStream();
+end
+
+-----------------------------------------------------------------------------------------
+
+function saveUser()
+
+	print("saveUser")
+	utils.tprint(user)
+	
+	utils.postWithJSON({
+		user = user;
+	},
+	SERVER_URL .. "/saveUser", 
+	userSaved)
+end
+
+function userSaved( event )
+	user = utils.joinTables(user, json.decode(event.response))
+	removeDummyTripAndGetMessages(user)
+	saveLocalData()
+end
+
+-----------------------------------------------------------------------------------------
+
+function saveLocalData()
+	localData.user = user
+   utils.saveTable(localData, "localData.json")  
 end
 
 -----------------------------------------------------------------------------------------
@@ -40,7 +66,7 @@ function getAccount()
 end
 
 function getAccountListener( event )
-	utils.joinTables(user, json.decode(event.response))
+	user = utils.joinTables(user, json.decode(event.response))
 	removeDummyTripAndGetMessages(user)
 	eventManager.getStream();
 end
@@ -122,12 +148,15 @@ end
 --- LinkedIn
 -- 
 
-local connectionFromAppHome
-function linkedInConnect(fromAppHome)
+function linkedInConnect()
 	native.setActivityIndicator( true )
 	connectionFromAppHome = fromAppHome
-	linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET);
-	linkedIn.authorise(linkedInConnected, linkedInCancel);
+
+	print("connecting to linkedin")
+	utils.tprint(user)
+	
+	print("authorise")
+   linkedIn.authorise(linkedInConnected, linkedInCancel);
 end
 
 function linkedInCancel()
@@ -137,8 +166,9 @@ end
 
 function linkedInConnected()
 
-	analytics.event("LinkedIn", "linkedInConnected") 
-
+	print("linkedInConnected")
+	analytics.event("LinkedIn", "linkedInConnected")
+	
 	user.linkedinUID 	= linkedIn.data.profile.id
 	user.firstName 	= linkedIn.data.profile.firstName
 	user.lastName 		= linkedIn.data.profile.lastName
@@ -146,18 +176,21 @@ function linkedInConnected()
 	user.headline 		= linkedIn.data.profile.headline
 	user.industry 		= linkedIn.data.profile.industry
 	user.pictureUrl 	= linkedIn.data.profile.pictureUrl
+	user.oldEmail 		= user.email
+	user.email 			= linkedIn.data.profile.emailAddress
 
 	localData.user 	= user
-   utils.saveTable(localData, "localData.json")  
+	removeDummyTripAndGetMessages(user)
+	
+	localData.linkedin.accessToken 			= linkedIn.data.accessToken
+	localData.linkedin.accessTokenSecret 	= linkedIn.data.accessTokenSecret
+	
+	saveUser()
 
 	user.isConnected = true
-   
+	native.setActivityIndicator( false )
   	
-  	if(connectionFromAppHome) then
-	  	router.openStream()
-	else
-  		router.displayProfile(user.linkedinUID, user.uid)
-  	end
+  	router.openStream()	
 end
 
 -----------------------------------------------------------------------------------------
