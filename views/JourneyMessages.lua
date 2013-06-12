@@ -155,9 +155,17 @@ function scene:rowRenderContent( row, picture, message )
    	recepientName.x = row.contentWidth - 20 - recepientName.contentWidth/2
    	row:insert(recepientName)
 
+		--------
+
+   	if(not message.recepient.pictureUrl) then
+   		message.recepient.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+   	end
+
+		--------
+	
    	imagesManager.drawImage(
    		row, 
-   		linkedIn.data.people[message.recepient.linkedinUID].pictureUrl, 
+   		message.recepient.pictureUrl, 
    		row.contentWidth - 50, 5,	
    		IMAGE_TOP_LEFT, 0.4,
    		false,

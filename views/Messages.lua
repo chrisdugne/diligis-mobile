@@ -32,8 +32,10 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:buildMessages()
-
- 	if( not accountManager.user.me or #accountManager.user.messages == 0) then
+	
+	utils.tprint(accountManager.user)
+	
+ 	if( not accountManager.user.messages or #accountManager.user.messages == 0) then
  		self:showNoMessages();
  		return
  	end	

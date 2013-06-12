@@ -22,11 +22,11 @@ end
 
 -----------------------------------------------------------------------------------------
 
-function scene:refreshScene(back)
+function scene:refreshScene()
 	
 	viewManager.setupView(self.view, tripManager.closeAddJourneyWindow)
 	viewManager.addCustomButton("images/buttons/add.png", function () return self:createJourney() end);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", function() back() tripManager.closeAddJourneyWindow() end);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", function() router.openTrips() tripManager.closeAddJourneyWindow() end);
 	
 	self:buildJourneys()
 end
@@ -170,7 +170,7 @@ function scene:onRowRender( event )
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = row.contentWidth/2 + 20 
+      	messagesIcon.x = row.contentWidth - 100 
       	messagesIcon.y = row.contentHeight/3
 			messagesIcon:addEventListener("tap", function() self:openMessages(journey) end)
       	
@@ -187,8 +187,9 @@ function scene:onRowRender( event )
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = row.contentWidth/2 + 85 
+      	diligisIcon.x = row.contentWidth - 40
       	diligisIcon.y = row.contentHeight/3
+			diligisIcon:addEventListener("tap", function() self:openDiligis(journey) end)
       
       	row:insert( diligisIcon )
 
@@ -196,6 +197,7 @@ function scene:onRowRender( event )
       	diligisCount:setTextColor( 0 )
       	diligisCount.x = diligisIcon.x - 30
       	diligisCount.y = row.contentHeight/3
+			diligisCount:addEventListener("tap", function() self:openDiligis(journey) end)
       	row:insert(diligisCount)
    	end
 	end
@@ -203,7 +205,12 @@ end
 
 function scene:openMessages(journey)
 	selectedJourney = journey
-	router.openJourneyMessages()
+	router.openJourneyMessages(router.openTrips)
+end
+
+function scene:openDiligis(journey)
+	selectedJourney = journey
+	router.openJourneyDiligis(router.openTrips)
 end
 
 ----------------------

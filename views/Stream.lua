@@ -109,7 +109,7 @@ function scene:onRowRender( event )
 	icon.x = icon.contentWidth/2 + 10
 	icon.y = row.height * 0.5
 	row:insert(icon)
-
+	
 	local title = display.newText( eventRendered.content.text, 0, 0, 200, 50, native.systemFont, 14 )
 	title:setTextColor( 0 )
 	title.x = 180
@@ -150,9 +150,8 @@ function showEvent(event)
 		
 	elseif (event.content.type == eventManager.MESSAGE) then
 		selectedJourney = getJourney(event)
-		router.openMessages()
+		router.openJourneyMessages(router.openStream)
       analytics.event("Navigation", "streamToMessage") 
-		
 	end
 	
 end

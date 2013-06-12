@@ -114,6 +114,24 @@ function receivedTrips( event )
 end
 
 ------------------------------------------
+--- after a message sent, refresh the journeys from the server to get events
+function refreshJourneysFromServer()
+	utils.postWithJSON({
+		user = user,
+	},
+	SERVER_URL .. "/getTrips",
+	receivedJourneys)
+end
+
+function receivedJourneys( event )
+	user.trips = json.decode(event.response);
+	removeDummyTrip(user)
+	
+	native.setActivityIndicator( false )
+	return router.displayJourneys() 
+end
+
+------------------------------------------
 
 function removeDummyTripAndGetMessages(user)
 

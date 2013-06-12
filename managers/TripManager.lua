@@ -85,17 +85,17 @@ function newJourneyListener( event )
       	analytics.event("Trips", "creationCancelled") 
 		else
       	analytics.event("Trips", "addJourney")
-      	local journey = {
-      		type				= params["type"],
-      		startTime		= params["startTime"],
-      		endTime			= params["endTime"],
-      		locationName	= params["locationName"],
-      		locationLat		= params["locationLat"],
-      		locationLon		= params["locationLon"],
-      		number			= params["number"],
-      		seat				= params["seat"],
-      		railcar			= params["railcar"]
-      	} 
+      	local journey = {} 
+
+			if(params["type"] 			~= "null") then journey.type 				= params["type"] 				end
+			if(params["startTime"] 		~= "null") then journey.startTime 		= params["startTime"] 		end
+			if(params["endTime"] 		~= "null") then journey.endTime 			= params["endTime"] 			end
+			if(params["locationName"]	~= "null") then journey.locationName 	= params["locationName"] 	end
+			if(params["locationLat"] 	~= "null") then journey.locationLat 	= params["locationLat"]  	end
+			if(params["locationLon"] 	~= "null") then journey.locationLon 	= params["locationLon"]		end
+			if(params["number"] 			~= "null") then journey.number 			= params["number"]			end
+			if(params["seat"]			 	~= "null") then journey.seat 				= params["seat"]				end
+			if(params["railcar"]	 		~= "null") then journey.railcar 			= params["railcar"]	 		end
 
       	createJourney(journey)
 		end
@@ -109,6 +109,8 @@ end
 --
 
 function createJourney(journey)
+	
+	utils.tprint(journey)
 	
 	utils.postWithJSON({
 		tripId 	= selectedTrip.tripId,

@@ -104,27 +104,23 @@ end
 ---------------------------------------------
 
 function openJourneys(back)
+	lastBack = back
+	accountManager.refreshJourneysFromServer()
+end
+
+function displayJourneys()
 
 	--- analytics
 	analytics.pageview("Journeys")
 	---
-	--  
+	 
 	local options = {
 		params = {
-			back = backOrLastBack(back)
+			back = lastBack
 		}
 	}
-	
+
 	storyboard.gotoScene( "views.Journeys", options )
-end
-
-function displayTrips()
-
-	--- analytics
-	analytics.pageview("Trips")
-	--- 
-	
-	storyboard.gotoScene( "views.Trips" )
 end
 
 ---------------------------------------------
