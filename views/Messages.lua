@@ -33,7 +33,7 @@ end
 
 function scene:buildMessages()
 
- 	if( #accountManager.user.messages == 0) then
+ 	if( not accountManager.user.me or #accountManager.user.messages == 0) then
  		self:showNoMessages();
  		return
  	end	
@@ -69,13 +69,22 @@ function scene:buildMessages()
 		if type(accountManager.user.messages[i].recepient) ~= "table" then accountManager.user.messages[i].recepient = json.decode(accountManager.user.messages[i].recepient) 	end
 
 	--- get all linkedin profiles
-		table.insert(ids, accountManager.user.messages[i].sender.linkedinUID)
-		table.insert(ids, accountManager.user.messages[i].recepient.linkedinUID)
+		
+		if(accountManager.user.messages[i].sender.linkedinUID ~= "none") then
+   		table.insert(ids, accountManager.user.messages[i].sender.linkedinUID)
+		end
+		
+		if(accountManager.user.messages[i].recepient.linkedinUID ~= "none") then
+			table.insert(ids, accountManager.user.messages[i].recepient.linkedinUID)
+		end
 	end
 	
 	----------------------
 
-	linkedIn.getProfiles(ids, function(event) return self:drawList() end) 
+	if(accountManager.user.isConnected) then
+   	linkedIn.getProfiles(ids, function(event) return self:drawList() end)
+   end 
+	
 
 end
 
@@ -101,10 +110,6 @@ end
 --- List tools : row creation + touch events
 function scene:createRow(message)
 	
-	print("-------->")
-	print(message.content.text)
-	print(#message.content.text)
-
 	list:insertRow
 	{
 		rowHeight = 150,
@@ -125,10 +130,14 @@ function scene:onRowRender( event )
 	local message = accountManager.user.messages[row.index];
 	
 	---------
+	
+	if(not message.sender.pictureUrl) then
+		message.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+	end
 		
 	imagesManager.drawImage(
 		row, 
-		linkedIn.data.people[message.sender.linkedinUID].pictureUrl, 
+		message.sender.pictureUrl, 
 		5, 5,	
 		IMAGE_TOP_LEFT, 0.4,
 		false,
@@ -141,7 +150,7 @@ end
 
 function scene:rowRenderContent( row, picture, message )
 	
-	local openProfile = function() router.displayProfile(message.sender.linkedinUID, message.sender.uid, router.openTripMessages) end
+	local openProfile = function() router.displayProfile(message.sender.linkedinUID, message.sender.uid, router.openJourneyMessages) end
 	picture:addEventListener("tap", openProfile)
 
 	---------
@@ -177,7 +186,7 @@ end
 function scene:rowRenderText( row, picture, message )
 
 	if(picture) then
-   	local openProfile = function() router.displayProfile(message.recepient.linkedinUID, message.recepient.uid, router.openTripMessages) end
+   	local openProfile = function() router.displayProfile(message.recepient.linkedinUID, message.recepient.uid, router.openJourneyMessages) end
    	picture:addEventListener("tap", openProfile)
 	end
 	

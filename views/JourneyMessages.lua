@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- TripDiligis.lua
+-- JourneyMessages.lua
 --
 
 -----------------------------------------------------------------------------------------
@@ -27,12 +27,13 @@ end
 function scene:refreshScene(back)
 	viewManager.setupView(self.view);
 	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
-	self:buildDiligis();
+--	viewManager.addCustomButton("images/icons/messages.icon.png", self.openWriter);
+	self:buildMessages();
 end
 	
 -----------------------------------------------------------------------------------------
 
-function scene:buildDiligis()
+function scene:buildMessages()
 
 	native.setActivityIndicator( true )
 	
@@ -53,27 +54,34 @@ function scene:buildDiligis()
 	
 	events = {}
 
-	if( selectedTrip ~= nil 
-	and selectedTrip.events ~= nil 
-	and #selectedTrip.events > 0 )
-	then
-		for i in pairs(selectedTrip.events) do
-			if(selectedTrip.events[i].content.type == eventManager.DILIGIS) then
-				table.insert(events, selectedTrip.events[i])
+	if(selectedJourney ~= nil and #selectedJourney.events > 0 ) then
+		for i in pairs(selectedJourney.events) do
+			if(selectedJourney.events[i].content.type == eventManager.MESSAGE) then
+				table.insert(events, selectedJourney.events[i])
+				accountManager.readEvent(selectedJourney.events[i])
    		end
 		end
 	end
-
-
+	
+	--- json to table for the event.sender
+	for i in pairs(events) do
+		if type(events[i].sender) ~= "table" then events[i].sender = json.decode(events[i].sender) end
+		if type(events[i].recepient) ~= "table" then events[i].recepient = json.decode(events[i].recepient) end
+	end
+	
 	--- get all linkedin profiles
 	local ids = {}
 	for i in pairs(events) do
-		if type(events[i].sender) ~= "table" then events[i].sender = json.decode(events[i].sender) end
-		if events[i].recepient and type(events[i].recepient) ~= "table" then events[i].recepient = json.decode(events[i].recepient) end
-		table.insert(ids, events[i].sender.linkedinUID)
+		if(events[i].sender.linkedinUID ~= "none") then
+			table.insert(ids, events[i].sender.linkedinUID)
+   	end
 	end
 
-	linkedIn.getProfiles(ids, function(event) return self:drawList() end) 
+	if(accountManager.user.isConnected) then
+		linkedIn.getProfiles(ids, function(event) return self:drawList() end)
+	else 
+		self:drawList()
+	end
 
 end
 
@@ -85,13 +93,12 @@ function scene:drawList()
 	native.setActivityIndicator( false )
 end
 
-
 -----------------------------------------------------------------------------------------
 --- List tools : row creation + touch events
 function scene:createRow()
 	list:insertRow
 	{
-		rowHeight = 144,
+		rowHeight = 164,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -106,76 +113,99 @@ end
 function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
-	local diligis = events[row.index]
-	local me = self
+	local message = events[row.index];
 
 	---------
+
+	if(not message.sender.pictureUrl) then
+		message.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+	end
 	
+	---------
+		
 	imagesManager.drawImage(
 		row, 
-		linkedIn.data.people[diligis.sender.linkedinUID].pictureUrl, 
-		30, row.height * 0.5,
-		IMAGE_CENTER, 0.6,
+		message.sender.pictureUrl, 
+		5, 5,	
+		IMAGE_TOP_LEFT, 0.4,
 		false,
-		function(picture) return me:rowRenderContent(row, picture, diligis) end
+		function(picture)
+			self:rowRenderContent(row, picture, message)
+		end
 	)
-	
+
 end
 
-function scene:receivedPicture(picture)
-	self:rowRenderContent(row, picture, diligis)
-end
+function scene:rowRenderContent( row, picture, message )
 	
-function scene:rowRenderContent( row, picture, diligis )
-
-	local openProfile = function() router.displayProfile(diligis.sender.linkedinUID, diligis.sender.uid, router.openTripDiligis) end
+	local openProfile = function() router.displayProfile(message.sender.linkedinUID, message.sender.uid, router.openJourneyMessages) end
 	picture:addEventListener("tap", openProfile)
 
 	---------
-	
-	local text = display.newText( diligis.content.text, 0, 0, 270, 50, native.systemFont, 14 )
-	text:setTextColor( 0 )
-	text.x = 205
-	text.y = 30
-	row:insert(text)
-	
-	local senderName = display.newText( diligis.sender.name, 0, 0, 270, 50, native.systemFontBold, 14 )
-	senderName:setTextColor( 0 )
-	senderName.x = 205
-	senderName.y = 70
-	row:insert(senderName)
 
-	local senderProfile = display.newText( diligis.sender.headline, 0, 0, 270, 50, native.systemFont, 14 )
-	senderProfile:setTextColor( 0 )
-	senderProfile.x = 205
-	senderProfile.y = 90
-	row:insert(senderProfile)
+	if(message.sender.linkedinUID ~= accountManager.user.linkedinUID) then
+   	local travelerName = display.newText( message.sender.name .. " :", 50, 10, 205, 30, native.systemFontBold, 14 )
+   	travelerName:setTextColor( 0 )
+   	row:insert(travelerName)
+		self:rowRenderText(row, nil, message)
+   else
 
-	---------
-	
-	local writeTo = display.newText( "Write a message : ", 0, 0, 270, 50, native.systemFont, 14 )
-	writeTo:setTextColor( 0 )
-	writeTo.x = 235
-	writeTo.y = 120
-	row:insert(writeTo)
+   	local recepientName = display.newText( "Sent to " .. message.recepient.name, 0, 20, 205, 30, native.systemFont, 11 )
+   	recepientName:setTextColor( 0 )
+   	recepientName.x = row.contentWidth - 20 - recepientName.contentWidth/2
+   	row:insert(recepientName)
 
-	local write = function() self:openWriter(diligis) end
-	
-	local message = widget.newButton{
-		defaultFile	= "images/icons/messages.icon.png", 
-		overFile		= "images/icons/messages.icon.png", 
-		onRelease	= write,
-		left 			= writeTo.x + 50, 
-		top 			= writeTo.y - 15
-   }
-   
-	row:insert(message)
-	
+   	imagesManager.drawImage(
+   		row, 
+   		linkedIn.data.people[message.recepient.linkedinUID].pictureUrl, 
+   		row.contentWidth - 50, 5,	
+   		IMAGE_TOP_LEFT, 0.4,
+   		false,
+   		function(picture)
+   			self:rowRenderText(row, picture, message)
+   		end
+   	)
+   end
+
+
+	-----------
 end
 
-function scene:openWriter(diligis)
-   analytics.event("Message", "startTalking") 
-   router.openWriteMessage(diligis, true)
+function scene:rowRenderText( row, picture, message )
+
+	if(picture) then
+   	local openProfile = function() router.displayProfile(message.recepient.linkedinUID, message.recepient.uid, router.openJourneyMessages) end
+   	picture:addEventListener("tap", openProfile)
+	end
+	
+	local text = display.newText( message.content.text, 50, 50, 205, 100, native.systemFont, 14 )
+	text:setTextColor( 0 )
+	row:insert(text)
+	
+	if(message.sender.linkedinUID ~= accountManager.user.linkedinUID) then
+   	local answerButton = widget.newButton	{
+   		width = 55,
+   		height = 25,
+   		fontSize = 10,
+   		label = "Answer", 
+   		labelYOffset = 2,
+   		onRelease = function() self.openWriter(message) end
+   	}
+   	
+   	answerButton.x = display.contentWidth - answerButton.width - 10
+   	answerButton.y = text.y + text.contentHeight/2 - 10
+   	
+   	row:insert( answerButton ) 
+	end
+end
+
+
+function scene:openWriter()
+	if(#events > 0) then
+      analytics.event("Message", "startAnswer") 
+      
+		router.openWriteMessage(events[#events], true, router.openJourneyMessages)
+	end
 end
 
 -----------------------------------------------------------------------------------------

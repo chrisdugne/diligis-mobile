@@ -25,16 +25,16 @@ end
 function newUserListener( event )
 	user = utils.joinTables(user, json.decode(event.response))
 	saveLocalData()
-	eventManager.getStream();
+	
+	native.setActivityIndicator( false )
+	router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
+--	eventManager.getStream();
 end
 
 -----------------------------------------------------------------------------------------
 
 function saveUser()
 
-	print("saveUser")
-	utils.tprint(user)
-	
 	utils.postWithJSON({
 		user = user;
 	},
@@ -44,7 +44,7 @@ end
 
 function userSaved( event )
 	user = utils.joinTables(user, json.decode(event.response))
-	removeDummyTripAndGetMessages(user)
+	removeDummyTrip(user)
 	saveLocalData()
 end
 
@@ -68,7 +68,9 @@ end
 function getAccountListener( event )
 	user = utils.joinTables(user, json.decode(event.response))
 	removeDummyTripAndGetMessages(user)
-	eventManager.getStream();
+	
+--	eventManager.getStream();
+	router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
 end
 
 -----------------------------------------------------------------------------------------
@@ -105,7 +107,7 @@ end
 
 function receivedTrips( event )
 	user.trips = json.decode(event.response);
-	removeDummyTripAndGetMessages(user)
+	removeDummyTrip(user)
 	
 	native.setActivityIndicator( false )
 	return router.displayTrips() 
@@ -120,16 +122,32 @@ function removeDummyTripAndGetMessages(user)
 	if(user.trips) then
 		for i in pairs(user.trips) do
    		
-      	if(user.trips[i].events) then
-      		for m in pairs(user.trips[i].events) do
-      			if(user.trips[i].events[m].content.type == eventManager.MESSAGE) then
-               	table.insert(user.messages, user.trips[i].events[m])
+      	if(user.trips[i].journeys) then
+      		for j in pairs(user.trips[i].journeys) do
+      			if(user.trips[i].journeys[j].events) then
+            		for m in pairs(user.trips[i].journeys[j].events) do
+            			if(user.trips[i].journeys[j].events[m].content.type == eventManager.MESSAGE) then
+                  		print("found message")
+                     	table.insert(user.messages, user.trips[i].journeys[j].events[m])
+            			end
+            		end
       			end
       		end
    		end
 
 			if(user.trips[i].tripId == user.uid) then
       		table.remove(user.trips, i) -- user dummy trip
+			end
+		end
+	end
+end
+
+function removeDummyTrip(user)
+	if(user.trips) then
+		for i in pairs(user.trips) do
+			if(user.trips[i].tripId == user.uid) then
+   			table.remove(user.trips, i) -- user dummy trip
+   			break
 			end
 		end
 	end
@@ -152,10 +170,6 @@ function linkedInConnect()
 	native.setActivityIndicator( true )
 	connectionFromAppHome = fromAppHome
 
-	print("connecting to linkedin")
-	utils.tprint(user)
-	
-	print("authorise")
    linkedIn.authorise(linkedInConnected, linkedInCancel);
 end
 
@@ -166,7 +180,6 @@ end
 
 function linkedInConnected()
 
-	print("linkedInConnected")
 	analytics.event("LinkedIn", "linkedInConnected")
 	
 	user.linkedinUID 	= linkedIn.data.profile.id

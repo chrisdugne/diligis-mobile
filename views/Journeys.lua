@@ -24,9 +24,9 @@ end
 
 function scene:refreshScene(back)
 	
-	viewManager.setupView(self.view)
+	viewManager.setupView(self.view, tripManager.closeAddJourneyWindow)
 	viewManager.addCustomButton("images/buttons/add.png", function () return self:createJourney() end);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", function() back() tripManager.closeAddJourneyWindow() end);
 	
 	self:buildJourneys()
 end
@@ -34,7 +34,7 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:createJourney()
-   tripManager.openNewJourneyWindow()
+   tripManager.openNewJourneyWindow(function() scene:refreshScene(router.openTrips) end)
 end
 
 -----------------------------------------------------------------------------------------
@@ -109,16 +109,24 @@ function scene:onRowRender( event )
 	local row = event.row
 	local journey = selectedTrip.journeys[row.index];
 
-	local title = display.newText( journey.name, 0, 0, native.systemFontBold, 16 )
+	-----------------------
+
+	local locationName
+	
+	if(journey.type == tripManager.PLACE) then
+		locationName = journey.locationName
+	elseif(journey.type == tripManager.PLANE) then
+		locationName = "Plane from " .. journey.previousLocationName
+	elseif(journey.type == tripManager.TRAIN) then
+		locationName = "Train from " .. journey.previousLocationName
+	end
+	
+	local title = display.newText( locationName, 10, 0, native.systemFont, 11 )
 	title:setTextColor( 0 )
-	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
 	title.y = 22
 	row:insert(title)
 
-	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
-	arrow.x = row.contentWidth - arrow.contentWidth
-	arrow.y = row.contentHeight * 0.5
-	row:insert(arrow)
+	-----------------------
 
 	local perlImage
 	if(os.time() - journey.startTime > 0) then
@@ -131,6 +139,20 @@ function scene:onRowRender( event )
 	perl.x = 27
 	perl.y = row.contentHeight - 20
 	row:insert(perl)
+
+	-----------------------
+
+	local startTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.startTime/1000), 47, row.contentHeight - 20, native.systemFont, 11 )
+	startTime:setTextColor( 0 )
+	row:insert(startTime)
+
+	if(journey.endTime > 0) then
+   	local endTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.endTime/1000), 177, row.contentHeight - 20, native.systemFont, 11 )
+   	endTime:setTextColor( 0 )
+   	row:insert(endTime)
+   end
+
+	-----------------------
 
 	if(journey.events ~= nil and #journey.events > 0) then
 	
@@ -148,33 +170,40 @@ function scene:onRowRender( event )
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = row.contentWidth - 130 
-      	messagesIcon.y = row.contentHeight - 25
-      
+      	messagesIcon.x = row.contentWidth/2 + 20 
+      	messagesIcon.y = row.contentHeight/3
+			messagesIcon:addEventListener("tap", function() self:openMessages(journey) end)
+      	
       	row:insert( messagesIcon )
       	
       	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 16 )
       	messagesCount:setTextColor( 0 )
       	messagesCount.x = messagesIcon.x - 30
-      	messagesCount.y = row.contentHeight - 25
+      	messagesCount.y = row.contentHeight/3
+			messagesCount:addEventListener("tap", function() self:openMessages(journey) end)
       	row:insert(messagesCount)
    	end
    	
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = row.contentWidth - 50 
-      	diligisIcon.y = row.contentHeight - 25
+      	diligisIcon.x = row.contentWidth/2 + 85 
+      	diligisIcon.y = row.contentHeight/3
       
       	row:insert( diligisIcon )
 
       	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 16 )
       	diligisCount:setTextColor( 0 )
       	diligisCount.x = diligisIcon.x - 30
-      	diligisCount.y = row.contentHeight - 25
+      	diligisCount.y = row.contentHeight/3
       	row:insert(diligisCount)
    	end
 	end
+end
+
+function scene:openMessages(journey)
+	selectedJourney = journey
+	router.openJourneyMessages()
 end
 
 ----------------------
@@ -250,7 +279,7 @@ end
 
 --- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
-	self:refreshScene(event.params.back);
+	self:refreshScene(event.params.back)
 end
 
 --- Called when scene is about to move offscreen:

@@ -45,12 +45,14 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:buildProfile(linkedinUID, userUID)
-	if(linkedinUID == "none" or not accountManager.user.isConnected) then 
+	if(not accountManager.user.isConnected) then 
 		if(userUID == accountManager.user.uid) then
-			self:drawDiligisProfile(accountManager.user)
+			self:drawDiligisProfile(accountManager.user, true, false)
 		else
-			accountManager.getUser(userUID, function (user) self:drawDiligisProfile(user) end)
+			accountManager.getUser(userUID, function (user) self:drawDiligisProfile(user, true, linkedinUID == "none") end)
 		end
+	elseif (linkedinUID == "none") then
+		self:drawDiligisProfile(accountManager.user, false, true)
 	else
 		linkedIn.getProfiles({linkedinUID}, function() self:drawProfile(linkedinUID) end) 
 	end
@@ -58,10 +60,7 @@ end
 
 -----------------------------------------------------------------------------------------
 
-function scene:drawDiligisProfile(user)
-
-	print("drawDiligisProfile")
-	utils.tprint(user)
+function scene:drawDiligisProfile(user, userIsNotConnected, otherUserIsNotLinked)
 
 	----------------------
 
@@ -89,7 +88,7 @@ function scene:drawDiligisProfile(user)
 		senderProfile.y = image.y + 30
 		profile:insert(senderProfile)
 
-		if(user.uid == accountManager.user.uid) then
+		if(userIsNotConnected) then
 		
       	local signinText = "Sign in with LinkedIn for a complete experience !"
       	local signinTextDisplay = display.newText( signinText, display.contentWidth * 0.5 - 80, display.contentHeight/2, display.contentWidth/2, 200, native.systemFontBold, 14 )
@@ -109,6 +108,16 @@ function scene:drawDiligisProfile(user)
    		signInButton.x = 2*display.contentWidth/3
    		signInButton.y =  3*display.contentHeight/4+20
    		profile:insert(signInButton)
+   	end
+		
+
+		if(otherUserIsNotLinked) then
+		
+      	local noLinkedText = "This user is not linked with LinkedIn yet"
+      	local noLinkedDisplay = display.newText( noLinkedText, display.contentWidth * 0.5 - 80, display.contentHeight/2, display.contentWidth/2, 200, native.systemFontBold, 14 )
+      	noLinkedDisplay:setTextColor( 0 )
+      
+      	profile:insert( noLinkedDisplay )
    	end
 		
    	----------------------

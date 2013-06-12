@@ -8,6 +8,12 @@ local webView
 
 -----------------------------------------------------------------------------------------
 
+PLACE 			= 1;
+PLANE 			= 2;
+TRAIN 			= 3;
+
+-----------------------------------------------------------------------------------------
+
 function createTrip()
 
 	local trip = {
@@ -29,8 +35,6 @@ function tripCreated( event )
 	local trip = json.decode(event.response)
 	table.insert(accountManager.user.trips, trip)
 	
-	print("-----> tripCreated")
-	utils.tprint(localData.user)
 	accountManager.saveLocalData()
 	
 	router.openTrips()
@@ -40,20 +44,31 @@ end
 
 -- 
 -- 
-local afterCreateTrip 
+local afterCreateJourney 
 
 --- requestToken reception
 function openNewJourneyWindow(next)
+	
+	local firstJourney = #selectedTrip.journeys == 0
 
    analytics.event("Trip", "openJourneyWebView") 
-	afterCreateTrip = next
+	afterCreateJourney = next
 
-	local url = SERVER_URL .. "/create"
+	local url = SERVER_URL .. "/create?firstJourney=" .. tostring(firstJourney) 
+	
+	print(url)
 
-	webView = native.newWebView( display.screenOriginX, display.screenOriginY, display.contentWidth, display.contentHeight)
+	webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT, display.contentWidth, display.contentHeight - HEADER_HEIGHT)
 	webView:addEventListener( "urlRequest", newJourneyListener )
 	webView:request( url )
 
+end
+
+function closeAddJourneyWindow()
+	if(webView) then
+		webView:removeSelf()
+		webView = nil;
+	end
 end
 
 -----------------------------------------------------
@@ -84,9 +99,8 @@ function newJourneyListener( event )
 
       	createJourney(journey)
 		end
-
-		webView:removeSelf()
-		webView = nil;
+		
+		closeAddJourneyWindow()
 	end
 
 end
@@ -96,7 +110,6 @@ end
 
 function createJourney(journey)
 	
-	utils.tprint(selectedTrip)
 	utils.postWithJSON({
 		tripId 	= selectedTrip.tripId,
 		journey 	= journey
@@ -104,10 +117,12 @@ function createJourney(journey)
 	
 	SERVER_URL .. "/createJourney", 
 	journeyCreated)
+	
 end
 
 function journeyCreated( event )
 	local journey = json.decode(event.response)
 	table.insert(selectedTrip.journeys, journey)
 	accountManager.saveLocalData()
+	afterCreateJourney()
 end

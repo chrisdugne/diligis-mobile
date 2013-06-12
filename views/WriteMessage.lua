@@ -45,8 +45,6 @@ end
 function scene:buildWriter(event)
 	
 	selectedEvent = event
-	print("buildWriter")
-	utils.tprint(selectedEvent)
 	
 	local backButton = widget.newButton	{
 		width = display.contentWidth/6,
@@ -133,17 +131,22 @@ function sendMessage()
 	
 		if(isAnswer) then 
 
-			local tripId
+			local journeyId
 			if(selectedEvent.recepient) then
-				tripId = selectedEvent.recepient.tripId
+				journeyId = selectedEvent.recepient.journeyId
    		else
-   			tripId = selectedTrip.tripitId
+   			journeyId = selectedJourney.journeyId
    		end
 
-			eventManager.sendAnswer(textBox.text, selectedEvent.content.uid, tripId)
+			print("------------ sendAnswer " .. journeyId)
+			utils.tprint(selectedEvent)
+			eventManager.sendAnswer(textBox.text, selectedEvent.content.uid, journeyId)
    		
    	else
-   		eventManager.sendMessage(textBox.text, accountManager.user.email, selectedEvent.sender.tripId)
+			print("------------ sendMessage " .. selectedEvent.sender.journeyId)
+			print("to " .. accountManager.user.email)
+			
+   		eventManager.sendMessage(textBox.text, accountManager.user.email, selectedEvent.sender.journeyId)
 		end
 		
    	effectBack()

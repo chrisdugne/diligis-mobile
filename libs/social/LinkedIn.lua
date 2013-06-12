@@ -105,8 +105,10 @@ function webviewListener( event )
 				getAccessToken(params["oauth_verifier"])
 			end
 
-			webView:removeSelf()
-			webView = nil;
+			if(webView) then
+				webView:removeSelf()
+				webView = nil;
+			end
 		end
 	end
 
@@ -248,7 +250,6 @@ function getPeopleProfile(id, next)
    		linkedinUID = id
    	}
    
-   	utils.tprint(customParams)
    	oAuth.networkRequest(profileUrl, customParams, data.consumerKey, data.accessToken, data.consumerSecret, data.accessTokenSecret, "GET", peopleProfileListener)
    end
 
@@ -260,7 +261,6 @@ function peopleProfileListener( event )
 	if ( not event.isError ) then
    	
 		local profile = json.decode(event.response)
-		utils.tprint(profile)
 		
 		if(profile.id == "private") then
       	local params = utils.getUrlParams(event.url)
@@ -295,9 +295,6 @@ end
 --- logout ok
 function logoutListener( event )
 
-	print("logoutListener")
-	utils.tprint(event)
-	
 	data.accessToken = nil
 	data.accessTokenSecret = nil
 	data.profile = nil

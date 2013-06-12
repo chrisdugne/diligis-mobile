@@ -170,7 +170,7 @@ end
 function enter()
 	analytics.event("Navigation", "appHomeEnter")
    
-   if(accountManager.user.linkedinUID) then
+   if(accountManager.user.linkedinUID and accountManager.user.linkedinUID ~= "none") then
    	accountManager.linkedInConnect(true)
    else
 		accountManager.getAccount()

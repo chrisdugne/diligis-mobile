@@ -52,10 +52,10 @@ end
 
 ---------------------------------------------
 
-function openPeopleTrip(announcement, back)
+function openPeopleJourney(announcement, back)
 
 	--- analytics
-	analytics.pageview("PeopleTrip")
+	analytics.pageview("PeopleJourney")
 	--- 
 
 	local options = {
@@ -65,7 +65,7 @@ function openPeopleTrip(announcement, back)
 		}
 	}
 	
-	storyboard.gotoScene( "views.PeopleTrip", options )
+	storyboard.gotoScene( "views.PeopleJourney", options )
 end
 
 
@@ -128,12 +128,12 @@ function displayTrips()
 end
 
 ---------------------------------------------
---- TripDiligis + TripMessages
+--- JourneyDiligis + JourneyMessages
 
-function openTripDiligis(back)
+function openJourneyDiligis(back)
 	
 	--- analytics
-	analytics.pageview("TripDiligis")
+	analytics.pageview("JourneyDiligis")
 	--- 
 	
 	local options = {
@@ -142,13 +142,13 @@ function openTripDiligis(back)
 		}
 	}
 
-	storyboard.gotoScene( "views.TripDiligis", options )
+	storyboard.gotoScene( "views.JourneyDiligis", options )
 end
 
-function openTripMessages(back)
+function openJourneyMessages(back)
 
 	--- analytics
-	analytics.pageview("TripMessages")
+	analytics.pageview("JourneyMessages")
 	--- 
 	
 	local options = {
@@ -157,7 +157,7 @@ function openTripMessages(back)
 		}
 	}
 
-	storyboard.gotoScene( "views.TripMessages", options )
+	storyboard.gotoScene( "views.JourneyMessages", options )
 end
 
 ---------------------------------------------

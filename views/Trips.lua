@@ -136,7 +136,13 @@ function scene:onRowRender( event )
 	local row = event.row
 	local tripRendered = accountManager.user.trips[row.index];
 
-	local title = display.newText( tripRendered.name, 0, 0, native.systemFontBold, 16 )
+	local plural = ""
+	if(#tripRendered.journeys > 1) then 
+		plural = "s"
+	end 
+	local nbJourneys = #tripRendered.journeys .. " journey" .. plural
+
+	local title = display.newText( nbJourneys, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
 	title.y = 22
@@ -159,48 +165,52 @@ function scene:onRowRender( event )
 	)
 end
 
-function scene:rowRenderContent (row, tripRendered)
+function scene:rowRenderContent (row, trip)
 
-	if(tripRendered.events ~= nil and #tripRendered.events > 0) then
-	
+	if(trip.journeys ~= nil and #trip.journeys > 0) then
+
 		local nbMessages 	= 0
 		local nbDiligis 	= 0
-		
-		for i in pairs(tripRendered.events) do
-			if(tripRendered.events[i].content.type == eventManager.MESSAGE) then
-				nbMessages = nbMessages + 1
-			elseif(tripRendered.events[i].content.type == eventManager.DILIGIS) then
-				nbDiligis = nbDiligis + 1
-			end
+	
+		for j in pairs(trip.journeys) do
+      	if(trip.journeys[j].events ~= nil and #trip.journeys[j].events > 0) then
+      		for i in pairs(trip.journeys[j].events) do
+      			if(trip.journeys[j].events[i].content.type == eventManager.MESSAGE) then
+      				nbMessages = nbMessages + 1
+      			elseif(trip.journeys[j].events[i].content.type == eventManager.DILIGIS) then
+      				nbDiligis = nbDiligis + 1
+      			end
+      		end
+   		end
 		end
 
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = row.contentWidth - 130 
-      	messagesIcon.y = row.contentHeight - 25
+      	messagesIcon.x = row.contentWidth/2 + 30 
+      	messagesIcon.y = row.contentHeight/3
       
       	row:insert( messagesIcon )
       	
       	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 16 )
       	messagesCount:setTextColor( 0 )
       	messagesCount.x = messagesIcon.x - 30
-      	messagesCount.y = row.contentHeight - 25
+      	messagesCount.y = row.contentHeight/3
       	row:insert(messagesCount)
    	end
    	
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = row.contentWidth - 50 
-      	diligisIcon.y = row.contentHeight - 25
+      	diligisIcon.x = row.contentWidth/2 + 95 
+      	diligisIcon.y = row.contentHeight/3
       
       	row:insert( diligisIcon )
 
       	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 16 )
       	diligisCount:setTextColor( 0 )
       	diligisCount.x = diligisIcon.x - 30
-      	diligisCount.y = row.contentHeight - 25
+      	diligisCount.y = row.contentHeight/3
       	row:insert(diligisCount)
    	end
 	end
@@ -264,7 +274,7 @@ end
 --	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
 --	messagesIcon.x = 100 
 --	messagesIcon.y = 360
---	messagesIcon:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
+--	messagesIcon:addEventListener("tap", function() router.openJourneyMessages(router.openTrips) end)
 --
 --	details:insert( messagesIcon )
 --	details.messagesIcon = messagesIcon 
@@ -273,7 +283,7 @@ end
 --	messagesCount:setTextColor( 0 )
 --	messagesCount.x = messagesIcon.x - 30
 --	messagesCount.y = 360
---	messagesCount:addEventListener("tap", function() router.openTripMessages(router.openTrips) end)
+--	messagesCount:addEventListener("tap", function() router.openJourneyMessages(router.openTrips) end)
 --
 --	details:insert(messagesCount)
 --	details.messagesCount = messagesCount 
@@ -282,7 +292,7 @@ end
 --	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
 --	diligisIcon.x = 250 
 --	diligisIcon.y = 360
---	diligisIcon:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
+--	diligisIcon:addEventListener("tap", function() router.openJourneyDiligis(router.openTrips) end)
 --
 --	details:insert(diligisIcon)
 --	details.diligisIcon = diligisIcon 
@@ -291,7 +301,7 @@ end
 --	diligisCount:setTextColor( 0 )
 --	diligisCount.x = diligisIcon.x - 30
 --	diligisCount.y = 360
---	diligisCount:addEventListener("tap", function() router.openTripDiligis(router.openTrips) end)
+--	diligisCount:addEventListener("tap", function() router.openJourneyDiligis(router.openTrips) end)
 --	
 --	details:insert(diligisCount)
 --	details.diligisCount = diligisCount 

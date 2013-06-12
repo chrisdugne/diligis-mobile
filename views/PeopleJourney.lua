@@ -1,6 +1,6 @@
 -----------------------------------------------------------------------------------------
 --
--- Peopletrip.lua
+-- PeopleJourney.lua
 --
 
 -----------------------------------------------------------------------------------------
@@ -8,8 +8,8 @@
 local scene = storyboard.newScene()
 local event
 local user
-local trip
-local tripContent
+local journey
+local journeyContent
 
 -----------------------------------------------------------------------------------------
 -- BEGINNING OF YOUR IMPLEMENTATION
@@ -21,7 +21,7 @@ local tripContent
 
 --- Called when the scene's view does not exist:
 function scene:createScene( event )
-	tripContent = display.newGroup()
+	journeyContent = display.newGroup()
 end
 
 -----------------------------------------------------------------------------------------
@@ -31,88 +31,121 @@ function scene:refreshScene(announcement, back)
 	user 	= announcement.sender
 	viewManager.setupView(self.view);
 	viewManager.addCustomButton("images/buttons/leftArrow.png", back);
+	
+	if(not user.pictureUrl) then
+		user.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+	end
+	
+	print("--------")
+	utils.tprint(announcement)
 		
-	linkedIn.getProfiles({user.linkedinUID}, function(event) return self:getTrip() end) 
+	if(user.linkedinUID == "none" or not accountManager.user.isConnected) then
+		self:getJourney() 
+	else
+		linkedIn.getProfiles({user.linkedinUID}, function(event) return self:getJourney() end) 
+   end
 end
 
 -----------------------------------------------------------------------------------------
 
-function scene:getTrip()
+function scene:getJourney()
 	native.setActivityIndicator( true )
 	utils.postWithJSON({
-		tripId = user.tripId;
+		journeyId = user.journeyId;
 	},
-	SERVER_URL .. "/getTrip", 
-	function(event) self:getTripListener(event) end)
+	SERVER_URL .. "/getJourney", 
+	function(event) self:getJourneyListener(event) end)
 end
 
-function scene:getTripListener( event )
-	trip = json.decode(event.response);
+function scene:getJourneyListener( event )
+	journey = json.decode(event.response);
 
-	utils.emptyGroup(tripContent)
-	self:drawPicture();
+	utils.emptyGroup(journeyContent)
+--	self:drawPicture();
+	self:buildJourney()
 end
 
 -----------------------------------------------------------------------------------------
+--
+--function scene:drawPicture()
+--
+--	imagesManager.drawImage(
+--		journeyContent, 
+--		user.pictureUrl, 
+--		20, 40,
+--		IMAGE_TOP_LEFT, 0.6,
+--		false,
+--		function(picture) return self:buildJourney() end
+--	)
+--	
+--end
 
-function scene:drawPicture()
+-----------------------------------------------------------------------------------------
 
-	imagesManager.drawImage(
-		tripContent, 
-		linkedIn.data.people[user.linkedinUID].pictureUrl, 
-		20, 40,
-		IMAGE_TOP_LEFT, 0.6,
-		false,
-		function(picture) return self:buildTrip() end
-	)
+function scene:buildJourney()
 	
-end
-
------------------------------------------------------------------------------------------
-
-function scene:buildTrip()
+	utils.tprint(journey)
 
 	local senderName = display.newText( user.name, 0, 0, 270, 50, native.systemFontBold, 14 )
 	senderName:setTextColor( 0 )
 	senderName.x = 215
-	senderName.y = 70
-	tripContent:insert(senderName)
+	senderName.y = 40
+	journeyContent:insert(senderName)
 
-	local senderProfile = display.newText( user.headline, 0, 0, 270, 50, native.systemFont, 14 )
+	local senderProfile = display.newText( user.headline, 0, 0, 100, 100, native.systemFont, 14 )
 	senderProfile:setTextColor( 0 )
-	senderProfile.x = 215
-	senderProfile.y = 90
-	tripContent:insert(senderProfile)
+	senderProfile.x = 145
+	senderProfile.y = 100
+	journeyContent:insert(senderProfile)
+
+	----------------------
+	
+	local locationName
+	
+	-- diligis annoucement
+	if(not journey) then
+		self.view:insert( journeyContent )
+		native.setActivityIndicator( false )
+		return
+	end
+
+	if(journey.type == tripManager.PLACE) then
+		locationName = journey.locationName
+	elseif(journey.type == tripManager.PLANE) then
+		locationName = "Plane from " .. journey.previousLocationName
+	elseif(journey.type == tripManager.TRAIN) then
+		locationName = "Train from " .. journey.previousLocationName
+	end
+
+	local locationName = display.newText( locationName, 0, 0, display.contentWidth * 0.5, 50, native.systemFontBold, 12 )
+	locationName:setTextColor( 0 )
+	locationName.x = display.contentWidth * 0.5
+	locationName.y = 120
+
+	journeyContent:insert( locationName )
+	journeyContent.locationName = locationName
 
 	----------------------
 
-	local address = display.newText( trip.address, 0, 0, native.systemFontBold, 16 )
-	address:setTextColor( 0 )
-	address.x = display.contentWidth * 0.5
-	address.y = 120
+	local startTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.startTime/1000), 0, 0, native.systemFont, 10 )
+	startTime:setTextColor( 0 )
+	startTime.x = display.contentWidth * 0.5
+	startTime.y = 150
 
-	tripContent:insert( address )
-	tripContent.address = address 
-
-	----------------------
-
-	local startDate = display.newText( trip.startDate, 0, 0, native.systemFontBold, 13 )
-	startDate:setTextColor( 0 )
-	startDate.x = display.contentWidth * 0.5
-	startDate.y = 140
-
-	tripContent:insert( startDate )
-	tripContent.startDate = startDate
+	journeyContent:insert( startTime )
+	journeyContent.startTime = startTime
 	 
 	----------------------
-
-	local endDate = display.newText( trip.endDate, 0, 0, native.systemFontBold, 13 )
-	endDate:setTextColor( 0 )
-	endDate.x = display.contentWidth * 0.5
-	endDate.y = 160
-
-	tripContent:insert( endDate )
-	tripContent.endDate = endDate 
+	
+	if(journey.endTime > 0) then
+   	local endTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.endTime/1000), 0, 0, native.systemFont, 10 )
+   	endTime:setTextColor( 0 )
+   	endTime.x = display.contentWidth * 0.5
+   	endTime.y = 170
+   
+   	journeyContent:insert( endTime )
+   	journeyContent.endTime = endTime
+   end 
 
 	----------------------
 	
@@ -120,7 +153,7 @@ function scene:buildTrip()
 	local writemeDisplay = display.newText( writemeText, display.contentWidth * 0.5 - 100, 300, 200, 200, native.systemFont, 11 )
 	writemeDisplay:setTextColor( 0 )
 
-	tripContent:insert( writemeDisplay )
+	journeyContent:insert( writemeDisplay )
 
 	---------
 	
@@ -128,7 +161,7 @@ function scene:buildTrip()
 	writeTo:setTextColor( 0 )
 	writeTo.x = 185
 	writeTo.y = 260
-	tripContent:insert(writeTo)
+	journeyContent:insert(writeTo)
 
 	
 	local message = widget.newButton{
@@ -139,11 +172,11 @@ function scene:buildTrip()
 		top 			= writeTo.y - 25
    }
    
-	tripContent:insert(message)
+	journeyContent:insert(message)
 	
 	------------------------------------------------
 	
-	self.view:insert( tripContent )
+	self.view:insert( journeyContent )
 
 	----------------------
 
@@ -151,7 +184,7 @@ function scene:buildTrip()
 end
 
 function writeAMessage()
-   analytics.event("Message", "startTalkingFromPeopleTrip") 
+   analytics.event("Message", "startTalkingFromPeopleJourney") 
    router.openWriteMessage(event, false, router.openStream)
 end
 
@@ -164,9 +197,9 @@ function scene:enterScene( event )
 		self:refreshScene(event.params.announcement, event.params.back);
 	end
 
-	tripContent.x = -display.contentWidth * 1.5
-	tripContent.y = 60
-	transition.to( tripContent,  { x = 0 , time = 400, transition = easing.outExpo } )
+	journeyContent.x = -display.contentWidth * 1.5
+	journeyContent.y = 60
+	transition.to( journeyContent,  { x = 0 , time = 400, transition = easing.outExpo } )
 end
 
 -- Called when scene is about to move offscreen:

@@ -133,24 +133,23 @@ end
 
 function showEvent(event)
 	
-	print("-----")
-	utils.tprint(event)
 	if(event.content.type == eventManager.ANNOUNCEMENT) then
+		
 		if(event.sender.tripId) then
          analytics.event("Navigation", "streamToTrip") 
-   		router.openPeopleTrip(event, router.openStream)
+   		router.openPeopleJourney(event, router.openStream)
 		else
          analytics.event("Navigation", "streamToProfile") 
    		router.displayProfile(event.sender.linkedinUID, event.sender.uid, router.openStream)
 		end
 		
 	elseif (event.content.type == eventManager.DILIGIS) then
-		selectedTrip = getTrip(event)
-		router.openTripDiligis(router.openStream)
+		selectedJourney = getJourney(event)
+		router.openJourneyDiligis(router.openStream)
       analytics.event("Navigation", "streamToDiligis") 
 		
 	elseif (event.content.type == eventManager.MESSAGE) then
-		selectedTrip = getTrip(event)
+		selectedJourney = getJourney(event)
 		router.openMessages()
       analytics.event("Navigation", "streamToMessage") 
 		
@@ -159,11 +158,13 @@ function showEvent(event)
 end
 
 
-function getTrip(diligis)
+function getJourney(diligis)
 	for i in pairs(accountManager.user.trips) do
-   	for j in pairs(accountManager.user.trips[i].events) do
-			if(accountManager.user.trips[i].events[j].uid == diligis.uid) then
-				return accountManager.user.trips[i]
+   	for j in pairs(accountManager.user.trips[i].journeys) do
+      	for k in pairs(accountManager.user.trips[i].journeys[j].events) do
+				if(accountManager.user.trips[i].journeys[j].events[k].uid == diligis.uid) then
+					return accountManager.user.trips[i].journeys[j]
+         	end
       	end
    	end
 	end

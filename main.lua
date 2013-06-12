@@ -63,6 +63,7 @@ menu = display.newGroup()
 ---- App globals
 
 selectedTrip 		= nil
+selectedJourney 	= nil
 selectedEvent 		= nil
 
 -----------------------------------------------------------------------------------------
@@ -73,8 +74,6 @@ if(not localData) then
 	localData = {user = {}, linkedin = {}}
    utils.saveTable(localData, "localData.json")
 end
-
-utils.tprint(localData)
 
 -----------------------------------------------------------------------------------------
 

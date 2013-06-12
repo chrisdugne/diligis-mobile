@@ -34,25 +34,25 @@ end
 
 -----------------------------------------------------------------------------------------
 
-function sendAnswer(text, contentUID, tripFromId)
+function sendAnswer(text, contentUID, journeyId)
 	native.setActivityIndicator( true )
 	utils.postWithJSON({
 		message = {
 			text 			= text,
 			contentUID 	= contentUID,
-			tripFromId 	= tripFromId
+			journeyId 	= journeyId
 		}
 	},
 	SERVER_URL .. "/sendAnswer")
 end
 
-function sendMessage(text, senderEmail, tripId)
+function sendMessage(text, senderEmail, journeyId)
 	native.setActivityIndicator( true )
 	utils.postWithJSON({
 		message = {
 			text 				= text,
 			senderEmail 	= senderEmail,
-			tripId 			= tripId
+			journeyId 		= journeyId
 		}
 	},
 	SERVER_URL .. "/sendMessage")
