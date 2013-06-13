@@ -185,7 +185,6 @@ end
 -- 
 
 function linkedInConnect()
-	native.setActivityIndicator( true )
 	connectionFromAppHome = fromAppHome
 
    linkedIn.authorise(linkedInConnected, linkedInCancel);
@@ -193,7 +192,6 @@ end
 
 function linkedInCancel()
 	analytics.event("LinkedIn", "linkedInCancel") 
-	native.setActivityIndicator( false )
 end
 
 function linkedInConnected()
@@ -219,7 +217,6 @@ function linkedInConnected()
 	saveUser()
 
 	user.isConnected = true
-	native.setActivityIndicator( false )
   	
   	router.openStream()	
 end
