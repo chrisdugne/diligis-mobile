@@ -193,6 +193,10 @@ function profileListener( event )
 			data.profile.lastName = ""
 		end
 		
+      if(not data.profile.pictureUrl) then
+      	data.profile.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+      end
+      
    	callBackAuthorisationDone();
 	end
 
@@ -268,7 +272,12 @@ function peopleProfileListener( event )
 			profile.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
 		end
 		
+      if(not profile.pictureUrl) then
+      	profile.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+      end
+
 		data.people[profile.id] = profile
+		utils.print(data.people)
 	end
 
 	peopleProfileReceived();

@@ -137,7 +137,7 @@ function scene:buildJourney()
 	 
 	----------------------
 	
-	if(journey.endTime > 0) then
+	if(journey.endTime) then
    	local endTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.endTime/1000), 0, 0, native.systemFont, 10 )
    	endTime:setTextColor( 0 )
    	endTime.x = display.contentWidth * 0.5
