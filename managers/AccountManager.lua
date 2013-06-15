@@ -34,6 +34,7 @@ end
 -----------------------------------------------------------------------------------------
 
 function saveUser()
+	utils.tprint(user)
 
 	utils.postWithJSON({
 		user = user;

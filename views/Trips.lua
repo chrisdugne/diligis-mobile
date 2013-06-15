@@ -25,7 +25,7 @@ end
 
 function scene:refreshScene()
 
-	viewManager.setupView(self.view)
+	viewManager.setupView(self.view, tripManager.closeWebWindow)
 	self:addTripsButtons()
 	
 	self:buildTripView()
@@ -58,11 +58,12 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:createTrip()
+   tripManager.openNewTripWindow()
+
 --   analytics.event("Trip", "create")
 --   tripManager.openNewJourneyWindow()
-
-	tripManager.createTrip()
-	self:refreshScene()
+	--tripManager.createTrip()
+--	self:refreshScene()
 end
 
 -----------------------------------------------------------------------------------------
@@ -136,13 +137,7 @@ function scene:onRowRender( event )
 	local row = event.row
 	local tripRendered = accountManager.user.trips[row.index];
 
-	local plural = ""
-	if(#tripRendered.journeys > 1) then 
-		plural = "s"
-	end 
-	local nbJourneys = #tripRendered.journeys .. " journey" .. plural
-
-	local title = display.newText( nbJourneys, 0, 0, native.systemFontBold, 16 )
+	local title = display.newText( tripRendered.name, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
 	title.y = 22

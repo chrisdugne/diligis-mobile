@@ -26,7 +26,7 @@ function scene:refreshScene()
 	
 	viewManager.setupView(self.view, tripManager.closeAddJourneyWindow)
 	viewManager.addCustomButton("images/buttons/add.png", function () return self:createJourney() end);
-	viewManager.addCustomButton("images/buttons/leftArrow.png", function() router.openTrips() tripManager.closeAddJourneyWindow() end);
+	viewManager.addCustomButton("images/buttons/leftArrow.png", function() router.openTrips() tripManager.closeWebWindow() end);
 	
 	self:buildJourneys()
 end
@@ -128,23 +128,27 @@ function scene:onRowRender( event )
 
 	-----------------------
 
-	local perlImage
-	if(os.time() - journey.startTime > 0) then
-		perlImage = "images/icons/green.mini.png"
-	else
-		perlImage = "images/icons/blue.mini.png"
-	end
-	
-	local perl = display.newImage( perlImage, false )
-	perl.x = 27
-	perl.y = row.contentHeight - 20
-	row:insert(perl)
+	if(journey.startTime) then
+   	local perlImage
+   	if(os.time() - journey.startTime > 0) then
+   		perlImage = "images/icons/green.mini.png"
+   	else
+   		perlImage = "images/icons/blue.mini.png"
+   	end
+   	
+   	local perl = display.newImage( perlImage, false )
+   	perl.x = 27
+   	perl.y = row.contentHeight - 20
+   	row:insert(perl)
+   end
 
 	-----------------------
 
-	local startTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.startTime/1000), 47, row.contentHeight - 20, native.systemFont, 11 )
-	startTime:setTextColor( 0 )
-	row:insert(startTime)
+	if(journey.startTime) then
+   	local startTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.startTime/1000), 47, row.contentHeight - 20, native.systemFont, 11 )
+   	startTime:setTextColor( 0 )
+   	row:insert(startTime)
+   end
 	
 	if(journey.endTime) then
    	local endTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.endTime/1000), 177, row.contentHeight - 20, native.systemFont, 11 )
