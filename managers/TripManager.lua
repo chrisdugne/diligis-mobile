@@ -16,6 +16,8 @@ TRAIN 			= 3;
 -----------------------------------------------------------------------------------------
 
 function openWebWindow(url, listener)
+	print("opening " .. url)
+	
 	webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT, display.contentWidth, display.contentHeight - HEADER_HEIGHT)
 	webView:addEventListener( "urlRequest", listener )
 	webView:request( url )
@@ -29,6 +31,8 @@ function closeWebWindow()
 		webView = nil
 		isWebViewOpened = false
 	end
+	
+	router.openTrips()
 end
 
 
@@ -117,13 +121,19 @@ function openAddTransportWindow()
 	
    analytics.event("Trip", "openAddTransportWebView") 
 
-	local url = SERVER_URL .. "/createTransport" 
+	local firstTransport = #selectedTrip.journeys == 1
+	local previousEndTime = 0
+	
+	if(not firstTransport) then
+		previousEndTime = selectedTrip.journeys[#selectedTrip.journeys].endTime
+	end
+	
+	local url = SERVER_URL .. "/createTransport?firstTransport=" .. tostring(firstTransport) .. "&startTime=" .. tostring(previousEndTime) 
 	openWebWindow(url, transportListener)
 
 end
 
 -----------------------------------------------------
---
 
 function transportListener( event )
 
@@ -171,6 +181,10 @@ end
 
 function transportCreated( event )
 	local transport = json.decode(event.response)
+	
+	print("--------- transportCreated")
+	utils.tprint(transport)
+	
 	table.insert(selectedTrip.journeys, transport)
 	accountManager.saveLocalData()
    openAddDestinationWindow()
@@ -191,13 +205,13 @@ function openAddDestinationWindow()
 	
    analytics.event("Trip", "openAddDestinationWindow") 
 
-	local url = SERVER_URL .. "/createDestination" 
+	local previousEndTime = selectedTrip.journeys[#selectedTrip.journeys].endTime
+	local url = SERVER_URL .. "/createDestination?startTime=" .. tostring(previousEndTime) 
 	openWebWindow(url, destinationListener)
 
 end
 
 -----------------------------------------------------
---
 
 function destinationListener( event )
 	
@@ -243,11 +257,17 @@ function createDestination(destination)
 end
 
 function destinationCreated( event )
+
 	local destination = json.decode(event.response)
+
+	print("--------- destinationCreated")
+	utils.tprint(destination)
+
 	table.insert(selectedTrip.journeys, destination)
 	accountManager.saveLocalData()
    openAddTransportWindow()
 end
+
 ---- 
 ---- 
 --local afterCreateJourney 
