@@ -155,6 +155,7 @@ function transportListener( event )
 			if(params["number"] 			~= "null") then transport.number 			= params["number"]			end
 			if(params["seat"]			 	~= "null") then transport.seat 				= params["seat"]				end
 			if(params["railcar"]	 		~= "null") then transport.railcar 			= params["railcar"]	 		end
+			if(params["onward"]	 		~= "null") then transport.onward 			= params["onward"] 	== "true" end
 
       	createTransport(transport)
 		end
@@ -167,7 +168,13 @@ end
 -----------------------------------------------------
 --
 
+local onward
 function createTransport(transport)
+	
+	onward = transport.onward
+
+	print("-----")
+	print(onward)
 	
 	utils.postWithJSON({
 		tripId 	 = selectedTrip.tripId,
@@ -187,7 +194,14 @@ function transportCreated( event )
 	
 	table.insert(selectedTrip.journeys, transport)
 	accountManager.saveLocalData()
-   openAddDestinationWindow()
+	
+	print("-----")
+	print(onward)
+	if(onward) then
+   	openAddDestinationWindow()
+   else
+   	router.openTrips()
+   end
 end
 
 

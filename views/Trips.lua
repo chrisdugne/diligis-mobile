@@ -152,7 +152,7 @@ function scene:onRowRender( event )
 		row, 
 		tripRendered.imageUrl, 
 		10, 5, 
-		IMAGE_TOP_LEFT, 0.3,
+		IMAGE_TOP_LEFT, 1,
 		false,
 		function(picture)
 			self:rowRenderContent(row, tripRendered)
