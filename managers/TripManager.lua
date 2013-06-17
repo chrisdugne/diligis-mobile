@@ -103,7 +103,7 @@ function tripCreated( event )
 	local trip = json.decode(event.response)
 	table.insert(accountManager.user.trips, trip)
 	accountManager.saveLocalData()
-	selectedTrip = trip
+	GLOBALS.selectedTrip = trip
    openAddTransportWindow()
 end
 
@@ -117,15 +117,13 @@ function openAddTransportWindow()
 		return
 	end
 	
-	isWebViewOpened = true
-	
    analytics.event("Trip", "openAddTransportWebView") 
 
-	local firstTransport = #selectedTrip.journeys == 1
+	local firstTransport = #GLOBALS.selectedTrip.journeys == 1
 	local previousEndTime = 0
 	
 	if(not firstTransport) then
-		previousEndTime = selectedTrip.journeys[#selectedTrip.journeys].endTime
+		previousEndTime = GLOBALS.selectedTrip.journeys[#GLOBALS.selectedTrip.journeys].endTime
 	end
 	
 	local url = SERVER_URL .. "/createTransport?firstTransport=" .. tostring(firstTransport) .. "&startTime=" .. tostring(previousEndTime) 
@@ -175,7 +173,7 @@ function createTransport(transport)
 	onward = transport.onward
 
 	utils.postWithJSON({
-		tripId 	 = selectedTrip.tripId,
+		tripId 	 = GLOBALS.selectedTrip.tripId,
 		transport = transport
 	},
 	
@@ -190,7 +188,7 @@ function transportCreated( event )
 	print("------- transportCreated")
 	utils.tprint(transport)
 	
-	table.insert(selectedTrip.journeys, transport)
+	table.insert(GLOBALS.selectedTrip.journeys, transport)
 	accountManager.saveLocalData()
 	
 	if(onward) then
@@ -211,15 +209,13 @@ function openAddDestinationWindow()
 		return
 	end
 	
-	isWebViewOpened = true
-	
    analytics.event("Trip", "openAddDestinationWindow") 
 
 
 	print("------- openAddDestinationWindow")
-	utils.tprint(selectedTrip.journeys)
+	utils.tprint(GLOBALS.selectedTrip.journeys)
 	
-	local previousEndTime = selectedTrip.journeys[#selectedTrip.journeys].endTime
+	local previousEndTime = GLOBALS.selectedTrip.journeys[#GLOBALS.selectedTrip.journeys].endTime
 	
 	if(not previousEndTime) then
 		previousEndTime = -1
@@ -267,7 +263,7 @@ end
 function createDestination(destination)
 	
 	utils.postWithJSON({
-		tripId 	 	= selectedTrip.tripId,
+		tripId 	 	= GLOBALS.selectedTrip.tripId,
 		destination = destination
 	},
 	
@@ -283,94 +279,222 @@ function destinationCreated( event )
 	print("------- destinationCreated")
 	utils.tprint(destination)
 
-	table.insert(selectedTrip.journeys, destination)
+	table.insert(GLOBALS.selectedTrip.journeys, destination)
 	accountManager.saveLocalData()
    openAddTransportWindow()
 end
 
----- 
----- 
---local afterCreateJourney 
---
---function openNewJourneyWindow(next)
---	
---	if(isWebViewOpened) then
---		return
---	end
---		
---	isWebViewOpened = true
---	
---	local firstJourney = #selectedTrip.journeys == 0
---
---   analytics.event("Trip", "openJourneyWebView") 
---	afterCreateJourney = next
---
---	local url = SERVER_URL .. "/create?firstJourney=" .. tostring(firstJourney) 
---	
---	openWebWindow(url, journeyListener)
---
---end
---
--------------------------------------------------------
-----
---
---function journeyListener( event )
---	if string.find(string.lower(event.url), "addjourney") then
---		
---		webView:removeEventListener( "urlRequest", newJourneyListener )
---		
---		local params = utils.getUrlParams(event.url);
---		
---		if(params.type == '0') then
---      	analytics.event("Trip", "journeyCreationCancelled") 
---		else
---      	analytics.event("Trip", "addJourney")
---      	local journey = {} 
---
---			if(params["type"] 			~= "null") then journey.type 				= params["type"] 				end
---			if(params["startTime"] 		~= "null") then journey.startTime 		= params["startTime"] 		end
---			if(params["endTime"] 		~= "null") then journey.endTime 			= params["endTime"] 			end
---			if(params["locationName"]	~= "null") then journey.locationName 	= params["locationName"] 	end
---			if(params["locationLat"] 	~= "null") then journey.locationLat 	= params["locationLat"]  	end
---			if(params["locationLon"] 	~= "null") then journey.locationLon 	= params["locationLon"]		end
---			if(params["number"] 			~= "null") then journey.number 			= params["number"]			end
---			if(params["seat"]			 	~= "null") then journey.seat 				= params["seat"]				end
---			if(params["railcar"]	 		~= "null") then journey.railcar 			= params["railcar"]	 		end
---
---      	createJourney(journey)
---		end
---		
---		closeWebWindow()
---	end
---
---end
+-----------------------------------------------------
+
+local afterDeleteJourney
+function deleteJourney(index, next)
+	
+	afterDeleteJourney = next
+
+	utils.postWithJSON({
+		tripId 		= GLOBALS.selectedTrip.tripId,
+		journeyId 	= GLOBALS.selectedTrip.journeys[index].journeyId
+	},
+	SERVER_URL .. "/deleteJourney", 
+	journeyDeleted)
+
+	table.remove(GLOBALS.selectedTrip.journeys, index)
+	
+end
+
+function journeyDeleted( event )
+	afterDeleteJourney()
+end
+
+-----------------------------------------------------------------------------------------
+---  EDITION
+-----------------------------------------------------------------------------------------
+
+function editJourney(journey)
+
+	if(isWebViewOpened) then
+		return
+	end
+
+	if(journey.type == DESTINATION) then
+		openEditDestinationWindow(journey)
+	else
+		openEditTransportWindow(journey)
+	end
+end
+
+-----------------------------------------------------------------------------------------
+--- TRANSPORT
+-----------------------------------------------------------------------------------------
+
+local tranportBeingEdited 
+local afterTransportEdition 
+
+function openEditTransportWindow(tranport, next)
+	
+	tranportBeingEdited 		= tranport
+	afterTransportEdition 	= next
+	
+	local firstTransport = #GLOBALS.selectedTrip.journeys == 1
+	
+   analytics.event("Trip", "openEditTransportWindow") 
+
+	local url = SERVER_URL .. "/editTransport" 		.. 
+	"?startTime=" 	.. tostring(tranport.startTime) 	.. 
+	"&endTime=" 	.. tostring(tranport.endTime)		.. 
+	"&type=" 		.. tostring(tranport.type)			.. 
+	"&number=" 		.. tostring(tranport.number)		.. 
+	"&seat=" 		.. tostring(tranport.seat)			.. 
+	"&railcar=" 	.. tostring(tranport.railcar)		.. 
+	"&firstTransport=" .. tostring(firstTransport)		.. 
+	"&onward=" 		.. tostring(GLOBALS.selectedTrip.journeys[#GLOBALS.selectedTrip.journeys].journeyId ~= tranport.journeyId)
+	
+	openWebWindow(url, editTransportListener)
+
+end
 
 -----------------------------------------------------
-----
+
+function editTransportListener( event )
+
+	print("editTransportListener", event.url)
+	if string.find(string.lower(event.url), "transportedited") then
+		
+		webView:removeEventListener( "urlRequest", editTransportListener )
+		
+		local params = utils.getUrlParams(event.url);
+		
+		if(params.cancel == '1') then
+      	analytics.event("Trip", "transportEditionCancelled") 
+		else
+      	analytics.event("Trip", "editTransport")
+      	local transport = {} 
+
+			if(params["type"] 			~= "null") then transport.type 				= params["type"] 				end
+			if(params["startTime"] 		~= "null") then transport.startTime 		= params["startTime"] 		end
+			if(params["endTime"] 		~= "null") then transport.endTime 			= params["endTime"] 			end
+			if(params["number"] 			~= "null") then transport.number 			= params["number"]			end
+			if(params["seat"]			 	~= "null") then transport.seat 				= params["seat"]				end
+			if(params["railcar"]	 		~= "null") then transport.railcar 			= params["railcar"]	 		end
+			if(params["onward"]	 		~= "null") then transport.onward 			= params["onward"] 	== "true" end
+
+      	editTransport(transport)
+		end
+		
+		closeWebWindow()
+	end
+
+end
+
+-----------------------------------------------------
 --
---function createJourney(journey)
---	
---	utils.tprint(journey)
---	
---	utils.postWithJSON({
---		tripId 	= selectedTrip.tripId,
---		journey 	= journey
---	},
---	
---	SERVER_URL .. "/createJourney", 
---	journeyCreated)
---	
---end
---
---function journeyCreated( event )
---	local journey = json.decode(event.response)
---	table.insert(selectedTrip.journeys, journey)
---	accountManager.saveLocalData()
---	afterCreateJourney()
---end
+
+function editTransport(transport)
+	
+	utils.postWithJSON({
+		transport = transport
+	},
+	
+	SERVER_URL .. "/editTransport", 
+	transportEdited)
+	
+end
+
+function transportEdited( event )
+	local transport = json.decode(event.response)
+	
+	print("------- transportEdited")
+	utils.tprint(transport)
+	
+	tranportBeingEdited = transport
+	accountManager.saveLocalData()
+	
+	afterTransportEdition()
+end
 
 
 -----------------------------------------------------------------------------------------
+--- DESTINATION
 -----------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------
------------------------------------------------------------------------------------------
+
+local destinationBeingEdited 
+local afterDestinationEdition 
+
+function openEditDestinationWindow(destination, next)
+	
+	destinationBeingEdited 		= destination
+	afterDestinationEdition 	= next
+	
+	if(isWebViewOpened) then
+		return
+	end
+	
+   analytics.event("Trip", "openEditDestinationWindow") 
+	
+	local url = SERVER_URL .. "/editDestination" 			.. 
+	"?startTime=" 	.. tostring(destination.startTime) 		.. 
+	"&endTime=" 	.. tostring(destination.endTime)			.. 
+	"&latitude=" 	.. tostring(destination.locationLat)	.. 
+	"&longitude=" 	.. tostring(destination.locationLon)
+	
+	openWebWindow(url, editDestinationListener)
+
+end
+
+-----------------------------------------------------
+
+function editDestinationListener( event )
+	
+	print("editDestinationListener", event.url)
+	if string.find(string.lower(event.url), "destinationedited") then
+		
+		webView:removeEventListener( "urlRequest", editDestinationListener )
+		
+		local params = utils.getUrlParams(event.url);
+		
+		if(params.cancel == '1') then
+      	analytics.event("Trip", "destinationEditionCancelled") 
+		else
+      	analytics.event("Trip", "editDestination")
+      	local destination = {} 
+
+			if(params["startTime"] 		~= "null") then destination.startTime 			= params["startTime"] 		end
+			if(params["endTime"] 		~= "null") then destination.endTime 			= params["endTime"] 			end
+			if(params["locationName"]	~= "null") then destination.locationName 		= params["locationName"] 	end
+			if(params["locationLat"] 	~= "null") then destination.locationLat 		= params["locationLat"]  	end
+			if(params["locationLon"] 	~= "null") then destination.locationLon 		= params["locationLon"]		end
+
+      	editDestination(destination)
+		end
+		
+		closeWebWindow()
+	end
+
+end
+
+-----------------------------------------------------
+--
+
+function editDestination(destination)
+	
+	utils.postWithJSON({
+		destination = destination
+	},
+	
+	SERVER_URL .. "/editDestination", 
+	destinationEdited)
+	
+end
+
+function destinationEdited( event )
+	
+	local destination = json.decode(event.response)
+
+	print("------- destinationEdited")
+	utils.tprint(destination)
+
+	destinationBeingEdited = destination
+	accountManager.saveLocalData()
+   
+   afterDestinationEdition()
+end

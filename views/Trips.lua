@@ -144,7 +144,7 @@ function scene:onRowRender( event )
 	row:insert(title)
 
 	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
-	arrow.x = row.contentWidth - arrow.contentWidth
+	arrow.x = row.contentWidth - arrow.contentWidth - 10
 	arrow.y = row.contentHeight * 0.5
 	row:insert(arrow)
 
@@ -163,6 +163,22 @@ end
 function scene:rowRenderContent (row, trip)
 
 	if(trip.journeys ~= nil and #trip.journeys > 0) then
+
+		-----------------------
+   
+   	if(trip.journeys[1].startTime) then
+      	local startTime = display.newText( os.date("%d %b, %Y   %H:%M", trip.journeys[1].startTime/1000), 47, row.contentHeight - 20, native.systemFont, 11 )
+      	startTime:setTextColor( 0 )
+      	row:insert(startTime)
+      end
+   	
+   	if(trip.journeys[#trip.journeys].endTime) then
+      	local endTime = display.newText( os.date("%d %b, %Y   %H:%M", trip.journeys[#trip.journeys].endTime/1000), 177, row.contentHeight - 20, native.systemFont, 11 )
+      	endTime:setTextColor( 0 )
+      	row:insert(endTime)
+		end
+
+		-----------------------
 
 		local nbMessages 	= 0
 		local nbDiligis 	= 0
@@ -208,6 +224,8 @@ function scene:rowRenderContent (row, trip)
       	diligisCount.y = row.contentHeight/3
       	row:insert(diligisCount)
    	end
+   	
+   	
 	end
 end
 
@@ -216,7 +234,7 @@ end
 function scene:onRowTouch( event )
 	local phase = event.phase
 	local row = event.target
-	selectedTrip = accountManager.user.trips[row.index];
+	GLOBALS.selectedTrip = accountManager.user.trips[row.index];
 
 	if "release" == phase then
 		local go = function() router.openJourneys(router.displayTrips) end

@@ -54,11 +54,11 @@ function scene:buildMessages()
 	
 	events = {}
 
-	if(selectedJourney ~= nil and #selectedJourney.events > 0 ) then
-		for i in pairs(selectedJourney.events) do
-			if(selectedJourney.events[i].content.type == eventManager.MESSAGE) then
-				table.insert(events, selectedJourney.events[i])
-				accountManager.readEvent(selectedJourney.events[i])
+	if(GLOBALS.selectedJourney ~= nil and #GLOBALS.selectedJourney.events > 0 ) then
+		for i in pairs(GLOBALS.selectedJourney.events) do
+			if(GLOBALS.selectedJourney.events[i].content.type == eventManager.MESSAGE) then
+				table.insert(events, GLOBALS.selectedJourney.events[i])
+				accountManager.readEvent(GLOBALS.selectedJourney.events[i])
    		end
 		end
 	end

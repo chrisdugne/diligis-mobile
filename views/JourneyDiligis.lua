@@ -53,13 +53,13 @@ function scene:buildDiligis()
 	
 	events = {}
 
-	if( selectedJourney ~= nil 
-	and selectedJourney.events ~= nil 
-	and #selectedJourney.events > 0 )
+	if( GLOBALS.selectedJourney ~= nil 
+	and GLOBALS.selectedJourney.events ~= nil 
+	and #GLOBALS.selectedJourney.events > 0 )
 	then
-		for i in pairs(selectedJourney.events) do
-			if(selectedJourney.events[i].content.type == eventManager.DILIGIS) then
-				table.insert(events, selectedJourney.events[i])
+		for i in pairs(GLOBALS.selectedJourney.events) do
+			if(GLOBALS.selectedJourney.events[i].content.type == eventManager.DILIGIS) then
+				table.insert(events, GLOBALS.selectedJourney.events[i])
    		end
 		end
 	end

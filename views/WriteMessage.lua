@@ -7,7 +7,6 @@
 
 local scene = storyboard.newScene()
 local textBox, charLeftText
-local selectedEvent
 local back
 
 ----------------------
@@ -44,7 +43,7 @@ end
 
 function scene:buildWriter(event)
 	
-	selectedEvent = event
+	GLOBALS.selectedEvent = event
 	
 	local backButton = widget.newButton	{
 		width = display.contentWidth/6,
@@ -100,7 +99,7 @@ function scene:buildWriter(event)
 	
 	----------------------
 
-	local writingToText = display.newText( "to " .. selectedEvent.sender.name, 40, 300, native.systemFontBold, 14 )
+	local writingToText = display.newText( "to " .. GLOBALS.selectedEvent.sender.name, 40, 300, native.systemFontBold, 14 )
 	writingToText:setTextColor( 0 )
 	
 	self.view:insert( writingToText )
@@ -132,21 +131,21 @@ function sendMessage()
 		if(isAnswer) then 
 
 			local journeyId
-			if(selectedEvent.recepient) then
-				journeyId = selectedEvent.recepient.journeyId
+			if(GLOBALS.selectedEvent.recepient) then
+				journeyId = GLOBALS.selectedEvent.recepient.journeyId
    		else
-   			journeyId = selectedJourney.journeyId
+   			journeyId = GLOBALS.selectedJourney.journeyId
    		end
 
 			print("------------ sendAnswer " .. journeyId)
-			utils.tprint(selectedEvent)
-			eventManager.sendAnswer(textBox.text, selectedEvent.content.uid, journeyId)
+			utils.tprint(GLOBALS.selectedEvent)
+			eventManager.sendAnswer(textBox.text, GLOBALS.selectedEvent.content.uid, journeyId)
    		
    	else
-			print("------------ sendMessage " .. selectedEvent.sender.journeyId)
+			print("------------ sendMessage " .. GLOBALS.selectedEvent.sender.journeyId)
 			print("to " .. accountManager.user.email)
 			
-   		eventManager.sendMessage(textBox.text, accountManager.user.email, selectedEvent.sender.journeyId)
+   		eventManager.sendMessage(textBox.text, accountManager.user.email, GLOBALS.selectedEvent.sender.journeyId)
 		end
 		
    	effectBack()

@@ -62,9 +62,11 @@ menu = display.newGroup()
 
 ---- App globals
 
-selectedTrip 		= nil
-selectedJourney 	= nil
-selectedEvent 		= nil
+GLOBALS = {
+   selectedTrip 		= nil,
+   selectedJourney 	= nil,
+   selectedEvent 		= nil
+}
 
 -----------------------------------------------------------------------------------------
 

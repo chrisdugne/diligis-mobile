@@ -144,12 +144,12 @@ function showEvent(event)
 		end
 		
 	elseif (event.content.type == eventManager.DILIGIS) then
-		selectedJourney = getJourney(event)
+		GLOBALS.selectedJourney = getJourney(event)
 		router.openJourneyDiligis(router.openStream)
       analytics.event("Navigation", "streamToDiligis") 
 		
 	elseif (event.content.type == eventManager.MESSAGE) then
-		selectedJourney = getJourney(event)
+		GLOBALS.selectedJourney = getJourney(event)
 		router.openJourneyMessages(router.openStream)
       analytics.event("Navigation", "streamToMessage") 
 	end

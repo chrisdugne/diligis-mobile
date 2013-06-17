@@ -5,6 +5,7 @@
 -----------------------------------------------------------------------------------------
 
 local scene = storyboard.newScene()
+local cancelNextTouch
 
 --- The elements
 local journeys
@@ -23,7 +24,6 @@ end
 -----------------------------------------------------------------------------------------
 
 function scene:refreshScene()
-	
 	viewManager.setupView(self.view, tripManager.closeAddJourneyWindow)
 	viewManager.addCustomButton("images/buttons/add.png", function () return self:createJourney() end);
 	viewManager.addCustomButton("images/buttons/leftArrow.png", function() router.openTrips() tripManager.closeWebWindow() end);
@@ -80,10 +80,13 @@ function scene:buildJourneys()
 	----------------------
 	-- insert rows into list (tableView widget)
 	-- 
- 	if( #selectedTrip.journeys == 0) then
+	print("------- build journeys")
+	utils.tprint(GLOBALS.selectedTrip.journeys)
+	
+ 	if( #GLOBALS.selectedTrip.journeys == 0) then
  		self:showNoJourneys();
  	else
-		for i in pairs(selectedTrip.journeys) do
+		for i in pairs(GLOBALS.selectedTrip.journeys) do
 			self.createRow()
 		end
  	end		
@@ -107,7 +110,7 @@ end
 function scene:onRowRender( event )
 	local phase = event.phase
 	local row = event.row
-	local journey = selectedTrip.journeys[row.index];
+	local journey = GLOBALS.selectedTrip.journeys[row.index];
 
 	-----------------------
 
@@ -145,13 +148,13 @@ function scene:onRowRender( event )
 	-----------------------
 
 	if(journey.startTime) then
-   	local startTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.startTime/1000), 47, row.contentHeight - 20, native.systemFont, 11 )
+   	local startTime = display.newText( os.date("%d %b, %Y   %H:%M", journey.startTime/1000), 47, row.contentHeight - 20, native.systemFont, 11 )
    	startTime:setTextColor( 0 )
    	row:insert(startTime)
    end
 	
 	if(journey.endTime) then
-   	local endTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.endTime/1000), 177, row.contentHeight - 20, native.systemFont, 11 )
+   	local endTime = display.newText( os.date("%d %b, %Y   %H:%M", journey.endTime/1000), 177, row.contentHeight - 20, native.systemFont, 11 )
    	endTime:setTextColor( 0 )
    	row:insert(endTime)
    end
@@ -205,74 +208,79 @@ function scene:onRowRender( event )
       	row:insert(diligisCount)
    	end
 	end
+	
+	-----------------------
+
+	local deleteImage = display.newImage( "images/buttons/remove.png", false )
+	deleteImage.x = row.contentWidth - 30
+	deleteImage.y = row.contentHeight/4
+	deleteImage:addEventListener("tap",
+		function()  
+			native.setActivityIndicator( true )
+      	timer.performWithDelay( 180,
+      		function()  
+         		cancelNextTouch = true
+         		self:delete(row.index) 
+      		end
+   		, 1)
+   	end
+   )
+	row:insert(deleteImage)
 end
 
+--------------------------------------------
+--
+
 function scene:openMessages(journey)
-	selectedJourney = journey
+	GLOBALS.selectedJourney = journey
 	router.openJourneyMessages(router.openTrips)
 end
 
 function scene:openDiligis(journey)
-	selectedJourney = journey
+	GLOBALS.selectedJourney = journey
 	router.openJourneyDiligis(router.openTrips)
 end
 
-----------------------
+--------------------------------------------
+--
+
+function scene:delete(journey)
+	
+	local next 
+	if(#GLOBALS.selectedTrip.journeys == 1) then
+		next = function() 
+			router.openTrips()
+			native.setActivityIndicator( false ) 
+		end
+	else
+		next = function() 
+      	timer.performWithDelay( 300,
+      		function()  
+         		self:refreshScene() 
+      		end
+   		, 1)
+			
+			native.setActivityIndicator( false ) 
+		end
+	end
+	
+	tripManager.deleteJourney(journey, next)
+end
+
+--------------------------------------------
 -- Handle row touch events
 function scene:onRowTouch( event )
+	
+	if(cancelNextTouch) then
+   	cancelNextTouch = false
+   	return
+   end
+	
 	local phase = event.phase
 	local row = event.target
---	selectedJourney = accountManager.user.trips[row.index];
---
---	if "release" == phase then
---		details.address.text 			= selectedTrip.address
---		details.startDate.text 			= "From " .. selectedTrip.startDate
---		details.endDate.text 			= "To "   .. selectedTrip.endDate
---		
---      imagesManager.drawImage(
---      	details, 
---      	selectedTrip.imageUrl,
---      	display.contentCenterX, 100,
---      	IMAGE_CENTER, 1,
---      	false,
---      	function(image)
---      		details.tripSelectedImage = image
---      	end
---      )
---		
---		local nbMessages 	= 0
---		local nbDiligis 	= 0
---   	
---   	if(selectedTrip.events ~= nil and #selectedTrip.events > 0) then
---   		for i in pairs(selectedTrip.events) do
---   			if(selectedTrip.events[i].content.type == eventManager.MESSAGE) then
---   				nbMessages = nbMessages + 1
---   			elseif(selectedTrip.events[i].content.type == eventManager.DILIGIS) then
---   				nbDiligis = nbDiligis + 1
---   			end
---   		end
---   	end
---   	
---   	if(nbDiligis > 0) then
---   		details.diligisCount.text 	= nbDiligis
---   		details.diligisCount.alpha = 1
---   		details.diligisIcon.alpha 	= 1
---   	else
---   		details.diligisCount.alpha = 0
---   		details.diligisIcon.alpha 	= 0
---   	end
---   	
---   	if(nbMessages > 0) then
---   		details.messagesCount.text  = nbMessages
---   		details.messagesCount.alpha = 1
---   		details.messagesIcon.alpha  = 1
---   	else
---   		details.messagesCount.alpha = 0
---   		details.messagesIcon.alpha  = 0
---   	end
---   	
---		showDetails()
---	end
+	
+	local journey = GLOBALS.selectedTrip.journeys[row.index];
+	tripManager.editJourney(journey)
 end
 
 -----------------------------------------------------------------------------------------
