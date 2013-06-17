@@ -9,8 +9,8 @@ local isWebViewOpened
 
 -----------------------------------------------------------------------------------------
 
-PLACE 			= 1;
-PLANE 			= 2;
+DESTINATION 	= 1;
+FLIGHT 			= 2;
 TRAIN 			= 3;
 
 -----------------------------------------------------------------------------------------
@@ -137,6 +137,7 @@ end
 
 function transportListener( event )
 
+	print("transportListener", event.url)
 	if string.find(string.lower(event.url), "addtransport") then
 		
 		webView:removeEventListener( "urlRequest", transportListener )
@@ -173,9 +174,6 @@ function createTransport(transport)
 	
 	onward = transport.onward
 
-	print("-----")
-	print(onward)
-	
 	utils.postWithJSON({
 		tripId 	 = selectedTrip.tripId,
 		transport = transport
@@ -189,14 +187,12 @@ end
 function transportCreated( event )
 	local transport = json.decode(event.response)
 	
-	print("--------- transportCreated")
+	print("------- transportCreated")
 	utils.tprint(transport)
 	
 	table.insert(selectedTrip.journeys, transport)
 	accountManager.saveLocalData()
 	
-	print("-----")
-	print(onward)
 	if(onward) then
    	openAddDestinationWindow()
    else
@@ -219,7 +215,16 @@ function openAddDestinationWindow()
 	
    analytics.event("Trip", "openAddDestinationWindow") 
 
+
+	print("------- openAddDestinationWindow")
+	utils.tprint(selectedTrip.journeys)
+	
 	local previousEndTime = selectedTrip.journeys[#selectedTrip.journeys].endTime
+	
+	if(not previousEndTime) then
+		previousEndTime = -1
+	end
+	
 	local url = SERVER_URL .. "/createDestination?startTime=" .. tostring(previousEndTime) 
 	openWebWindow(url, destinationListener)
 
@@ -229,6 +234,7 @@ end
 
 function destinationListener( event )
 	
+	print("destinationListener", event.url)
 	if string.find(string.lower(event.url), "adddestination") then
 		
 		webView:removeEventListener( "urlRequest", destinationListener )
@@ -271,10 +277,10 @@ function createDestination(destination)
 end
 
 function destinationCreated( event )
-
+	
 	local destination = json.decode(event.response)
 
-	print("--------- destinationCreated")
+	print("------- destinationCreated")
 	utils.tprint(destination)
 
 	table.insert(selectedTrip.journeys, destination)

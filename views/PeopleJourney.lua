@@ -109,9 +109,9 @@ function scene:buildJourney()
 		return
 	end
 
-	if(journey.type == tripManager.PLACE) then
+	if(journey.type == tripManager.DESTINATION) then
 		locationName = journey.locationName
-	elseif(journey.type == tripManager.PLANE) then
+	elseif(journey.type == tripManager.FLIGHT) then
 		locationName = "Plane from " .. journey.previousLocationName
 	elseif(journey.type == tripManager.TRAIN) then
 		locationName = "Train from " .. journey.previousLocationName
