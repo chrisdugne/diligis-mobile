@@ -137,6 +137,9 @@ function scene:onRowRender( event )
 	local row = event.row
 	local tripRendered = accountManager.user.trips[row.index];
 
+	print("-------")
+	utils.tprint(tripRendered)
+
 	local title = display.newText( tripRendered.name, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50

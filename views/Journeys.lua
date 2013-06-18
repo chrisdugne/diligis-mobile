@@ -25,16 +25,10 @@ end
 
 function scene:refreshScene()
 	viewManager.setupView(self.view, tripManager.closeAddJourneyWindow)
-	viewManager.addCustomButton("images/buttons/add.png", function () return self:createJourney() end);
+	viewManager.addCustomButton("images/buttons/add.png", function () return tripManager:addJourney() end);
 	viewManager.addCustomButton("images/buttons/leftArrow.png", function() router.openTrips() tripManager.closeWebWindow() end);
 	
 	self:buildJourneys()
-end
-
------------------------------------------------------------------------------------------
-
-function scene:createJourney()
-   tripManager.openNewJourneyWindow(function() scene:refreshScene(router.openTrips) end)
 end
 
 -----------------------------------------------------------------------------------------
@@ -66,8 +60,7 @@ function scene:buildJourneys()
 		height 			= 448,
 		hideBackground = true,
 		maskFile 		= "images/masks/mask-320x448.png",
-		onRowRender 	= function(event) return self:onRowRender(event) end,
-		onRowTouch 		= function(event) return self:onRowTouch(event) end
+		onRowRender 	= function(event) return self:onRowRender(event) end
 	}
 
 	journeys:insert( list )
@@ -80,8 +73,6 @@ function scene:buildJourneys()
 	----------------------
 	-- insert rows into list (tableView widget)
 	-- 
-	print("------- build journeys")
-	utils.tprint(GLOBALS.selectedTrip.journeys)
 	
  	if( #GLOBALS.selectedTrip.journeys == 0) then
  		self:showNoJourneys();
@@ -113,20 +104,19 @@ function scene:onRowRender( event )
 	local journey = GLOBALS.selectedTrip.journeys[row.index];
 
 	-----------------------
-
+	
 	local locationName
 	
 	if(journey.type == tripManager.DESTINATION) then
 		locationName = journey.locationName
 	elseif(journey.type == tripManager.FLIGHT) then
-		locationName = "Plane from " .. journey.previousLocationName
+		locationName = "Flight     " .. journey.number
 	elseif(journey.type == tripManager.TRAIN) then
-		locationName = "Train from " .. journey.previousLocationName
+		locationName = "Train     " .. journey.number
 	end
-	
-	local title = display.newText( locationName, 10, 0, native.systemFont, 11 )
+
+	local title = display.newText( locationName, 30, 5, native.systemFont, 11 )
 	title:setTextColor( 0 )
-	title.y = 22
 	row:insert(title)
 
 	-----------------------
@@ -140,8 +130,8 @@ function scene:onRowRender( event )
    	end
    	
    	local perl = display.newImage( perlImage, false )
-   	perl.x = 27
-   	perl.y = row.contentHeight - 20
+   	perl.x = 15
+   	perl.y = 12
    	row:insert(perl)
    end
 
@@ -177,16 +167,16 @@ function scene:onRowRender( event )
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = row.contentWidth - 100 
-      	messagesIcon.y = row.contentHeight/3
+      	messagesIcon.x = 45
+      	messagesIcon.y = 35
 			messagesIcon:addEventListener("tap", function() self:openMessages(journey) end)
       	
       	row:insert( messagesIcon )
       	
-      	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 16 )
+      	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 12 )
       	messagesCount:setTextColor( 0 )
       	messagesCount.x = messagesIcon.x - 30
-      	messagesCount.y = row.contentHeight/3
+      	messagesCount.y = 35
 			messagesCount:addEventListener("tap", function() self:openMessages(journey) end)
       	row:insert(messagesCount)
    	end
@@ -194,20 +184,42 @@ function scene:onRowRender( event )
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = row.contentWidth - 40
-      	diligisIcon.y = row.contentHeight/3
+      	diligisIcon.x = 105
+      	diligisIcon.y = 35
 			diligisIcon:addEventListener("tap", function() self:openDiligis(journey) end)
       
       	row:insert( diligisIcon )
 
-      	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 16 )
+      	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 12 )
       	diligisCount:setTextColor( 0 )
       	diligisCount.x = diligisIcon.x - 30
-      	diligisCount.y = row.contentHeight/3
+      	diligisCount.y = 35
 			diligisCount:addEventListener("tap", function() self:openDiligis(journey) end)
       	row:insert(diligisCount)
    	end
 	end
+	
+	-----------------------
+
+	local editImage = display.newImage( "images/buttons/add.png", false )
+	editImage.x = row.contentWidth - 60
+	editImage.y = row.contentHeight/4
+	editImage:addEventListener("tap",
+		function()  
+      	GLOBALS.selectedJourney = GLOBALS.selectedTrip.journeys[row.index];
+      	
+      	local next = function() 
+         	timer.performWithDelay( 300,
+         		function()  
+            		self:refreshScene() 
+         		end
+      		, 1)
+      	end
+	
+			tripManager.editJourney(next)
+   	end
+   )
+	row:insert(editImage)
 	
 	-----------------------
 
@@ -219,7 +231,6 @@ function scene:onRowRender( event )
 			native.setActivityIndicator( true )
       	timer.performWithDelay( 180,
       		function()  
-         		cancelNextTouch = true
          		self:delete(row.index) 
       		end
    		, 1)
@@ -265,22 +276,6 @@ function scene:delete(journey)
 	end
 	
 	tripManager.deleteJourney(journey, next)
-end
-
---------------------------------------------
--- Handle row touch events
-function scene:onRowTouch( event )
-	
-	if(cancelNextTouch) then
-   	cancelNextTouch = false
-   	return
-   end
-	
-	local phase = event.phase
-	local row = event.target
-	
-	local journey = GLOBALS.selectedTrip.journeys[row.index];
-	tripManager.editJourney(journey)
 end
 
 -----------------------------------------------------------------------------------------

@@ -5,12 +5,12 @@
 -----------------------------------------------------------------------------------------
 
 APP_NAME 	= "Diligis"
-APP_VERSION = "2.0"
+APP_VERSION = "2.3"
 
 -----------------------------------------------------------------------------------------
 
---SERVER_URL 		= "http://192.168.0.8:9000" 
-SERVER_URL 		= "http://localhost:9000" 
+SERVER_URL 		= "http://192.168.0.7:9000" 
+--SERVER_URL 		= "http://localhost:9000" 
 --SERVER_URL 		= "http://diligis.herokuapp.com/" 
 
 -----------------------------------------------------------------------------------------
@@ -70,27 +70,29 @@ GLOBALS = {
 
 -----------------------------------------------------------------------------------------
 
-localData = utils.loadTable("localData.json")
-	
-if(not localData) then
-	localData = {user = {}, linkedin = {}}
-   utils.saveTable(localData, "localData.json")
-end
-
-if(not localData.user.pictureUrl) then
-	localData.user.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
-end
+--localData = utils.loadTable("localData.json")
+--	
+--if(not localData) then
+--	localData = {user = {}, linkedin = {}}
+--   utils.saveTable(localData, "localData.json")
+--end
+--
+--if(not localData.user.pictureUrl) then
+--	localData.user.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+--end
 	
 -----------------------------------------------------------------------------------------
 
 display.setStatusBar( display.HiddenStatusBar ) 
 analytics.init(ANALYTICS_VERSION, ANALYTICS_TRACKING_ID, ANALYTICS_PROFILE_ID, APP_NAME, APP_VERSION)
-linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET, localData.linkedin.accessToken, localData.linkedin.accessTokenSecret);
+linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET, nil, nil);
+--linkedIn.init(LINKEDIN_CONSUMER_KEY, LINKEDIN_CONSUMER_SECRET, localData.linkedin.accessToken, localData.linkedin.accessTokenSecret);
 
 ------------------------------------------
 
-accountManager.user = localData.user
+accountManager.user = {}
 accountManager.user.isConnected = false
+accountManager.user.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
 
 ------------------------------------------
 

@@ -169,13 +169,13 @@ function scene:drawTextsAndButtons(image, linkedinUID)
    	profile:insert( privateDisplay )
    else
   		--- simple Diligis profile
-   	local senderName = display.newText( localData.user.name, 0, 0, 270, 50, native.systemFontBold, 14 )
+   	local senderName = display.newText( accountManager.user.name, 0, 0, 270, 50, native.systemFontBold, 14 )
    	senderName:setTextColor( 0 )
    	senderName.x = image.x + 180
    	senderName.y = image.y
    	profile:insert(senderName)
    
-   	local senderProfile = display.newText( localData.user.headline, 0, 0, 270, 50, native.systemFont, 14 )
+   	local senderProfile = display.newText( accountManager.user.headline, 0, 0, 270, 50, native.systemFont, 14 )
    	senderProfile:setTextColor( 0 )
    	senderProfile.x = image.x + 180
    	senderProfile.y = image.y + 30

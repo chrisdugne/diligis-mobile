@@ -36,9 +36,6 @@ function scene:refreshScene(announcement, back)
 		user.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
 	end
 	
-	print("--------")
-	utils.tprint(announcement)
-		
 	if(user.linkedinUID == "none" or not accountManager.user.isConnected) then
 		self:getJourney() 
 	else
@@ -61,24 +58,23 @@ function scene:getJourneyListener( event )
 	journey = json.decode(event.response);
 
 	utils.emptyGroup(journeyContent)
---	self:drawPicture();
-	self:buildJourney()
+	self:drawPicture();
 end
 
 -----------------------------------------------------------------------------------------
---
---function scene:drawPicture()
---
---	imagesManager.drawImage(
---		journeyContent, 
---		user.pictureUrl, 
---		20, 40,
---		IMAGE_TOP_LEFT, 0.6,
---		false,
---		function(picture) return self:buildJourney() end
---	)
---	
---end
+
+function scene:drawPicture()
+
+	imagesManager.drawImage(
+		journeyContent, 
+		linkedIn.data.people[user.linkedinUID].pictureUrl, 
+		20, 40,
+		IMAGE_TOP_LEFT, 0.6,
+		false,
+		function(picture) return self:buildJourney() end
+	)
+	
+end
 
 -----------------------------------------------------------------------------------------
 

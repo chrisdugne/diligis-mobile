@@ -120,7 +120,7 @@ end
 -- Called immediately after scene has moved onscreen:
 function scene:enterScene( event )
 	loadingSpinner.alpha = 0
-	cancelButton.alpha = 0
+	transition.to( cancelButton, { alpha = 0 } )
 	transition.to( signInButton, { alpha = 1 } )
 	enterSceneBeforeTimerComplete = true
 	viewManager.removeHeader()

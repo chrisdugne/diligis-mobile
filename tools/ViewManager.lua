@@ -58,7 +58,7 @@ function drawHeader(view, showMenuCustomAction)
 	-- linkedIn.data.profile.pictureUrl
 	imagesManager.drawImage(
 		header, 
-		localData.user.pictureUrl, 
+		accountManager.user.pictureUrl, 
 		display.contentWidth - 70, 0, 
 		IMAGE_TOP_LEFT, 0.4,
 		false,

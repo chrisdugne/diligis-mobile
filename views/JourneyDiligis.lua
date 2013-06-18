@@ -117,16 +117,16 @@ function scene:onRowRender( event )
 	local me = self
 
 	---------
-
-	if(not diligis.sender.pictureUrl) then
-		diligis.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
-	end
+--
+--	if(not diligis.sender.pictureUrl) then
+--		diligis.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+--	end
 	
 	---------
 	
 	imagesManager.drawImage(
 		row, 
-		diligis.sender.pictureUrl, 
+		linkedIn.data.people[diligis.sender.linkedinUID].pictureUrl , 
 		30, row.height * 0.5,
 		IMAGE_CENTER, 0.6,
 		false,
