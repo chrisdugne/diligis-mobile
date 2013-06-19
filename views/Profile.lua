@@ -46,11 +46,12 @@ end
 
 function scene:buildProfile(linkedinUID, userUID)
 	if(not accountManager.user.isConnected) then 
-		if(userUID == accountManager.user.uid) then
-			self:drawDiligisProfile(accountManager.user, true, false)
-		else
-			accountManager.getUser(userUID, function (user) self:drawDiligisProfile(user, true, linkedinUID == "none") end)
-		end
+		print("------------ DEPRECATED ! user is always connected")
+--		if(userUID == accountManager.user.uid) then
+--			self:drawDiligisProfile(accountManager.user, true, false)
+--		else
+--			accountManager.getUser(userUID, function (user) self:drawDiligisProfile(user, true, linkedinUID == "none") end)
+--		end
 	elseif (linkedinUID == "none") then
 		self:drawDiligisProfile(accountManager.user, false, true)
 	else

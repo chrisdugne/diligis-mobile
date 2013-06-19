@@ -2,18 +2,31 @@
 --
 -- WriteMessage.lua
 --
-
 -----------------------------------------------------------------------------------------
 
 local scene = storyboard.newScene()
-local textBox, charLeftText
 local back
 
-----------------------
+-----------------------------------------------------------------------------------------
 
-function effectBack()
- 	native.setKeyboardFocus( nil ) 
-	transition.to( textBox, { y = - display.contentHeight, time = 400, transition = easing.inExpo, onComplete = back } )
+function openWebWindow(url, listener)
+	webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT + 100, display.contentWidth, display.contentHeight - HEADER_HEIGHT - 100)
+	webView:addEventListener( "urlRequest", listener )
+	webView:request( url )
+
+	isWebViewOpened = true
+end
+
+function closeWebWindow(goBack)
+	if(webView) then
+		webView:removeSelf()
+		webView = nil
+		isWebViewOpened = false
+	end
+	
+	if(goBack) then
+		back()
+	end
 end
 
 -----------------------------------------------------------------------------------------
@@ -35,7 +48,7 @@ end
 function scene:refreshScene(event, answer, fromView)
 	back = fromView
 	isAnswer = answer
-	viewManager.setupView(self.view, effectBack);
+	viewManager.setupView(self.view, back);
 	self:buildWriter(event);
 end
 	
@@ -45,111 +58,93 @@ function scene:buildWriter(event)
 	
 	GLOBALS.selectedEvent = event
 	
-	local backButton = widget.newButton	{
-		width = display.contentWidth/6,
-		height = 23,
-		label = "Back", 
-		labelYOffset = 2,
-		onRelease = effectBack
-	}
+	--- get all linkedin profiles
+	local ids = {}
+	if type(event.sender) ~= "table" then event.sender = json.decode(event.sender) end
+	if event.recepient and type(event.recepient) ~= "table" then event.recepient = json.decode(events.recepient) end
+		
+	if(event.sender.linkedinUID ~= "none") then
+		table.insert(ids, event.sender.linkedinUID)
+	end
+
+	if(event.recepient and event.recepient.linkedinUID ~= "none") then
+		table.insert(ids, event.recepient.linkedinUID)
+	end
+
+	if(accountManager.user.isConnected) then
+		linkedIn.getProfiles(ids, function(event) return self:drawWriteTo() end)
+	else 
+		self:drawWriteTo()
+	end
+end
 	
-	backButton.x = display.contentCenterX - 70
-	backButton.y = 40 + backButton.contentHeight
+
+function scene:drawWriteTo()
+
+   local text = display.newText( "Write a message to ", 20, 60, native.systemFont, 12 )
+   text:setTextColor( 0 )
+   self.view:insert(text)
+
+	local pictureUrl = linkedIn.data.people[GLOBALS.selectedEvent.sender.linkedinUID].pictureUrl
+   local text = display.newText( GLOBALS.selectedEvent.sender.name .. " :", 20, 77, native.systemFont, 12 )
+	text:setTextColor( 0 )
+	self.view:insert(text)
+		
+	imagesManager.drawImage(
+		self.view, 
+		pictureUrl, 
+		display.contentWidth - 50 , 90,
+		IMAGE_CENTER, 1,
+		false,
+		function(picture) return self:displayWebView(picture) end
+	)
+end
+
+function scene:displayWebView()
+	local url = SERVER_URL .. "/writeMessage" 
+	openWebWindow(url, writeListener)
+end
 	
-	self.view:insert( backButton )
+function writeListener( event )
 
-	local sendButton = widget.newButton	{
-		width = display.contentWidth/6,
-		height = 23,
-		label = "Send", 
-		labelYOffset = 2,
-		onRelease = sendMessage
-	}
-	
-	sendButton.x = display.contentCenterX + 70
-	sendButton.y = 40 + sendButton.contentHeight
-	
-	self.view:insert( sendButton )
+	if string.find(string.lower(event.url), "messagewriten") then
+		
+		webView:removeEventListener( "urlRequest", writeListener )
+		
+		local params = utils.getUrlParams(event.url);
+		
+		if(params.cancel == '1') then
+      	analytics.event("Message", "cancelSendMessage") 
+   		closeWebWindow(true)
+		else
+      	analytics.event("Message", "sendMessage")
+      	sendMessage(params.message)
+   		closeWebWindow()
+		end
+		
+	end
 
-	----------------------
-
-	--- note : a message is always an answer. Answer to another message, or answer to a diligis...
---	if not textBox then
-      textBox = native.newTextBox( 25, - display.contentHeight, display.contentWidth-50, 220 )
-   	textBox.font = native.newFont( native.systemFont, 14 )
-   	textBox.isEditable = true
-      textBox:addEventListener( "userInput", inputListener )
---	end
-
-	----------------------
-
-	textBox.text = ""   
-
-	----------------------
-
-	transition.to( textBox, { y = 140 + textBox.contentHeight/2, time = 400, transition = easing.outExpo } )
-   native.setKeyboardFocus( textBox )
-	
-	----------------------
-
-	charLeftText = display.newText( "(" .. 200-#textBox.text .. ")", display.contentWidth - 60, 100, native.systemFontBold, 14 )
-	charLeftText:setTextColor( 0 )
-	
-	self.view:insert( charLeftText )
-	
-	----------------------
-
-	local writingToText = display.newText( "to " .. GLOBALS.selectedEvent.sender.name, 40, 300, native.systemFontBold, 14 )
-	writingToText:setTextColor( 0 )
-	
-	self.view:insert( writingToText )
 end
 
 ----------------------
 
-function inputListener( event )
-	if event.phase == "began" then
-	elseif event.phase == "ended" then
-	elseif event.phase == "editing" then
+function sendMessage(message)
 
-		if(#event.text > 200) then
-			textBox.text = string.sub(event.text, 1, event.startPosition-1) .. string.sub(event.text, event.startPosition+1) 
+	if(isAnswer) then 
+		local journeyId
+		if(GLOBALS.selectedEvent.recepient) then
+			journeyId = GLOBALS.selectedEvent.recepient.journeyId
+		else
+			journeyId = GLOBALS.selectedJourney.journeyId
 		end
+
+		eventManager.sendAnswer(message, GLOBALS.selectedEvent.content.uid, journeyId)
 		
-		charLeftText.text = "(" .. 200-#textBox.text .. ")"
-
+	else
+		eventManager.sendMessage(message, accountManager.user.email, GLOBALS.selectedEvent.sender.journeyId)
 	end
-end
-
-function sendMessage()
 	
-   analytics.event("Message", "sendMessage") 
-   
-	-- BUG with copy paste we may go over 200 :s
-	if(#textBox.text < 201) then
-	
-		if(isAnswer) then 
-
-			local journeyId
-			if(GLOBALS.selectedEvent.recepient) then
-				journeyId = GLOBALS.selectedEvent.recepient.journeyId
-   		else
-   			journeyId = GLOBALS.selectedJourney.journeyId
-   		end
-
-			print("------------ sendAnswer " .. journeyId)
-			utils.tprint(GLOBALS.selectedEvent)
-			eventManager.sendAnswer(textBox.text, GLOBALS.selectedEvent.content.uid, journeyId)
-   		
-   	else
-			print("------------ sendMessage " .. GLOBALS.selectedEvent.sender.journeyId)
-			print("to " .. accountManager.user.email)
-			
-   		eventManager.sendMessage(textBox.text, accountManager.user.email, GLOBALS.selectedEvent.sender.journeyId)
-		end
-		
-   	effectBack()
-	end
+	back()
 	
 end
 

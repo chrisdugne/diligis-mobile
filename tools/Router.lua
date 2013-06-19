@@ -176,13 +176,19 @@ function openWriteMessage(event, answer, back)
 end
 
 
+---------------------------------------------
+
 function openMessages()
-	
+	lastBack = openMessages
+	accountManager.refreshUser(displayMessages)
+end
+
+function displayMessages()
+
 	--- analytics
 	analytics.pageview("Messages")
 	--- 
 	
-	lastBack = openMessages
 	storyboard.gotoScene( "views.Messages" )
 end
 

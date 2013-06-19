@@ -8,34 +8,6 @@ user = {}
 
 -----------------------------------------------------------------------------------------
 
-function newUser()
-	print("NEW USER @@")
-	return
-
---	native.setActivityIndicator( true )
---	localData.user.name 			= localData.user.firstName .. " " .. localData.user.lastName
---	localData.user.linkedinUID 	= "none"
---	localData.user.industry 	= "none"
---	localData.user.pictureUrl  = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
---
---	utils.postWithJSON({
---		user = localData.user;
---	},
---	SERVER_URL .. "/getAccount", 
---	newUserListener)
-end
-
-function newUserListener( event )
-	user = utils.joinTables(user, json.decode(event.response))
-	saveLocalData()
-	
-	native.setActivityIndicator( false )
-	router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
---	eventManager.getStream();
-end
-
------------------------------------------------------------------------------------------
-
 function saveUserAndGetAccount()
 	utils.postWithJSON({
 		user = user;
@@ -47,56 +19,26 @@ end
 function accountReceived( event )
 	user = utils.joinTables(user, json.decode(event.response))
 	removeDummyTripAndGetMessages(user)
-	
-	saveLocalData()
-	
   	router.openStream()	
 end
 
 -----------------------------------------------------------------------------------------
 
-function saveLocalData()
---	localData.user = user
---   utils.saveTable(localData, "localData.json")  
-end
-
------------------------------------------------------------------------------------------
-
---function getAccount()
---	utils.postWithJSON({
---		user = user;
---	},
---	SERVER_URL .. "/getAccount", 
---	getAccountListener)
---end
---
---function getAccountListener( event )
---	user = utils.joinTables(user, json.decode(event.response))
---	removeDummyTripAndGetMessages(user)
---	
-----	eventManager.getStream();
---	router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
---end
-
------------------------------------------------------------------------------------------
-
 local afterHavingReceivedUser
-function getUser(userUID, next)
+function refreshUser(next)
+	native.setActivityIndicator( true )
 	afterHavingReceivedUser = next
 	utils.postWithJSON({
-		userUID = userUID;
+		userUID = user.uid;
 	},
 	SERVER_URL .. "/getUser", 
 	receivedUser)
 end
 
 function receivedUser( event )
-	local user =  json.decode(event.response) 
+	user = utils.joinTables(user, json.decode(event.response))
 	removeDummyTripAndGetMessages(user)
-	
-	user.industry 		= ""
-	user.pictureUrl 	= "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
-	
+	native.setActivityIndicator( false )
 	afterHavingReceivedUser ( user ) 
 end
 
@@ -140,6 +82,7 @@ end
 
 function removeDummyTripAndGetMessages(user)
 
+	local dummyTripIndex
 	user.messages = {}
 	
 	if(user.trips) then
@@ -150,7 +93,6 @@ function removeDummyTripAndGetMessages(user)
       			if(user.trips[i].journeys[j].events) then
             		for m in pairs(user.trips[i].journeys[j].events) do
             			if(user.trips[i].journeys[j].events[m].content.type == eventManager.MESSAGE) then
-                  		print("found message")
                      	table.insert(user.messages, user.trips[i].journeys[j].events[m])
             			end
             		end
@@ -159,9 +101,11 @@ function removeDummyTripAndGetMessages(user)
    		end
 
 			if(user.trips[i].tripId == user.uid) then
-      		table.remove(user.trips, i) -- user dummy trip
+      		dummyTripIndex = i
 			end
 		end
+		
+	   table.remove(user.trips, dummyTripIndex) -- user dummy trip
 	end
 end
 
@@ -214,15 +158,14 @@ function linkedInConnected()
 	user.oldEmail 		= user.email
 	user.email 			= linkedIn.data.profile.emailAddress
 
---	localData.user 	= user
-	removeDummyTripAndGetMessages(user)
-	
---	localData.linkedin.accessToken 			= linkedIn.data.accessToken
---	localData.linkedin.accessTokenSecret 	= linkedIn.data.accessTokenSecret
-	
 	saveUserAndGetAccount()
 	user.isConnected = true
-  	
+	
+-- DEPRECATED : signup form
+--	localData.user 	= user
+--	removeDummyTripAndGetMessages(user)
+--	localData.linkedin.accessToken 			= linkedIn.data.accessToken
+--	localData.linkedin.accessTokenSecret 	= linkedIn.data.accessTokenSecret
 end
 
 -----------------------------------------------------------------------------------------
@@ -239,7 +182,63 @@ function logout()
 end
 
 -----------------------------------------------------------------------------------------
---- V1 : DEPRECATED
+--- V1 : DEPRECATED : signup form
+-----------------------------------------------------------------------------------------
+
+--function newUser()
+--	print("--------------------- > DEPRECATED : NEW USER @@")
+--	return
+
+--	native.setActivityIndicator( true )
+--	localData.user.name 			= localData.user.firstName .. " " .. localData.user.lastName
+--	localData.user.linkedinUID 	= "none"
+--	localData.user.industry 	= "none"
+--	localData.user.pictureUrl  = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+--
+--	utils.postWithJSON({
+--		user = localData.user;
+--	},
+--	SERVER_URL .. "/getAccount", 
+--	newUserListener)
+--end
+
+--function newUserListener( event )
+--	user = utils.joinTables(user, json.decode(event.response))
+--	saveLocalData()
+--	
+--	native.setActivityIndicator( false )
+--	router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
+----	eventManager.getStream();
+--end
+
+-----------------------------------------------------------------------------------------
+
+--function saveLocalData()
+-- DEPRECATED : with diligis signup
+--	localData.user = user
+--   utils.saveTable(localData, "localData.json")  
+--end
+
+-----------------------------------------------------------------------------------------
+
+--function getAccount()
+--	utils.postWithJSON({
+--		user = user;
+--	},
+--	SERVER_URL .. "/getAccount", 
+--	getAccountListener)
+--end
+--
+--function getAccountListener( event )
+--	user = utils.joinTables(user, json.decode(event.response))
+--	removeDummyTripAndGetMessages(user)
+--	
+----	eventManager.getStream();
+--	router.displayProfile(accountManager.user.linkedinUID, accountManager.user.uid)
+--end
+
+-----------------------------------------------------------------------------------------
+--- V1 : DEPRECATED : Tripit
 -----------------------------------------------------------------------------------------
 
 --function getTripitProfileAndTrips()

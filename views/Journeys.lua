@@ -262,7 +262,7 @@ end
 
 function scene:openMessages(journey)
 	GLOBALS.selectedJourney = journey
-	router.openJourneyMessages(router.openTrips)
+	router.openJourneyMessages(function() accountManager.refreshUser(router.openJourneys) end)
 end
 
 function scene:openDiligis(journey)

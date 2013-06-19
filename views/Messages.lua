@@ -26,15 +26,13 @@ end
 
 function scene:refreshScene()
 	viewManager.setupView(self.view);
+	viewManager.addCustomButton("images/buttons/refresh.png", router.openMessages);
 	self:buildMessages();
 end
 	
 -----------------------------------------------------------------------------------------
 
 function scene:buildMessages()
-	
-	print("----------- buildMessages")
-	utils.tprint(accountManager.user)
 	
  	if( not accountManager.user.messages or #accountManager.user.messages == 0) then
  		self:showNoMessages();
@@ -134,13 +132,13 @@ function scene:onRowRender( event )
 	
 	---------
 	
-	if(not message.sender.pictureUrl) then
-		message.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
-	end
+--	if(not message.sender.pictureUrl) then
+--		message.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+--	end
 		
 	imagesManager.drawImage(
 		row, 
-		message.sender.pictureUrl, 
+		linkedIn.data.people[message.sender.linkedinUID].pictureUrl , 
 		5, 5,	
 		IMAGE_TOP_LEFT, 0.4,
 		false,

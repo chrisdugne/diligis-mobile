@@ -16,7 +16,6 @@ TRAIN 			= 3;
 -----------------------------------------------------------------------------------------
 
 function openWebWindow(url, listener)
-	print("opening " .. url)
 	
 	webView = native.newWebView( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT, display.contentWidth, display.contentHeight - HEADER_HEIGHT)
 	webView:addEventListener( "urlRequest", listener )
@@ -104,7 +103,6 @@ end
 function tripCreated( event )
 	local trip = json.decode(event.response)
 	table.insert(accountManager.user.trips, trip)
-	accountManager.saveLocalData()
 	GLOBALS.selectedTrip = trip
    openAddTransportWindow()
 end
@@ -137,7 +135,6 @@ end
 
 function transportListener( event )
 
-	print("transportListener", event.url)
 	if string.find(string.lower(event.url), "addtransport") then
 		
 		webView:removeEventListener( "urlRequest", transportListener )
@@ -189,7 +186,6 @@ function transportCreated( event )
 	local transport = json.decode(event.response)
 	
 	table.insert(GLOBALS.selectedTrip.journeys, transport)
-	accountManager.saveLocalData()
 	
 	if(onward) then
    	openAddDestinationWindow()
@@ -226,7 +222,6 @@ end
 
 function destinationListener( event )
 	
-	print("destinationListener", event.url)
 	if string.find(string.lower(event.url), "adddestination") then
 		
 		webView:removeEventListener( "urlRequest", destinationListener )
@@ -272,7 +267,6 @@ function destinationCreated( event )
 	local destination = json.decode(event.response)
 
 	table.insert(GLOBALS.selectedTrip.journeys, destination)
-	accountManager.saveLocalData()
    openAddTransportWindow()
 end
 
@@ -360,7 +354,6 @@ end
 
 function editTransportListener( event )
 
-	print("editTransportListener", event.url)
 	if string.find(string.lower(event.url), "transportedited") then
 		
 		webView:removeEventListener( "urlRequest", editTransportListener )
@@ -406,7 +399,6 @@ function transportEdited( event )
 	local onward = GLOBALS.selectedJourney.onward
 	
 	GLOBALS.selectedJourney = json.decode(event.response)
-	accountManager.saveLocalData()
 	
 	if(onward) then
    	openAddDestinationWindow()
@@ -445,7 +437,6 @@ end
 
 function editDestinationListener( event )
 	
-	print("editDestinationListener", event.url)
 	if string.find(string.lower(event.url), "destinationedited") then
 		
 		webView:removeEventListener( "urlRequest", editDestinationListener )
@@ -487,6 +478,5 @@ end
 
 function destinationEdited( event )
 	GLOBALS.selectedJourney = json.decode(event.response)
-	accountManager.saveLocalData()
    afterDestinationEdition()
 end
