@@ -33,6 +33,7 @@ end
 
 function scene:buildMessages()
 	
+	print("----------- buildMessages")
 	utils.tprint(accountManager.user)
 	
  	if( not accountManager.user.messages or #accountManager.user.messages == 0) then
@@ -47,11 +48,11 @@ function scene:buildMessages()
 	----------------------
 
 	list = widget.newTableView{
-		top 				= 38,
-		width 			= 320, 
-		height			= 448,
+		top 				= HEADER_HEIGHT,
+		width 			= display.contentWidth, 
+		height			= display.contentHeight - HEADER_HEIGHT,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x448.png",
+		maskFile 		= "images/masks/mask-".. display.contentWidth .. "x" .. display.contentHeight - HEADER_HEIGHT .. ".png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 	}
 

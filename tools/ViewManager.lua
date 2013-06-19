@@ -114,7 +114,7 @@ function drawMenu(view)
 	menu.x = 0
 	menu.y = display.contentHeight + display.contentHeight * 0.5
 	
-	local bg = display.newRect( display.screenOriginX, display.screenOriginY + 38, display.contentWidth, display.contentHeight - 38 )
+	local bg = display.newRect( display.screenOriginX, display.screenOriginY + HEADER_HEIGHT, display.contentWidth, display.contentHeight - HEADER_HEIGHT )
 	bg:setFillColor( 255 )
 	menu:insert( bg )
 

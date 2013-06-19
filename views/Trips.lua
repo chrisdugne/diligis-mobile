@@ -59,11 +59,6 @@ end
 
 function scene:createTrip()
    tripManager.openNewTripWindow()
-
---   analytics.event("Trip", "create")
---   tripManager.openNewJourneyWindow()
-	--tripManager.createTrip()
---	self:refreshScene()
 end
 
 -----------------------------------------------------------------------------------------
@@ -89,11 +84,11 @@ function scene:buildTripView()
 	-- Create a tableView
 
 	local list = widget.newTableView{
-		top 				= 38,
-		width 			= 320, 
-		height 			= 448,
+		top 				= HEADER_HEIGHT,
+		width 			= display.contentWidth, 
+		height			= display.contentHeight - HEADER_HEIGHT,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x448.png",
+		maskFile 		= "images/masks/mask-".. display.contentWidth .. "x" .. display.contentHeight - HEADER_HEIGHT .. ".png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
@@ -137,9 +132,6 @@ function scene:onRowRender( event )
 	local row = event.row
 	local tripRendered = accountManager.user.trips[row.index];
 
-	print("-------")
-	utils.tprint(tripRendered)
-
 	local title = display.newText( tripRendered.name, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
@@ -151,16 +143,28 @@ function scene:onRowRender( event )
 	arrow.y = row.contentHeight * 0.5
 	row:insert(arrow)
 
-	imagesManager.drawImage(
-		row, 
-		tripRendered.imageUrl, 
-		10, 5, 
-		IMAGE_TOP_LEFT, 1,
-		false,
-		function(picture)
-			self:rowRenderContent(row, tripRendered)
-		end
-	)
+	local icon = widget.newButton{
+		defaultFile	= "images/icons/traveler.png", 
+		overFile		= "images/icons/traveler.png"
+   }
+   
+   icon.x = 20
+   icon.y = 35
+   
+	row:insert(icon)
+   
+   self:rowRenderContent(row, tripRendered)
+	
+--	imagesManager.drawImage(
+--		row, 
+--		tripRendered.imageUrl, 
+--		10, 5, 
+--		IMAGE_TOP_LEFT, 1,
+--		false,
+--		function(picture)
+--			self:rowRenderContent(row, tripRendered)
+--		end
+--	)
 end
 
 function scene:rowRenderContent (row, trip)

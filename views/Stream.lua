@@ -44,11 +44,11 @@ function scene:buildStream()
 	-- Create a tableView
 	
 	local list = widget.newTableView{
-		top 				= 38,
-		width 			= 320, 
-		height			= 448,
+		top 				= HEADER_HEIGHT,
+		width 			= display.contentWidth, 
+		height			= display.contentHeight - HEADER_HEIGHT,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x448.png",
+		maskFile 		= "images/masks/mask-".. display.contentWidth .. "x" .. display.contentHeight - HEADER_HEIGHT .. ".png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 		onRowTouch 		= function(event) return self:onRowTouch(event) end
 	}
@@ -96,9 +96,18 @@ function scene:onRowRender( event )
 	if type(eventRendered.sender) ~= "table" then eventRendered.sender = json.decode(eventRendered.sender) end
 	if eventRendered.recepient and type(eventRendered.recepient) ~= "table" then eventRendered.recepient = json.decode(eventRendered.recepient) end
 
+
+	-----------------------
+
 	local image
 	if(eventRendered.content.type == eventManager.ANNOUNCEMENT) then
-		image = "images/buttons/trip.png"
+   	if(string.find(string.lower(eventRendered.content.text), "journey")) then
+   		image = "images/icons/destination.png"
+   	elseif(string.find(string.lower(eventRendered.content.text), "flight")) then
+   		image = "images/icons/plane.png"
+   	elseif(string.find(string.lower(eventRendered.content.text), "train")) then
+   		image = "images/icons/train.png"
+   	end
 	elseif (eventRendered.content.type == eventManager.DILIGIS) then
 		image = "images/buttons/diligis.png"
 	elseif (eventRendered.content.type == eventManager.MESSAGE) then

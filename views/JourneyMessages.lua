@@ -40,11 +40,11 @@ function scene:buildMessages()
 	----------------------
 
 	list = widget.newTableView{
-		top 				= 38,
-		width 			= 320, 
-		height			= 448,
+		top 				= HEADER_HEIGHT,
+		width 			= display.contentWidth, 
+		height			= display.contentHeight - HEADER_HEIGHT,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x448.png",
+		maskFile 		= "images/masks/mask-".. display.contentWidth .. "x" .. display.contentHeight - HEADER_HEIGHT .. ".png",
 		onRowRender 	= function(event) return self:onRowRender(event) end,
 	}
 
@@ -74,6 +74,9 @@ function scene:buildMessages()
 	for i in pairs(events) do
 		if(events[i].sender.linkedinUID ~= "none") then
 			table.insert(ids, events[i].sender.linkedinUID)
+   	end
+		if(events[i].recepient.linkedinUID ~= "none") then
+			table.insert(ids, events[i].recepient.linkedinUID)
    	end
 	end
 
@@ -117,15 +120,15 @@ function scene:onRowRender( event )
 
 	---------
 
-	if(not message.sender.pictureUrl) then
-		message.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
-	end
+--	if(not message.sender.pictureUrl) then
+--		message.sender.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+--	end
 	
 	---------
 		
 	imagesManager.drawImage(
 		row, 
-		message.sender.pictureUrl, 
+		linkedIn.data.people[message.sender.linkedinUID].pictureUrl , 
 		5, 5,	
 		IMAGE_TOP_LEFT, 0.4,
 		false,
@@ -157,15 +160,15 @@ function scene:rowRenderContent( row, picture, message )
 
 		--------
 
-   	if(not message.recepient.pictureUrl) then
-   		message.recepient.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
-   	end
+--   	if(not message.recepient.pictureUrl) then
+--   		message.recepient.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon/icon_no_photo_60x60.png"
+--   	end
 
 		--------
 	
    	imagesManager.drawImage(
    		row, 
-   		message.recepient.pictureUrl, 
+			linkedIn.data.people[message.recepient.linkedinUID].pictureUrl , 
    		row.contentWidth - 50, 5,	
    		IMAGE_TOP_LEFT, 0.4,
    		false,

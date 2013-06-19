@@ -68,19 +68,18 @@ function scene:drawPicture()
 	imagesManager.drawImage(
 		journeyContent, 
 		linkedIn.data.people[user.linkedinUID].pictureUrl, 
-		20, 40,
+		20, 20,
 		IMAGE_TOP_LEFT, 0.6,
 		false,
-		function(picture) return self:buildJourney() end
+		function(picture) return self:buildJourney(picture) end
 	)
 	
 end
 
 -----------------------------------------------------------------------------------------
 
-function scene:buildJourney()
+function scene:buildJourney(picture)
 	
-	utils.tprint(journey)
 
 	local senderName = display.newText( user.name, 0, 0, 270, 50, native.systemFontBold, 14 )
 	senderName:setTextColor( 0 )
@@ -105,6 +104,29 @@ function scene:buildJourney()
 		return
 	end
 
+	-----------------------
+
+	local openProfile = function() router.displayProfile(user.linkedinUID, user.uid, router.openStream) end
+	picture:addEventListener("tap", openProfile)
+
+	-----------------------
+	
+	local iconImage
+	if(journey.type == tripManager.DESTINATION) then
+		iconImage = "images/icons/destination.png"
+	elseif(journey.type == tripManager.FLIGHT) then
+		iconImage = "images/icons/plane.png"
+	elseif(journey.type == tripManager.TRAIN) then
+		iconImage = "images/icons/train.png"
+	end
+
+	local icon = display.newImage( iconImage, false )
+	icon.x = display.contentWidth * 0.2
+	icon.y = 160
+	journeyContent:insert(icon)
+
+	-----------------------
+
 	if(journey.type == tripManager.DESTINATION) then
 		locationName = journey.locationName
 	elseif(journey.type == tripManager.FLIGHT) then
@@ -116,14 +138,14 @@ function scene:buildJourney()
 	local locationName = display.newText( locationName, 0, 0, display.contentWidth * 0.5, 50, native.systemFontBold, 12 )
 	locationName:setTextColor( 0 )
 	locationName.x = display.contentWidth * 0.5
-	locationName.y = 120
+	locationName.y = 140
 
 	journeyContent:insert( locationName )
 	journeyContent.locationName = locationName
 
 	----------------------
 
-	local startTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.startTime/1000), 0, 0, native.systemFont, 10 )
+	local startTime = display.newText( os.date("%m %b, %Y    %H:%M", journey.startTime/1000), 0, 0, native.systemFont, 10 )
 	startTime:setTextColor( 0 )
 	startTime.x = display.contentWidth * 0.5
 	startTime.y = 150
@@ -134,7 +156,7 @@ function scene:buildJourney()
 	----------------------
 	
 	if(journey.endTime) then
-   	local endTime = display.newText( os.date("%m.%d.%Y %H:%M", journey.endTime/1000), 0, 0, native.systemFont, 10 )
+   	local endTime = display.newText( os.date("%m %b, %Y    %H:%M", journey.endTime/1000), 0, 0, native.systemFont, 10 )
    	endTime:setTextColor( 0 )
    	endTime.x = display.contentWidth * 0.5
    	endTime.y = 170

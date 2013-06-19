@@ -55,11 +55,11 @@ function scene:buildJourneys()
 	-- Create a tableView
 
 	local list = widget.newTableView{
-		top 				= 38,
-		width 			= 320, 
-		height 			= 448,
+		top 				= HEADER_HEIGHT,
+		width 			= display.contentWidth, 
+		height 			= display.contentHeight - HEADER_HEIGHT,
 		hideBackground = true,
-		maskFile 		= "images/masks/mask-320x448.png",
+		maskFile 		= "images/masks/mask-".. display.contentWidth .. "x" .. display.contentHeight - HEADER_HEIGHT .. ".png",
 		onRowRender 	= function(event) return self:onRowRender(event) end
 	}
 
@@ -122,18 +122,34 @@ function scene:onRowRender( event )
 	-----------------------
 
 	if(journey.startTime) then
-   	local perlImage
-   	if(os.time() - journey.startTime > 0) then
-   		perlImage = "images/icons/green.mini.png"
-   	else
-   		perlImage = "images/icons/blue.mini.png"
-   	end
-   	
-   	local perl = display.newImage( perlImage, false )
-   	perl.x = 15
-   	perl.y = 12
-   	row:insert(perl)
-   end
+		local perlImage
+		if(os.time() - journey.startTime > 0) then
+			perlImage = "images/icons/green.mini.png"
+		else
+			perlImage = "images/icons/blue.mini.png"
+		end
+
+		local perl = display.newImage( perlImage, false )
+		perl.x = 15
+		perl.y = 12
+		row:insert(perl)
+	end
+
+	-----------------------
+	
+	local iconImage
+	if(journey.type == tripManager.DESTINATION) then
+		iconImage = "images/icons/destination.png"
+	elseif(journey.type == tripManager.FLIGHT) then
+		iconImage = "images/icons/plane.png"
+	elseif(journey.type == tripManager.TRAIN) then
+		iconImage = "images/icons/train.png"
+	end
+
+	local icon = display.newImage( iconImage, false )
+	icon.x = 15
+	icon.y = 42
+	row:insert(icon)
 
 	-----------------------
 
@@ -167,15 +183,16 @@ function scene:onRowRender( event )
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = 45
+      	messagesIcon.x = 85
       	messagesIcon.y = 35
+      	messagesIcon:scale (0.6, 0.6)
 			messagesIcon:addEventListener("tap", function() self:openMessages(journey) end)
       	
       	row:insert( messagesIcon )
       	
       	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 12 )
       	messagesCount:setTextColor( 0 )
-      	messagesCount.x = messagesIcon.x - 30
+      	messagesCount.x = messagesIcon.x - 20
       	messagesCount.y = 35
 			messagesCount:addEventListener("tap", function() self:openMessages(journey) end)
       	row:insert(messagesCount)
@@ -184,15 +201,16 @@ function scene:onRowRender( event )
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = 105
+      	diligisIcon.x = 145
       	diligisIcon.y = 35
+      	diligisIcon:scale (0.6, 0.6)
 			diligisIcon:addEventListener("tap", function() self:openDiligis(journey) end)
       
       	row:insert( diligisIcon )
 
       	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 12 )
       	diligisCount:setTextColor( 0 )
-      	diligisCount.x = diligisIcon.x - 30
+      	diligisCount.x = diligisIcon.x - 20
       	diligisCount.y = 35
 			diligisCount:addEventListener("tap", function() self:openDiligis(journey) end)
       	row:insert(diligisCount)
@@ -201,7 +219,7 @@ function scene:onRowRender( event )
 	
 	-----------------------
 
-	local editImage = display.newImage( "images/buttons/add.png", false )
+	local editImage = display.newImage( "images/buttons/edit.png", false )
 	editImage.x = row.contentWidth - 60
 	editImage.y = row.contentHeight/4
 	editImage:addEventListener("tap",
