@@ -110,10 +110,12 @@ end
 -----------------------------------------------------------------------------------------
 --- List tools : row creation + touch events
 function scene:createRow(message)
+	local _, nbCR = string.gsub(message.content.text, "\n", "")
+	local nbLines = nbCR + 1
 	
 	list:insertRow
 	{
-		rowHeight = 150,
+		rowHeight = 70 + nbLines*14,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -191,7 +193,7 @@ function scene:rowRenderText( row, picture, message )
    	picture:addEventListener("tap", openProfile)
 	end
 	
-	local text = display.newText( message.content.text, 50, 50, 205, 100, native.systemFont, 11 )
+	local text = display.newText( message.content.text, 50, 50, 205, row.contentHeight - 60, native.systemFont, 11 )
 	text:setTextColor( 0 )
 	row:insert(text)
 	

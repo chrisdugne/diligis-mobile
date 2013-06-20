@@ -135,7 +135,7 @@ function scene:onRowRender( event )
 	local title = display.newText( tripRendered.name, 0, 0, native.systemFontBold, 16 )
 	title:setTextColor( 0 )
 	title.x = row.x - ( row.contentWidth * 0.5 ) + ( title.contentWidth * 0.5 ) + 50
-	title.y = 22
+	title.y = 12
 	row:insert(title)
 
 	local arrow = display.newImage( "images/buttons/rowArrow.png", false )
@@ -205,30 +205,32 @@ function scene:rowRenderContent (row, trip)
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = row.contentWidth/2 + 30 
-      	messagesIcon.y = row.contentHeight/3
+      	messagesIcon.x = 80 
+      	messagesIcon.y = 33
+      	messagesIcon:scale (0.6, 0.6)
       
       	row:insert( messagesIcon )
       	
-      	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 16 )
+      	local messagesCount = display.newText( nbMessages, 0, 0, native.systemFontBold, 12 )
       	messagesCount:setTextColor( 0 )
-      	messagesCount.x = messagesIcon.x - 30
-      	messagesCount.y = row.contentHeight/3
+      	messagesCount.x = messagesIcon.x - 20
+      	messagesCount.y = 33
       	row:insert(messagesCount)
    	end
    	
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = row.contentWidth/2 + 95 
-      	diligisIcon.y = row.contentHeight/3
+      	diligisIcon.x = 140 
+      	diligisIcon.y = 33
+      	diligisIcon:scale (0.6, 0.6)
       
       	row:insert( diligisIcon )
 
-      	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 16 )
+      	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 12 )
       	diligisCount:setTextColor( 0 )
-      	diligisCount.x = diligisIcon.x - 30
-      	diligisCount.y = row.contentHeight/3
+      	diligisCount.x = diligisIcon.x - 20
+      	diligisCount.y = 30
       	row:insert(diligisCount)
    	end
    	

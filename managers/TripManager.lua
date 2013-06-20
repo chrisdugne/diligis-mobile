@@ -98,9 +98,13 @@ function createTrip(trip)
 	
 	SERVER_URL .. "/createTrip", 
 	tripCreated)
+	
+	native.setActivityIndicator( true )
 end
 
 function tripCreated( event )
+	native.setActivityIndicator( false )
+	
 	local trip = json.decode(event.response)
 	table.insert(accountManager.user.trips, trip)
 	GLOBALS.selectedTrip = trip
@@ -180,6 +184,8 @@ function createTransport(transport)
 	SERVER_URL .. "/createTransport", 
 	transportCreated)
 	
+	native.setActivityIndicator( true )
+	
 end
 
 function transportCreated( event )
@@ -187,6 +193,8 @@ function transportCreated( event )
 	
 	table.insert(GLOBALS.selectedTrip.journeys, transport)
 	
+	native.setActivityIndicator( false )
+		
 	if(onward) then
    	openAddDestinationWindow()
    else
@@ -260,10 +268,12 @@ function createDestination(destination)
 	SERVER_URL .. "/createDestination", 
 	destinationCreated)
 	
+	native.setActivityIndicator( true )
 end
 
 function destinationCreated( event )
 	
+	native.setActivityIndicator( false )
 	local destination = json.decode(event.response)
 
 	table.insert(GLOBALS.selectedTrip.journeys, destination)
@@ -392,12 +402,15 @@ function editTransport()
 	
 	SERVER_URL .. "/editJourney", 
 	transportEdited)
-	
+
+	native.setActivityIndicator( true )	
 end
 
 function transportEdited( event )
+
+	native.setActivityIndicator( false )
+
 	local onward = GLOBALS.selectedJourney.onward
-	
 	GLOBALS.selectedJourney = json.decode(event.response)
 	
 	if(onward) then
@@ -474,9 +487,11 @@ function editDestination()
 	SERVER_URL .. "/editJourney", 
 	destinationEdited)
 	
+	native.setActivityIndicator( true )
 end
 
 function destinationEdited( event )
+	native.setActivityIndicator( false )
 	GLOBALS.selectedJourney = json.decode(event.response)
    afterDestinationEdition()
 end

@@ -90,7 +90,7 @@ end
 
 function scene:drawList()
 	for i in pairs(events) do
-		self:createRow() 
+		self:createRow(events[i]) 
 	end
 	
 	native.setActivityIndicator( false )
@@ -98,10 +98,13 @@ end
 
 -----------------------------------------------------------------------------------------
 --- List tools : row creation + touch events
-function scene:createRow()
+function scene:createRow(message)
+	local _, nbCR = string.gsub(message.content.text, "\n", "")
+	local nbLines = nbCR + 1
+	
 	list:insertRow
 	{
-		rowHeight = 164,
+		rowHeight = 80 + nbLines*14,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -189,7 +192,7 @@ function scene:rowRenderText( row, picture, message )
    	picture:addEventListener("tap", openProfile)
 	end
 	
-	local text = display.newText( message.content.text, 50, 50, 205, 100, native.systemFont, 14 )
+	local text = display.newText( message.content.text, 50, 50, 205, row.contentHeight - 70, native.systemFont, 11 )
 	text:setTextColor( 0 )
 	row:insert(text)
 	
@@ -204,7 +207,7 @@ function scene:rowRenderText( row, picture, message )
    	}
    	
    	answerButton.x = display.contentWidth - answerButton.width - 10
-   	answerButton.y = text.y + text.contentHeight/2 - 10
+   	answerButton.y = row.contentHeight - 30
    	
    	row:insert( answerButton ) 
 	end

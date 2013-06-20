@@ -183,7 +183,7 @@ function scene:onRowRender( event )
 		if(nbMessages > 0) then
       	--- messages icon
       	local messagesIcon = display.newImage ( "images/icons/messages.icon.png", false) 
-      	messagesIcon.x = 85
+      	messagesIcon.x = 75
       	messagesIcon.y = 35
       	messagesIcon:scale (0.6, 0.6)
 			messagesIcon:addEventListener("tap", function() self:openMessages(journey) end)
@@ -201,7 +201,7 @@ function scene:onRowRender( event )
 		if(nbDiligis > 0) then
       	--- diligis icon
       	local diligisIcon = display.newImage ( "images/icons/diligis.icon.png", false) 
-      	diligisIcon.x = 145
+      	diligisIcon.x = 135
       	diligisIcon.y = 35
       	diligisIcon:scale (0.6, 0.6)
 			diligisIcon:addEventListener("tap", function() self:openDiligis(journey) end)

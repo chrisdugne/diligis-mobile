@@ -148,7 +148,7 @@ function scene:buildJourney(picture)
 	local startTime = display.newText( os.date("%m %b, %Y    %H:%M", journey.startTime/1000), 0, 0, native.systemFont, 10 )
 	startTime:setTextColor( 0 )
 	startTime.x = display.contentWidth * 0.5
-	startTime.y = 150
+	startTime.y = 180
 
 	journeyContent:insert( startTime )
 	journeyContent.startTime = startTime
@@ -159,7 +159,7 @@ function scene:buildJourney(picture)
    	local endTime = display.newText( os.date("%m %b, %Y    %H:%M", journey.endTime/1000), 0, 0, native.systemFont, 10 )
    	endTime:setTextColor( 0 )
    	endTime.x = display.contentWidth * 0.5
-   	endTime.y = 170
+   	endTime.y = 200
    
    	journeyContent:insert( endTime )
    	journeyContent.endTime = endTime
