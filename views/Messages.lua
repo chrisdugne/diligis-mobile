@@ -115,7 +115,7 @@ function scene:createRow(message)
 	
 	list:insertRow
 	{
-		rowHeight = 70 + nbLines*14,
+		rowHeight = 70 + nbLines*16,
 		rowColor = 
 		{ 
 			default = { 255, 255, 255, 0 },
@@ -193,7 +193,7 @@ function scene:rowRenderText( row, picture, message )
    	picture:addEventListener("tap", openProfile)
 	end
 	
-	local text = display.newText( message.content.text, 50, 50, 205, row.contentHeight - 60, native.systemFont, 11 )
+	local text = display.newText( message.content.text, 50, 50, 205, row.contentHeight - 45, native.systemFont, 11 )
 	text:setTextColor( 0 )
 	row:insert(text)
 	
@@ -207,7 +207,7 @@ function scene:rowRenderText( row, picture, message )
    		onRelease = function() self:openWriter(message) end
    	}
    	
-   	answerButton.x = row.contentWidth - answerButton.width - 10
+   	answerButton.x = row.contentWidth - 2*answerButton.width/3
    	answerButton.y = row.contentHeight - 30
    	
    	row:insert( answerButton ) 

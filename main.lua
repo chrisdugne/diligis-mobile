@@ -5,13 +5,13 @@
 -----------------------------------------------------------------------------------------
 
 APP_NAME 	= "Diligis"
-APP_VERSION = "2.3"
+APP_VERSION = "2.5"
 
 -----------------------------------------------------------------------------------------
 
 --SERVER_URL 		= "http://192.168.0.7:9000" 
---SERVER_URL 		= "http://localhost:9000" 
-SERVER_URL 		= "http://diligis.herokuapp.com/" 
+SERVER_URL 		= "http://localhost:9000" 
+--SERVER_URL 		= "http://diligis.herokuapp.com/" 
 
 -----------------------------------------------------------------------------------------
 
@@ -107,3 +107,25 @@ accountManager.user.pictureUrl = "http://static.licdn.com/scds/common/u/img/icon
 router.openAppHome()
 
 ------------------------------------------
+--- ANDROID BACK BUTTON
+
+local function onKeyEvent( event )
+
+   local phase = event.phase
+   local keyName = event.keyName
+   print( event.phase, event.keyName )
+
+   if ( "back" == keyName and phase == "up" ) then
+      if ( storyboard.currentScene == "splash" ) then
+         native.requestExit()
+      else
+      	native.setKeyboardFocus( nil )
+         router.lastBack()
+      end
+   end
+
+   return true  --SEE NOTE BELOW
+end
+
+--add the key callback
+Runtime:addEventListener( "key", onKeyEvent )

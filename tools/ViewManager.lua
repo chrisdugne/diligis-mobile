@@ -122,7 +122,7 @@ function drawMenu(view)
 
 	local openStreamAction = function() return router.openStream() end
 	
-	local streamText = display.newText( "Stream", 160, 130, native.systemFont, 20 )
+	local streamText = display.newText( "Updates", 160, 130, native.systemFont, 20 )
 	streamText:setReferencePoint( display.CenterReferencePoint )
 	streamText:setTextColor( 000 )
 	streamText:addEventListener("tap", openStreamAction)
@@ -144,7 +144,7 @@ function drawMenu(view)
 
 	local openTripsAction = function() return router.openTrips() end
 
-	local tripsText = display.newText( "Trips", 160, 230, native.systemFont, 20 )
+	local tripsText = display.newText( "My trips", 160, 230, native.systemFont, 20 )
 	tripsText:setReferencePoint( display.CenterReferencePoint )
 	tripsText:setTextColor( 000 )
 	tripsText:addEventListener("tap", openTripsAction)

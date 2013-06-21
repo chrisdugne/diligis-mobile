@@ -89,7 +89,7 @@ function scene:buildJourney(picture)
 
 	local senderProfile = display.newText( user.headline, 0, 0, 100, 100, native.systemFont, 14 )
 	senderProfile:setTextColor( 0 )
-	senderProfile.x = 145
+	senderProfile.x = 135
 	senderProfile.y = 100
 	journeyContent:insert(senderProfile)
 
@@ -121,8 +121,8 @@ function scene:buildJourney(picture)
 	end
 
 	local icon = display.newImage( iconImage, false )
-	icon.x = display.contentWidth * 0.2
-	icon.y = 160
+	icon.x = 50
+	icon.y = 130
 	journeyContent:insert(icon)
 
 	-----------------------
@@ -130,55 +130,106 @@ function scene:buildJourney(picture)
 	if(journey.type == tripManager.DESTINATION) then
 		locationName = journey.locationName
 	elseif(journey.type == tripManager.FLIGHT) then
-		locationName = "Plane from " .. journey.previousLocationName
+		locationName = "Flight from " .. journey.previousLocationName
 	elseif(journey.type == tripManager.TRAIN) then
 		locationName = "Train from " .. journey.previousLocationName
 	end
 
-	local locationName = display.newText( locationName, 0, 0, display.contentWidth * 0.5, 50, native.systemFontBold, 12 )
+	local locationName = display.newText( locationName, 0, 0, 150, 50, native.systemFontBold, 12 )
 	locationName:setTextColor( 0 )
-	locationName.x = display.contentWidth * 0.5
+	locationName.x = 155
 	locationName.y = 140
 
 	journeyContent:insert( locationName )
 	journeyContent.locationName = locationName
 
 	----------------------
+	
+	local departureText
+	
+	if(journey.type == tripManager.DESTINATION) then
+		departureText = "From " .. os.date("%m %b, %Y", journey.startTime/1000)
+	elseif(journey.type == tripManager.FLIGHT) then
+		departureText = journey.startAirport .. "   " .. os.date("%m %b, %Y    %H:%M", journey.startTime/1000)
+	elseif(journey.type == tripManager.TRAIN) then
+		departureText = os.date("%m %b, %Y    %H:%M", journey.startTime/1000)
+	end
 
-	local startTime = display.newText( os.date("%m %b, %Y    %H:%M", journey.startTime/1000), 0, 0, native.systemFont, 10 )
-	startTime:setTextColor( 0 )
-	startTime.x = display.contentWidth * 0.5
-	startTime.y = 180
+	local startText = display.newText( departureText, 0, 0, native.systemFont, 10 )
+	startText:setTextColor( 0 )
+	startText.x = 145
+	startText.y = 180
 
-	journeyContent:insert( startTime )
-	journeyContent.startTime = startTime
+	journeyContent:insert( startText )
+	journeyContent.startText = startText
 	 
 	----------------------
 	
 	if(journey.endTime) then
-   	local endTime = display.newText( os.date("%m %b, %Y    %H:%M", journey.endTime/1000), 0, 0, native.systemFont, 10 )
-   	endTime:setTextColor( 0 )
-   	endTime.x = display.contentWidth * 0.5
-   	endTime.y = 200
+   	
+   	local arrivalText 
+   	
+   	if(journey.type == tripManager.DESTINATION) then
+   		arrivalText = "To    " .. os.date("%m %b, %Y", journey.endTime/1000)
+   	elseif(journey.type == tripManager.FLIGHT) then
+   		arrivalText = journey.endAirport .. "   " .. os.date("%m %b, %Y    %H:%M", journey.endTime/1000)
+   	elseif(journey.type == tripManager.TRAIN) then
+   		arrivalText = os.date("%m %b, %Y    %H:%M", journey.endTime/1000)
+   	end
+   	
+   	local endText = display.newText( arrivalText, 0, 0, native.systemFont, 10 )
+   	endText:setTextColor( 0 )
+   	endText.x = 145
+   	endText.y = 200
    
-   	journeyContent:insert( endTime )
-   	journeyContent.endTime = endTime
+   	journeyContent:insert( endText )
+   	journeyContent.endText = endText
    end 
+
+	-----------------------
+	
+
+	if(journey.type == tripManager.FLIGHT) then
+   	local flightDetails = journey.number
+   	if(#journey.airline > 0) then
+   		flightDetails = "With " .. journey.airline .. ", flight : " .. journey.number
+   	else
+   		flightDetails = "Flight : " .. journey.number
+   	end
+   	
+   	
+   	local detailsText = display.newText( flightDetails, 0, 0, 150, 50, native.systemFont, 14 )
+   	detailsText:setTextColor( 0 )
+   	detailsText.x = 155
+   	detailsText.y = 250
+   
+   	journeyContent:insert( detailsText )
+   	journeyContent.detailsText = detailsText
+	end
 
 	----------------------
 	
-	local writemeText = "If you're travelling at the same time to the same destination, send me a note so we arrange to meet up"
-	local writemeDisplay = display.newText( writemeText, display.contentWidth * 0.5 - 100, 300, 200, 200, native.systemFont, 11 )
+	local writemeText
+	
+	if(journey.type == tripManager.DESTINATION) then
+		writemeText = "If you'll be at the same destination on any day that I'm there, let's arrange to meet up ?"
+	elseif(journey.type == tripManager.FLIGHT) then
+		writemeText = "If you're taking the same flight, send me a note so we arrange to meet up"
+	elseif(journey.type == tripManager.TRAIN) then
+		writemeText = "If you're taking the same train, send me a note so we arrange to meet up"
+	end
+	
+	local writemeDisplay = display.newText( writemeText, display.contentWidth * 0.5 - 100, 280, 200, 200, native.systemFont, 11 )
 	writemeDisplay:setTextColor( 0 )
 
 	journeyContent:insert( writemeDisplay )
 
 	---------
 	
-	local writeTo = display.newText( "Write a message : ", 0, 0, 230, 50, native.systemFont, 14 )
+	local writeTo = display.newText( "Send a message : ", 0, 0, 230, 50, native.systemFont, 14 )
 	writeTo:setTextColor( 0 )
 	writeTo.x = 185
-	writeTo.y = 260
+	writeTo.y = display.contentHeight - 100
 	journeyContent:insert(writeTo)
 
 	

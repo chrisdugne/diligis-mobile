@@ -230,7 +230,7 @@ function scene:rowRenderContent (row, trip)
       	local diligisCount = display.newText( nbDiligis, 0, 0, native.systemFontBold, 12 )
       	diligisCount:setTextColor( 0 )
       	diligisCount.x = diligisIcon.x - 20
-      	diligisCount.y = 30
+      	diligisCount.y = 33
       	row:insert(diligisCount)
    	end
    	

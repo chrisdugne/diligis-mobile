@@ -100,8 +100,11 @@ function scene:onRowRender( event )
 	-----------------------
 
 	local image
+	
+	print(eventRendered.content.text)
+	
 	if(eventRendered.content.type == eventManager.ANNOUNCEMENT) then
-   	if(string.find(string.lower(eventRendered.content.text), "journey")) then
+   	if(string.find(string.lower(eventRendered.content.text), "trip")) then
    		image = "images/icons/destination.png"
    	elseif(string.find(string.lower(eventRendered.content.text), "flight")) then
    		image = "images/icons/plane.png"

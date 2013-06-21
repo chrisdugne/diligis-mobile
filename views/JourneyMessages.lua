@@ -206,7 +206,7 @@ function scene:rowRenderText( row, picture, message )
    		onRelease = function() self.openWriter(message) end
    	}
    	
-   	answerButton.x = display.contentWidth - answerButton.width - 10
+   	answerButton.x = display.contentWidth - 2*answerButton.width/3
    	answerButton.y = row.contentHeight - 30
    	
    	row:insert( answerButton ) 

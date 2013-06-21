@@ -155,6 +155,9 @@ function transportListener( event )
 			if(params["type"] 			~= "null") then transport.type 				= tonumber(params["type"]) end
 			if(params["startTime"] 		~= "null") then transport.startTime 		= params["startTime"] 		end
 			if(params["endTime"] 		~= "null") then transport.endTime 			= params["endTime"] 			end
+			if(params["airline"] 		~= "null") then transport.airline 			= params["airline"]			end
+			if(params["startAirport"] 	~= "null") then transport.startAirport 	= params["startAirport"]	end
+			if(params["endAirport"] 	~= "null") then transport.endAirport 		= params["endAirport"]		end
 			if(params["number"] 			~= "null") then transport.number 			= params["number"]			end
 			if(params["seat"]			 	~= "null") then transport.seat 				= params["seat"]				end
 			if(params["railcar"]	 		~= "null") then transport.railcar 			= params["railcar"]	 		end
@@ -347,15 +350,18 @@ function openEditTransportWindow(tranport, next)
    analytics.event("Trip", "openEditTransportWindow") 
 
 	local url = SERVER_URL .. "/editTransport" 		.. 
-	"?startTime=" 	.. tostring(tranport.startTime) 	.. 
-	"&endTime=" 	.. tostring(tranport.endTime)		.. 
-	"&type=" 		.. tostring(tranport.type)			.. 
-	"&number=" 		.. tostring(tranport.number)		.. 
-	"&seat=" 		.. tostring(tranport.seat)			.. 
-	"&railcar=" 	.. tostring(tranport.railcar)		.. 
-	"&lastTransport=" .. tostring(lastTransport)		.. 
-	"&onward=" 		.. tostring(GLOBALS.selectedTrip.journeys[#GLOBALS.selectedTrip.journeys].journeyId ~= tranport.journeyId)
+	"?startTime=" 		.. utils.urlEncode(tostring(tranport.startTime)) 		.. 
+	"&endTime=" 		.. utils.urlEncode(tostring(tranport.endTime))			.. 
+	"&type=" 			.. utils.urlEncode(tostring(tranport.type))				.. 
+	"&number=" 			.. utils.urlEncode(tostring(tranport.number))			.. 
+	"&airline=" 		.. utils.urlEncode(tostring(tranport.airline))			.. 
+	"&startAirport="	.. utils.urlEncode(tostring(tranport.startAirport)) 	.. 
+	"&endAirport=" 	.. utils.urlEncode(tostring(tranport.endAirport))		.. 
+	"&seat=" 			.. utils.urlEncode(tostring(tranport.seat))				.. 
+	"&railcar=" 		.. utils.urlEncode(tostring(tranport.railcar))			.. 
+	"&lastTransport=" .. tostring(lastTransport)
 	
+	print(url)
 	openWebWindow(url, editTransportListener)
 
 end
@@ -379,6 +385,9 @@ function editTransportListener( event )
 			if(params["endTime"] 		~= "null") then GLOBALS.selectedJourney.endTime 		= params["endTime"] 			end
 			if(params["type"]	 			~= "null") then GLOBALS.selectedJourney.type 			= tonumber(params["type"]) end
 			if(params["number"] 			~= "null") then GLOBALS.selectedJourney.number 			= params["number"]			end
+			if(params["airline"] 		~= "null") then GLOBALS.selectedJourney.airline 		= params["airline"]			end
+			if(params["startAirport"] 	~= "null") then GLOBALS.selectedJourney.startAirport 	= params["startAirport"]	end
+			if(params["endAirport"] 	~= "null") then GLOBALS.selectedJourney.endAirport 	= params["endAirport"]		end
 			if(params["seat"]			 	~= "null") then GLOBALS.selectedJourney.seat 			= params["seat"]				end
 			if(params["railcar"]	 		~= "null") then GLOBALS.selectedJourney.railcar 		= params["railcar"]	 		end
 			if(params["onward"]	 		~= "null") then GLOBALS.selectedJourney.onward 			= params["onward"] 	== "true" end
@@ -410,10 +419,12 @@ function transportEdited( event )
 
 	native.setActivityIndicator( false )
 
-	local onward = GLOBALS.selectedJourney.onward
+	local onward = GLOBALS.selectedJourney.onward	
+	local lastTransport = GLOBALS.selectedTrip.journeys[#GLOBALS.selectedTrip.journeys].journeyId == GLOBALS.selectedJourney.journeyId
+	
 	GLOBALS.selectedJourney = json.decode(event.response)
 	
-	if(onward) then
+	if(onward and lastTransport) then
    	openAddDestinationWindow()
    else
    	afterTransportEdition()
