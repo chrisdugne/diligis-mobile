@@ -10,8 +10,8 @@ APP_VERSION = "2.5"
 -----------------------------------------------------------------------------------------
 
 --SERVER_URL 		= "http://192.168.0.7:9000" 
-SERVER_URL 		= "http://localhost:9000" 
---SERVER_URL 		= "http://diligis.herokuapp.com/" 
+--SERVER_URL 		= "http://localhost:9000" 
+SERVER_URL 		= "http://diligis.herokuapp.com/" 
 
 -----------------------------------------------------------------------------------------
 
